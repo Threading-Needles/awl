@@ -3,12 +3,23 @@ description: Safely merge PR with verification and Linear integration
 category: version-control-git
 tools: Bash(linearis *), Bash(git *), Bash(gh *), Read
 model: inherit
-version: 1.0.0
+version: 2.0.0
 ---
 
 # Merge Pull Request
 
 Safely merges a PR after comprehensive verification, with Linear integration and automated cleanup.
+
+## Prerequisites
+
+Before executing, verify Linear integration is available:
+
+```bash
+# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
+if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
+  "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
+fi
+```
 
 ## Configuration
 
@@ -135,7 +146,7 @@ Resolve manually:
   2. git add <resolved-files>
   3. git rebase --continue
   4. git push --force-with-lease
-  5. Run /catalyst-dev:merge_pr again
+  5. Run /merge_pr again
 ```
 
 Exit with error.
@@ -167,7 +178,7 @@ Fix failing tests before merge:
   $test_cmd
 
 Or skip tests (not recommended):
-  /catalyst-dev:merge_pr $pr_number --skip-tests
+  /merge_pr $pr_number --skip-tests
 ```
 
 Exit with error (unless `--skip-tests` flag provided).
@@ -290,18 +301,12 @@ merge_sha=$(git rev-parse HEAD)
 If ticket found and not using `--no-update`:
 
 ```bash
-# Verify linearis is available
-if ! command -v linearis &> /dev/null; then
-    echo "⚠️  Linearis CLI not found - skipping Linear ticket update"
-    echo "Install: npm install -g --install-links ryanrozich/linearis#feat/cycles-cli"
-else
-    # Move to "Done"
-    linearis issues update "$ticket" --state "Done"
+# Move to "Done"
+linearis issues update "$ticket" --state "Done"
 
-    # Add merge comment
-    linearis comments create "$ticket" \
-        --body "✅ PR merged!\n\n**PR**: #${prNumber} - ${prTitle}\n**Merge commit**: ${mergeSha}\n**Merged into**: ${baseBranch}\n\nView PR: ${prUrl}"
-fi
+# Add merge comment
+linearis comments create "$ticket" \
+    --body "✅ PR merged!\n\n**PR**: #${prNumber} - ${prTitle}\n**Merge commit**: ${mergeSha}\n**Merged into**: ${baseBranch}\n\nView PR: ${prUrl}"
 ```
 
 ### 12. Delete local branch and update base
@@ -322,16 +327,25 @@ echo "✅ Deleted local branch: $head_branch"
 
 **Always delete local branch** - no prompt (remote already deleted).
 
-### 13. Extract post-merge tasks
+### 13. Extract post-merge tasks from Linear
 
-**Read PR description:**
+**Read PR description from Linear:**
 
 ```bash
-desc_file="thoughts/shared/prs/${pr_number}_description.md"
-if [ -f "$desc_file" ]; then
-    # Extract "Post-Merge Tasks" section
-    tasks=$(sed -n '/## Post-Merge Tasks/,/^##/p' "$desc_file" | grep -E '^\- \[')
-fi
+# Find PR document attached to ticket
+linearis attachments list --issue "$ticket"
+```
+
+Look for document with title starting with "PR:".
+
+**If PR document found:**
+
+```bash
+# Read the document content
+pr_doc_content=$(linearis documents read "$pr_doc_id")
+
+# Extract "Post-Merge Tasks" section
+tasks=$(echo "$pr_doc_content" | sed -n '/## Post-Merge Tasks/,/^##/p' | grep -E '^\- \[')
 ```
 
 **If tasks exist:**
@@ -342,23 +356,7 @@ fi
 - [ ] Monitor error rates in production
 - [ ] Notify stakeholders
 
-Save these tasks? [Y/n]:
-```
-
-If yes:
-
-```bash
-# Save to thoughts
-cat > "thoughts/shared/post_merge_tasks/${ticket}_tasks.md" <<EOF
-# Post-Merge Tasks: $ticket
-
-Merged: $(date)
-PR: #$pr_number
-
-$tasks
-EOF
-
-humanlayer thoughts sync
+These tasks are recorded in the Linear document for reference.
 ```
 
 ### 14. Report success summary
@@ -382,8 +380,6 @@ Linear:
   Ticket:  $ticket → Done ✅
   Comment: Added with merge details
 
-Post-merge tasks: $task_count saved to thoughts/
-
 Next steps:
   - Monitor deployment
   - Check CI/CD pipeline
@@ -392,30 +388,53 @@ Next steps:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
+## Integration with Other Commands
+
+```
+/research-codebase PROJ-123 → research document
+                  ↓
+           /create-plan → implementation plan
+                  ↓
+          /implement-plan → code changes
+                  ↓
+           /validate-plan → verification
+                  ↓
+              /describe-pr → PR description
+                  ↓
+              /create-pr → creates PR on GitHub
+                  ↓
+              /merge-pr → merges PR (this command)
+```
+
+**How it connects:**
+
+- **Previous**: PR created by `/create-pr` with description in Linear
+- **Workflow context**: Ticket is used for Linear integration
+
 ## Flags
 
 **`--skip-tests`** - Skip local test execution
 
 ```bash
-/catalyst-dev:merge_pr 123 --skip-tests
+/merge_pr 123 --skip-tests
 ```
 
 **`--no-update`** - Don't update Linear ticket
 
 ```bash
-/catalyst-dev:merge_pr 123 --no-update
+/merge_pr 123 --no-update
 ```
 
 **`--keep-branch`** - Don't delete local branch
 
 ```bash
-/catalyst-dev:merge_pr 123 --keep-branch
+/merge_pr 123 --keep-branch
 ```
 
 **Combined:**
 
 ```bash
-/catalyst-dev:merge_pr 123 --skip-tests --no-update
+/merge_pr 123 --skip-tests --no-update
 ```
 
 ## Error Handling
@@ -437,7 +456,7 @@ Resolve manually:
   git add <files>
   git rebase --continue
   git push --force-with-lease
-  /catalyst-dev:merge_pr $pr_number
+  /merge_pr $pr_number
 ```
 
 **Tests failing:**
@@ -450,7 +469,7 @@ Failed tests:
   - auth.test.ts:12 - Timeout exceeded
 
 Fix tests or skip (not recommended):
-  /catalyst-dev:merge_pr $pr_number --skip-tests
+  /merge_pr $pr_number --skip-tests
 ```
 
 **CI checks failing:**
@@ -467,23 +486,6 @@ You can:
   2. Override and merge anyway (not recommended)
 
 Override? [y/N]:
-```
-
-**Linearis CLI not found:**
-
-```
-⚠️  Linearis CLI not found
-
-PR merged successfully, but Linear ticket not updated.
-
-Install Linearis:
-  npm install -g --install-links ryanrozich/linearis#feat/cycles-cli
-
-Configure:
-  export LINEAR_API_TOKEN=your_token
-
-Then update ticket manually:
-  linearis issues update $ticket --state "Done"
 ```
 
 **Linear API error:**
@@ -540,7 +542,7 @@ Uses `.claude/config.json`:
 **Happy path (all checks pass):**
 
 ```bash
-/catalyst-dev:merge_pr 123
+/merge_pr 123
 
 Running tests: make test
 ✅ All tests passed
@@ -559,7 +561,7 @@ Proceed? Y
 **With failing CI (user override):**
 
 ```bash
-/catalyst-dev:merge_pr 124
+/merge_pr 124
 
 ⚠️  Some CI checks failing
 Continue anyway? y
@@ -570,21 +572,10 @@ Continue anyway? y
 **Skip tests:**
 
 ```bash
-/catalyst-dev:merge_pr 125 --skip-tests
+/merge_pr 125 --skip-tests
 
 ⚠️  Skipping tests (not recommended)
 ✅ Merged!
-```
-
-**Linearis not installed:**
-
-```bash
-/catalyst-dev:merge_pr 126
-
-✅ PR merged successfully!
-⚠️  Linearis CLI not found - Linear ticket not updated
-
-Install Linearis to enable automatic ticket updates.
 ```
 
 ## Safety Features
@@ -608,29 +599,8 @@ Install Linearis to enable automatic ticket updates.
 - Squash merge
 - Delete remote branch
 - Delete local branch
-- Update Linear to Done (if Linearis available)
+- Update Linear to Done
 - Pull latest base branch
-
-**Graceful degradation:**
-
-- If Linearis not installed, warn but continue
-- Merge succeeds regardless of Linear integration
-
-## Post-Merge Workflow
-
-```
-PR merged
-    ↓
-Linear ticket → Done (if Linearis available)
-    ↓
-Branches deleted
-    ↓
-Base branch updated locally
-    ↓
-Post-merge tasks extracted
-    ↓
-Monitor deployment
-```
 
 ## Remember:
 
@@ -639,8 +609,6 @@ Monitor deployment
 - **Always run tests** - unless explicitly skipped
 - **Auto-rebase** - keep up-to-date with base
 - **Fail fast** - stop on conflicts or test failures
-- **Update Linear** - move ticket to Done automatically (if Linearis available)
-- **Extract tasks** - save post-merge checklist
+- **Update Linear** - move ticket to Done automatically
 - **Clear summary** - show what happened
 - **Only prompt for exceptions** - approvals missing, CI failing
-- **Graceful degradation** - Work without Linearis if needed

@@ -3,7 +3,7 @@ description: Plan work for current or next cycle using Linearis and GitHub
 category: project-task-management
 tools: Bash(linearis *), Bash(gh *), Read, Write, TodoWrite
 model: inherit
-version: 1.0.0
+version: 2.0.0
 status: placeholder
 ---
 
@@ -86,7 +86,7 @@ When fully implemented, this command will:
   - Who is actively working on what
   - Team velocity based on PR activity
 - **Team activity report** - Show contribution breakdown by team member
-- **Summary generation** - Create cycle plan document in thoughts/
+- **Summary generation** - Create cycle plan document in `reports/cycles/`
 
 Track progress at: https://github.com/coalesce-labs/catalyst/issues
 

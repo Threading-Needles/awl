@@ -13,11 +13,12 @@ When you run workflow commands, the Linear command automatically updates ticket 
 
 | Command                            | Ticket Status Update               |
 | ---------------------------------- | ---------------------------------- |
-| `/catalyst-dev:research_codebase` (with ticket) | → **Research**                     |
-| `/catalyst-dev:create_plan` (with ticket)       | → **Planning**                     |
-| `/catalyst-dev:implement_plan` (with ticket)    | → **In Progress**                  |
-| `/catalyst-dev:describe_pr` (with ticket)       | → **In Review**                    |
-| PR merged                          | → **Done** (manual or via webhook) |
+| `/catalyst-dev:research_codebase` (with ticket) | → **Research in Progress**         |
+| `/catalyst-dev:create_plan` (with ticket)       | → **Plan in Progress**             |
+| `/catalyst-dev:implement_plan` (with ticket)    | → **In Dev**                       |
+| `/catalyst-dev:validate_plan` (with ticket)     | → **In Review**                    |
+| `/catalyst-dev:create_pr` (with ticket)         | → **In Review**                    |
+| `/catalyst-dev:merge_pr` (with ticket)          | → **Done**                         |
 
 ### How It Detects Tickets
 
@@ -45,29 +46,52 @@ The commands look for tickets in:
 
 ## The Workflow
 
-### Recommended Workflow Statuses
+### Recommended Workflow Statuses (12-Stage Granular)
 
-Simplified 6-status workflow (Option C):
+The granular workflow separates **queue states** (ready for action) from **active states** (work in progress). This enables agentic automation where agents can pick up work from queue states.
 
 ```
-1. Backlog → New ideas and requests
-2. Research → Investigation, triage, spec definition ← /catalyst-dev:research_codebase
-3. Planning → Implementation plans ← /catalyst-dev:create_plan
-4. In Progress → Active development ← /catalyst-dev:implement_plan
-5. In Review → Code review ← /catalyst-dev:describe_pr
-6. Done → Complete
+BACKLOG
+  1. Backlog              → New ideas and feature requests
+
+UNSTARTED (Queue States)
+  2. Triage               → Initial review and prioritization
+  3. Spec Needed          → Needs problem statement and solution outline
+  4. Research Needed      → Requires investigation before planning    ← Agent pickup
+
+STARTED (Active States)
+  5. Research in Progress → Active research underway                  ← /research_codebase
+  6. Ready for Plan       → Research complete, ready for planning     ← Agent pickup
+  7. Plan in Progress     → Writing implementation plan               ← /create_plan
+  8. Plan in Review       → Plan under team discussion
+  9. Ready for Dev        → Plan approved, ready to implement         ← Agent pickup
+ 10. In Dev               → Active development                        ← /implement_plan
+ 11. In Review            → Validation complete, PR submitted         ← /validate_plan, /create_pr
+
+COMPLETED
+ 12. Done                 → Completed and deployed                    ← /merge_pr
+
+CANCELED
+  - Canceled              → Won't be done
+  - Duplicate             → Duplicate of another issue
 ```
 
 ### Why This Workflow Works
 
-**Key insight**: Review happens at the **planning stage**, not just the PR stage.
+**Key insight**: Queue states enable **agentic automation**.
 
 **Benefits**:
 
-- Clear progression from idea to completion
-- Each command moves ticket forward automatically
-- Fewer statuses = less cognitive overhead
-- Maintains review gates (plan review + code review)
+- **Queue states** (Research Needed, Ready for Plan, Ready for Dev) can trigger webhooks/agents
+- **Active states** show work in progress with clear ownership
+- Review gates at multiple stages (plan review + code review)
+- Clear handoff points between human and AI work
+
+**Agentic automation examples**:
+- Webhook detects "Research Needed" → spawns research agent → moves to "Research in Progress"
+- Agent completes research → moves to "Ready for Plan"
+- Human reviews plan → moves to "Ready for Dev"
+- Webhook detects "Ready for Dev" → spawns implementation agent
 
 ---
 
@@ -75,67 +99,75 @@ Simplified 6-status workflow (Option C):
 
 ### Quick Setup (Recommended)
 
-Use the `/linear_setup_workflow` command:
+Run the setup script:
 
 ```bash
-/catalyst-dev:linear_setup_workflow
+./scripts/linear/setup-linear-workflow [TEAM_KEY]
 ```
 
-This creates 6 statuses optimized for the workflow commands:
-
-1. **Backlog** (Backlog category) - Gray
-2. **Research** (Unstarted category) - Yellow
-3. **Planning** (Started category) - Yellow
-4. **In Progress** (Started category) - Blue
-5. **In Review** (Started category) - Blue
-6. **Done** (Completed category) - Blue
+This generates GraphQL mutations to create all 12 statuses.
 
 ### Manual Setup
 
-If you prefer to create statuses manually in Linear:
+Create these statuses in Linear (Team Settings → Workflow States):
 
-1. Go to Team Settings → Workflow States
-2. Create these 6 statuses in order
-3. Assign to the correct category (Backlog/Unstarted/Started/Completed)
-4. Use the color scheme above for visual clarity
+| # | Status | Category | Color | Purpose |
+|---|--------|----------|-------|---------|
+| 1 | Backlog | Backlog | Gray | New ideas |
+| 2 | Triage | Unstarted | Gray | Initial review |
+| 3 | Spec Needed | Unstarted | Gray | Needs problem statement |
+| 4 | Research Needed | Unstarted | Yellow | **Queue**: Ready for research agent |
+| 5 | Research in Progress | Started | Yellow | **Active**: `/research_codebase` |
+| 6 | Ready for Plan | Started | Yellow | **Queue**: Ready for planning |
+| 7 | Plan in Progress | Started | Yellow | **Active**: `/create_plan` |
+| 8 | Plan in Review | Started | Yellow | Team reviewing plan |
+| 9 | Ready for Dev | Started | Blue | **Queue**: Ready for dev agent |
+| 10 | In Dev | Started | Blue | **Active**: `/implement_plan` |
+| 11 | In Review | Started | Blue | **Active**: `/validate_plan`, `/create_pr` |
+| 12 | Done | Completed | Green | `/merge_pr` |
+| - | Canceled | Canceled | Gray | Won't do |
+| - | Duplicate | Canceled | Gray | Duplicate issue |
 
 ## Complete Workflow Example
 
-Here's how tickets flow through the simplified workflow:
+Here's how tickets flow through the granular workflow:
 
 ### 1. Create Ticket
 
 ```bash
 /catalyst-dev:linear create "Add OAuth support"
 # Creates in Backlog
+# Human triages → moves to "Research Needed"
 ```
 
 ### 2. Research Phase
 
 ```bash
+# Agent or human picks up from "Research Needed"
 /catalyst-dev:research_codebase PROJ-123
 > "How does authentication currently work?"
 
 # Automatically:
-# - Moves ticket to "Research"
+# - Moves ticket to "Research in Progress"
 # - Adds comment: "Starting research: How does authentication currently work?"
 # - Saves research document
 # - Attaches research to ticket
-# - Adds comment: "Research complete! See findings: [link]"
+# - When complete, human moves to "Ready for Plan"
 ```
 
 ### 3. Planning Phase
 
 ```bash
+# Agent or human picks up from "Ready for Plan"
 /catalyst-dev:create_plan
 # Reference research document
 # User provides task details
 
 # Automatically:
-# - Moves ticket to "Planning"
+# - Moves ticket to "Plan in Progress"
 # - Creates plan document
 # - Attaches plan to ticket
-# - Stays in "Planning" for team review
+# - When complete, moves to "Plan in Review"
 ```
 
 ### 4. Team Review
@@ -143,57 +175,88 @@ Here's how tickets flow through the simplified workflow:
 ```
 # Team reviews plan in Linear
 # Discusses in comments
-# When approved, manually move to "In Progress"
-# Or /catalyst-dev:implement_plan does it automatically
+# When approved, manually move to "Ready for Dev"
 ```
 
 ### 5. Implementation Phase
 
 ```bash
+# Agent or human picks up from "Ready for Dev"
 /catalyst-dev:implement_plan thoughts/shared/plans/2025-10-04-PROJ-123-oauth.md
 
 # Automatically:
-# - Moves ticket to "In Progress"
+# - Moves ticket to "In Dev"
 # - Implements each phase
 # - Updates plan checkboxes
 ```
 
-### 6. Code Review Phase
+### 6. Validation Phase
 
 ```bash
-/catalyst-dev:describe_pr
+/catalyst-dev:validate_plan
 
 # Automatically:
+# - Verifies all success criteria
+# - Runs automated tests
+# - Moves ticket to "In Review"
+# - Documents any issues found
+```
+
+### 7. Code Review Phase
+
+```bash
+/catalyst-dev:create_pr
+
+# Automatically:
+# - Creates PR with description
 # - Moves ticket to "In Review"
 # - Attaches PR to ticket
 # - Adds comment with PR link
 ```
 
-### 7. Completion
+### 8. Completion
 
-```
-# After PR is merged
-# Manually move to "Done"
-# Or set up Linear webhook automation
+```bash
+/catalyst-dev:merge_pr
+
+# Automatically:
+# - Merges PR after checks pass
+# - Moves ticket to "Done"
+# - Adds completion comment
 ```
 
 ## Workflow Progression Summary
 
 ```
 Backlog
-  ↓ (create ticket)
-Research
-  ↓ (/research_codebase)
-Planning
-  ↓ (/create_plan)
-Planning (stays for team review)
-  ↓ (team approves or /catalyst-dev:implement_plan)
-In Progress
-  ↓ (/implement_plan)
-In Review
-  ↓ (/describe_pr)
-Done
-  ↓ (PR merged)
+  ↓ (triage)
+Triage → Spec Needed → Research Needed
+  ↓ (agent or human picks up)
+Research in Progress                    ← /research_codebase
+  ↓ (research complete)
+Ready for Plan
+  ↓ (human or agent picks up)
+Plan in Progress                        ← /create_plan
+  ↓ (plan complete)
+Plan in Review
+  ↓ (team approves)
+Ready for Dev
+  ↓ (agent or human picks up)
+In Dev                                  ← /implement_plan
+  ↓ (implementation complete)
+In Review                               ← /validate_plan, /create_pr
+  ↓ (PR approved and merged)
+Done                                    ← /merge_pr
+```
+
+### Queue vs Active States
+
+```
+Queue States (waiting for pickup):     Active States (work in progress):
+├── Research Needed                    ├── Research in Progress
+├── Ready for Plan                     ├── Plan in Progress
+└── Ready for Dev                      ├── In Dev
+                                       └── In Review
 ```
 
 ---

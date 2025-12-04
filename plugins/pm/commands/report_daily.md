@@ -21,19 +21,7 @@ Lightweight daily standup report for quick team status checks.
 ## Prerequisites Check
 
 ```bash
-# 1. Validate thoughts system (REQUIRED)
-if [[ -f "scripts/validate-thoughts-setup.sh" ]]; then
-  ./scripts/validate-thoughts-setup.sh || exit 1
-else
-  # Inline validation if script not found
-  if [[ ! -d "thoughts/shared" ]]; then
-    echo "❌ ERROR: Thoughts system not configured"
-    echo "Run: ./scripts/humanlayer/init-project.sh . {project-name}"
-    exit 1
-  fi
-fi
-
-# 2. Determine script directory with fallback
+# 1. Determine script directory with fallback
 if [[ -n "${CLAUDE_PLUGIN_ROOT}" ]]; then
   SCRIPT_DIR="${CLAUDE_PLUGIN_ROOT}/scripts"
 else
@@ -41,12 +29,15 @@ else
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts"
 fi
 
-# 3. Check PM plugin prerequisites
+# 2. Check PM plugin prerequisites (validates Linearis CLI and LINEAR_API_TOKEN)
 if [[ -f "${SCRIPT_DIR}/check-prerequisites.sh" ]]; then
   "${SCRIPT_DIR}/check-prerequisites.sh" || exit 1
 else
   echo "⚠️ Prerequisites check skipped (script not found at: ${SCRIPT_DIR})"
 fi
+
+# 3. Ensure reports directory exists
+mkdir -p "reports/daily"
 ```
 
 ## Process
@@ -171,7 +162,7 @@ Combine research results to identify:
 ### Step 5: Save Report
 
 ```bash
-REPORT_DIR="thoughts/shared/reports/daily"
+REPORT_DIR="reports/daily"
 mkdir -p "$REPORT_DIR"
 
 REPORT_FILE="$REPORT_DIR/$(date +%Y-%m-%d)-team-daily.md"
@@ -184,11 +175,6 @@ cat > "$REPORT_FILE" << EOF
 EOF
 
 echo "✅ Report saved: $REPORT_FILE"
-
-# Update workflow context
-if [[ -f "${SCRIPT_DIR}/workflow-context.sh" ]]; then
-  "${SCRIPT_DIR}/workflow-context.sh" add reports "$REPORT_FILE" null
-fi
 ```
 
 ### Step 6: Display Summary
@@ -206,7 +192,7 @@ Quick Actions:
   • Assign backlog work to Dave and Emily
   • Check TEAM-465 status with Charlie
 
-Full report: thoughts/shared/reports/daily/2025-01-27-team-daily.md
+Full report: reports/daily/2025-01-27-team-daily.md
 ```
 
 ## Success Criteria

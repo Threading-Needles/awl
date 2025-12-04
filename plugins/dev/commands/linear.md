@@ -3,13 +3,13 @@ description: Manage Linear tickets with workflow automation
 category: project-task-management
 tools: Bash(linearis *), Read, Write, Edit, Grep
 model: inherit
-version: 1.0.0
+version: 2.0.0
 ---
 
 # Linear - Ticket Management
 
-You are tasked with managing Linear tickets, including creating tickets from thoughts documents,
-updating existing tickets, and following a structured workflow using the Linearis CLI.
+You are tasked with managing Linear tickets, updating ticket statuses, and following a structured
+workflow using the Linearis CLI.
 
 ## Prerequisites Check
 
@@ -20,11 +20,18 @@ if ! command -v linearis &> /dev/null; then
     echo "❌ Linearis CLI not found"
     echo ""
     echo "Install with:"
-    echo "  npm install -g --install-links ryanrozich/linearis#feat/cycles-cli"
+    echo "  npm install -g linearis"
     echo ""
     echo "Configure with:"
     echo "  export LINEAR_API_TOKEN=your_token"
-    echo "  # or create ~/.linear_api_token file"
+    exit 1
+fi
+
+if [[ -z "$LINEAR_API_TOKEN" ]]; then
+    echo "❌ LINEAR_API_TOKEN not set"
+    echo ""
+    echo "Get a token from: https://linear.app/settings/api"
+    echo "Then: export LINEAR_API_TOKEN=your_token"
     exit 1
 fi
 ```
@@ -41,9 +48,6 @@ TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' "$CONFIG_FILE")
 
 # Read default team name (optional)
 DEFAULT_TEAM=$(jq -r '.catalyst.linear.defaultTeam // null' "$CONFIG_FILE")
-
-# Read thoughts repo URL
-THOUGHTS_URL=$(jq -r '.catalyst.linear.thoughtsRepoUrl // "https://github.com/org/thoughts/blob/main"' "$CONFIG_FILE")
 ```
 
 **Configuration in `.claude/config.json`**:
@@ -52,8 +56,7 @@ THOUGHTS_URL=$(jq -r '.catalyst.linear.thoughtsRepoUrl // "https://github.com/or
 {
   "linear": {
     "teamKey": "ENG",
-    "defaultTeam": "Backend",
-    "thoughtsRepoUrl": "https://github.com/coalesce-labs/thoughts/blob/main"
+    "defaultTeam": "Backend"
   }
 }
 ```
@@ -66,11 +69,12 @@ If tools are available, respond based on the user's request:
 
 ```
 I can help you with Linear tickets. What would you like to do?
-1. Create a new ticket from a thoughts document
-2. Add a comment to a ticket (I'll use our conversation context)
+1. Create a new ticket
+2. Add a comment to a ticket
 3. Search for tickets
 4. Update ticket status or details
 5. Move ticket through workflow
+6. View documents attached to a ticket
 ```
 
 Then wait for the user's input.
@@ -85,16 +89,12 @@ This workflow ensures alignment through planning before implementation:
 
 1. **Backlog** → New ideas and feature requests
 2. **Triage** → Initial review and prioritization
-3. **Spec Needed** → Needs problem statement and solution outline
-4. **Research Needed** → Requires investigation
-5. **Research in Progress** → Active research underway
-6. **Ready for Plan** → Research complete, needs implementation plan
-7. **Plan in Progress** → Writing implementation plan
-8. **Plan in Review** → Plan under discussion
-9. **Ready for Dev** → Plan approved, ready to implement
-10. **In Dev** → Active development
-11. **In Review** → PR submitted
-12. **Done** → Completed
+3. **Research** → Requires investigation
+4. **Planning** → Writing implementation plan
+5. **Ready for Dev** → Plan approved, ready to implement
+6. **In Progress** → Active development
+7. **In Review** → PR submitted
+8. **Done** → Completed
 
 **Note**: These statuses must be configured in your Linear workspace settings. The Linearis CLI will
 read and use whatever states exist in your workspace.
@@ -107,129 +107,40 @@ read and use whatever states exist in your workspace.
 
 These commands automatically update ticket status:
 
-- `/catalyst-dev:create_plan` → Moves ticket to "Plan in Progress"
-- Plan completed → Moves to "Plan in Review"
-- `/catalyst-dev:implement_plan` → Moves to "In Dev"
-- `/catalyst-dev:create_pr` → Moves to "In Review"
-- `/catalyst-dev:merge_pr` → Moves to "Done"
-
----
-
-## Important Conventions
-
-### URL Mapping for Thoughts Documents
-
-When referencing thoughts documents, always provide GitHub links:
-
-- `thoughts/shared/...` → `{thoughtsRepoUrl}/repos/{project}/shared/...`
-- `thoughts/{user}/...` → `{thoughtsRepoUrl}/repos/{project}/{user}/...`
-- `thoughts/global/...` → `{thoughtsRepoUrl}/global/...`
-
-### Default Values
-
-- **Status**: Create new tickets in "Backlog" status
-- **Priority**: Default to Medium (3) for most tasks
-  - Urgent (1): Critical blockers, security issues
-  - High (2): Important features with deadlines, major bugs
-  - Medium (3): Standard implementation tasks (default)
-  - Low (4): Nice-to-haves, minor improvements
+- `/research-codebase PROJ-123` → Moves ticket to "Research"
+- `/create-plan` → Moves ticket to "Planning"
+- `/implement-plan` → Moves to "In Progress"
+- `/create-pr` → Moves to "In Review"
+- `/merge-pr` → Moves to "Done"
 
 ---
 
 ## Action-Specific Instructions
 
-### 1. Creating Tickets from Thoughts
+### 1. Creating Tickets
 
 #### Steps to follow:
 
-1. **Locate and read the thoughts document:**
-   - If given a path, read the document directly
-   - If given a topic/keyword, search thoughts/ directory using Grep
-   - If multiple matches found, show list and ask user to select
-   - Create a TodoWrite list to track: Read document → Analyze → Draft → Create
+1. **Gather information:**
+   - Title: Clear, action-oriented
+   - Description: Problem/goal summary
+   - Priority: 1=Urgent, 2=High, 3=Medium (default), 4=Low
 
-2. **Analyze the document content:**
-   - Identify the core problem or feature being discussed
-   - Extract key implementation details or technical decisions
-   - Note any specific code files or areas mentioned
-   - Look for action items or next steps
-   - Identify what stage the idea is at (early ideation vs ready to implement)
-
-3. **Check for related context (if mentioned in doc):**
-   - If the document references specific code files, read relevant sections
-   - If it mentions other thoughts documents, quickly check them
-   - Look for any existing Linear tickets mentioned
-
-4. **Draft the ticket summary:** Present a draft to the user:
-
-   ```
-   ## Draft Linear Ticket
-
-   **Title**: [Clear, action-oriented title]
-
-   **Description**:
-   [2-3 sentence summary of the problem/goal]
-
-   ## Key Details
-   - [Bullet points of important details from thoughts]
-   - [Technical decisions or constraints]
-   - [Any specific requirements]
-
-   ## Implementation Notes (if applicable)
-   [Any specific technical approach or steps outlined]
-
-   ## References
-   - Source: `thoughts/[path]` ([View on GitHub](converted URL))
-   - Related code: [any file:line references]
-
-   ---
-   Based on the document, this seems to be at the stage of: [ideation/planning/ready to implement]
-   ```
-
-5. **Interactive refinement:** Ask the user:
-   - Does this summary capture the ticket accurately?
-   - What priority? (Default: Medium/3)
-   - Any additional context to add?
-   - Should we include more/less implementation detail?
-   - Do you want to assign it to yourself?
-
-   Note: Ticket will be created in "Backlog" status by default.
-
-6. **Create the Linear ticket using Linearis CLI:**
+2. **Create the ticket:**
 
    ```bash
-   # Create issue with linearis
    linearis issues create \
-     --team "$TEAM_KEY" \
-     --title "[refined title]" \
-     --description "[final description in markdown]" \
+     --title "[title]" \
+     --description "[description in markdown]" \
      --priority [1-4] \
-     --status "Backlog"
-
-   # Capture the created issue ID from output
-   ISSUE_ID=$(linearis issues create ... | jq -r '.id')
+     --state "Backlog"
    ```
 
-   **Note**: Linearis creates issues in the team's default backlog state. To set specific status or
-   assignee, create first then update:
-
-   ```bash
-   # Assign to self
-   linearis issues update "$ISSUE_ID" --assignee "@me"
-   ```
-
-7. **Post-creation actions:**
+3. **Post-creation:**
    - Show the created ticket URL
-   - Ask if user wants to:
-     - Add a comment with additional implementation details
-     - Update the original thoughts document with the ticket reference
-   - If yes to updating thoughts doc:
-     ```
-     Add at the top of the document:
-     ---
-     linear_ticket: [TEAM-123]
-     created: [date]
-     ---
+   - Set the ticket in workflow context for subsequent commands:
+     ```bash
+     "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
      ```
 
 ### 2. Adding Comments to Existing Tickets
@@ -237,35 +148,15 @@ When referencing thoughts documents, always provide GitHub links:
 When user wants to add a comment to a ticket:
 
 1. **Determine which ticket:**
-   - Use context from the current conversation to identify the relevant ticket
-   - If uncertain, use `linearis issues read TEAM-123` to show ticket details and confirm
+   - Use context from the current conversation
+   - Or use `linearis issues read TEAM-123` to confirm
 
 2. **Format comments for clarity:**
    - Keep concise (~10 lines) unless more detail needed
-   - Focus on key insights or most useful information
-   - Include relevant file references with backticks and GitHub links
+   - Include relevant file references with backticks
+   - Focus on key insights
 
-3. **File reference formatting:**
-   - Wrap paths in backticks: `thoughts/user/example.md`
-   - Add GitHub link after: `([View](url))`
-   - Do this for both thoughts/ and code files
-
-4. **Comment structure example:**
-
-   ```markdown
-   Implemented retry logic in webhook handler to address rate limit issues.
-
-   Key insight: The 429 responses were clustered during batch operations, so exponential backoff
-   alone wasn't sufficient - added request queuing.
-
-   Files updated:
-
-   - `src/webhooks/handler.ts` ([GitHub](link))
-   - `thoughts/shared/rate_limit_analysis.md` ([GitHub](link))
-   ```
-
-5. **Add comment with Linearis:**
-
+3. **Add comment:**
    ```bash
    linearis comments create TEAM-123 --body "Your comment text here"
    ```
@@ -275,41 +166,26 @@ When user wants to add a comment to a ticket:
 When moving tickets to a new status:
 
 1. **Get current status:**
-
    ```bash
    linearis issues read TEAM-123 | jq -r '.state.name'
    ```
 
 2. **Suggest next status based on workflow:**
-
    ```
-   Backlog → Triage (for initial review)
-   Triage → Spec Needed (needs more detail) OR Research Needed (needs investigation)
-   Spec Needed → Research Needed (once problem outlined)
-   Research Needed → Research in Progress (starting research)
-   Research in Progress → Ready for Plan (research complete)
-   Ready for Plan → Plan in Progress (starting plan with /catalyst-dev:create_plan)
-   Plan in Progress → Plan in Review (plan complete)
-   Plan in Review → Ready for Dev (plan approved)
-   Ready for Dev → In Dev (starting work with /catalyst-dev:implement_plan)
-   In Dev → In Review (PR created)
+   Backlog → Research (needs investigation)
+   Research → Planning (starting plan with /create-plan)
+   Planning → Ready for Dev (plan approved)
+   Ready for Dev → In Progress (starting work with /implement-plan)
+   In Progress → In Review (PR created)
    In Review → Done (PR merged)
    ```
 
-3. **Automatic status updates:** When certain commands are run, automatically update ticket status:
-   - `/catalyst-dev:create_plan` with ticket → Move to "Plan in Progress"
-   - Plan synced and linked → Move to "Plan in Review"
-   - `/catalyst-dev:implement_plan` with ticket → Move to "In Dev"
-   - `/catalyst-dev:create_pr` with ticket → Move to "In Review"
-   - `/catalyst-dev:merge_pr` with ticket → Move to "Done"
-
-4. **Manual status updates:**
-
+3. **Update status:**
    ```bash
    linearis issues update TEAM-123 --state "In Progress"
    ```
 
-5. **Add comment explaining the transition:**
+4. **Add comment explaining the transition:**
    ```bash
    linearis comments create TEAM-123 --body "Moving to In Progress: Starting implementation"
    ```
@@ -318,95 +194,100 @@ When moving tickets to a new status:
 
 When user wants to find tickets:
 
-1. **Gather search criteria:**
-   - Query text
-   - Status filters
-   - Assignee filters
-
-2. **Execute search:**
-
+1. **Execute search:**
    ```bash
-   # List all issues (linearis issues list only supports --limit, not --team)
+   # List issues
    linearis issues list --limit 100
-
-   # Filter by team using jq
-   linearis issues list --limit 100 | jq '.[] | select(.team.key == "TEAM")'
 
    # Filter by status using jq
    linearis issues list --limit 100 | jq '.[] | select(.state.name == "In Progress")'
 
-   # Filter by assignee using jq
-   linearis issues list --limit 100 | jq '.[] | select(.assignee.email == "user@example.com")'
-
-   # Search by text (filter JSON output with jq)
-   linearis issues list --limit 100 | \
-     jq '.[] | select(.title | contains("search term"))'
+   # Search by text
+   linearis issues list --limit 100 | jq '.[] | select(.title | contains("search term"))'
    ```
 
-3. **Present results:**
+2. **Present results:**
    - Show ticket ID, title, status, assignee
    - Include direct links to Linear
-   - Parse JSON output for display
+
+### 5. Viewing Documents Attached to Tickets
+
+To see documents (research, plans, handoffs, PR descriptions) attached to a ticket:
+
+```bash
+linearis attachments list --issue TEAM-123
+```
+
+This returns all document attachments on the issue. Documents are categorized by title pattern:
+- `Research: ...` - Research documents
+- `Plan: ...` - Implementation plans
+- `Handoff: ...` - Session handoffs
+- `PR: ...` - PR descriptions
+
+To read a specific document:
+```bash
+linearis documents read <document-id>
+```
 
 ---
 
-## Integration with Other Commands
+## Integration with Workflow Commands
 
 ### Automatic Ticket Updates
 
-When these commands are run, check if there's a related Linear ticket and update it:
+When workflow commands are run, they automatically update the associated ticket:
 
-**During `/catalyst-dev:create_plan`:**
+**During `/research-codebase PROJ-123`:**
+1. Sets ticket in workflow context
+2. Moves to "Research" status
+3. Creates "Research: ..." document attached to ticket
 
-1. If ticket mentioned, move to "Plan in Progress"
-2. When plan complete, add comment with plan link
-3. Move to "Plan in Review"
+**During `/create-plan`:**
+1. Moves to "Planning" status
+2. Creates "Plan: ..." document attached to ticket
 
-**During `/catalyst-dev:implement_plan`:**
+**During `/implement-plan`:**
+1. Moves to "In Progress" status
+2. Adds progress comments as phases complete
 
-1. If ticket in plan metadata, move to "In Dev"
-2. Add comment: "Started implementation from plan: [link]"
+**During `/create-pr`:**
+1. Moves to "In Review" status
+2. Creates "PR: ..." document attached to ticket
 
-**During `/catalyst-dev:create_pr`:**
-
-1. If ticket mentioned in PR or plan, move to "In Review"
-2. Add comment with PR link
-
-**During `/catalyst-dev:merge_pr`:**
-
-1. Move ticket to "Done"
-2. Add comment with merge details
+**During `/merge-pr`:**
+1. Moves to "Done" status
+2. Adds merge completion comment
 
 ---
 
 ## Example Workflows
 
-### Workflow 1: Thought → Ticket → Plan → Implement
+### Workflow 1: Research → Plan → Implement
 
 ```bash
-# 1. Research and document
-/catalyst-dev:research_codebase "authentication patterns"
-# Saves to thoughts/shared/research/auth-patterns.md
+# 1. Start research with ticket
+/research-codebase PROJ-123
+# Creates "Research: ..." document in Linear
+# Ticket moves to "Research"
 
-# 2. Create ticket from research
-/catalyst-dev:linear create thoughts/shared/research/auth-patterns.md
-# Creates ticket in Backlog
+# 2. Create plan
+/create-plan
+# Reads research from Linear
+# Creates "Plan: ..." document in Linear
+# Ticket moves to "Planning"
 
-# 3. Create plan
-/catalyst-dev:create_plan
-# Reads research, creates plan
-# Ticket moves to "Plan in Progress" → "Plan in Review"
+# 3. Implement
+/implement-plan
+# Reads plan from Linear
+# Ticket moves to "In Progress"
 
-# 4. Implement
-/catalyst-dev:implement_plan thoughts/shared/plans/2025-01-08-auth-feature.md
-# Ticket moves to "In Dev"
-
-# 5. Create PR
-/catalyst-dev:create_pr
+# 4. Create PR
+/create-pr
+# Creates "PR: ..." document in Linear
 # Ticket moves to "In Review"
 
-# 6. Merge PR
-/catalyst-dev:merge_pr
+# 5. Merge PR
+/merge-pr
 # Ticket moves to "Done"
 ```
 
@@ -417,10 +298,13 @@ When these commands are run, check if there's a related Linear ticket and update
 linearis comments create PROJ-123 --body "Completed phase 1, moving to phase 2"
 
 # Move ticket forward
-linearis issues update PROJ-123 --state "In Dev"
+linearis issues update PROJ-123 --state "In Progress"
 
 # Search for related tickets
-linearis issues list --team PROJ | jq '.[] | select(.title | contains("authentication"))'
+linearis issues list --limit 100 | jq '.[] | select(.title | contains("authentication"))'
+
+# View documents attached to ticket
+linearis attachments list --issue PROJ-123
 ```
 
 ---
@@ -430,7 +314,7 @@ linearis issues list --team PROJ | jq '.[] | select(.title | contains("authentic
 ### Common Commands
 
 ```bash
-# List issues (only --limit supported, use jq for filtering)
+# List issues
 linearis issues list --limit 50
 
 # Filter by status using jq
@@ -440,22 +324,28 @@ linearis issues list --limit 100 | jq '.[] | select(.state.name == "In Progress"
 linearis issues read TICKET-123
 
 # Create issue
-linearis issues create "Title" --description "Description" --state "Todo"
+linearis issues create --title "Title" --description "Description" --state "Backlog"
 
 # Update issue state
 linearis issues update TICKET-123 --state "In Progress"
 
 # Update assignee
-linearis issues update TICKET-123 --assignee <user-id>
+linearis issues update TICKET-123 --assignee "@me"
 
 # Add comment
 linearis comments create TICKET-123 --body "Comment text"
 
+# List documents attached to issue
+linearis attachments list --issue TICKET-123
+
+# Read document
+linearis documents read <document-id>
+
+# Create document
+linearis documents create --title "Title" --content "Content" --attach-to TICKET-123
+
 # List cycles
 linearis cycles list --team TEAM [--active]
-
-# Read cycle
-linearis cycles read "Sprint 2025-10" --team TEAM
 ```
 
 ### JSON Output Parsing
@@ -473,7 +363,7 @@ linearis issues read TEAM-123 | jq -r '.title'
 linearis issues read TEAM-123 | jq -r '.assignee.name'
 
 # Filter list by keyword
-linearis issues list --team TEAM | jq '.[] | select(.title | contains("bug"))'
+linearis issues list --limit 100 | jq '.[] | select(.title | contains("bug"))'
 ```
 
 ---
@@ -482,8 +372,9 @@ linearis issues list --team TEAM | jq '.[] | select(.title | contains("bug"))'
 
 - **Configuration**: Use `.claude/config.json` for team settings
 - **Status mapping**: Use status names that exist in your Linear workspace
-- **Automation**: Workflow commands auto-update tickets when ticket IDs are referenced
-- **CLI required**: Linearis CLI must be installed and configured with LINEAR_API_TOKEN
+- **Automation**: Workflow commands auto-update tickets when ticket IDs are used
+- **CLI required**: Linearis CLI must be installed and LINEAR_API_TOKEN set
+- **Documents**: All workflow documents (research, plans, handoffs, PRs) are stored as Linear documents attached to tickets
 
-This command integrates seamlessly with the create_plan → implement_plan → validate_plan workflow
-while keeping Linear tickets in sync!
+This command integrates seamlessly with the research → plan → implement → validate workflow while
+keeping Linear tickets in sync!

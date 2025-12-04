@@ -16,7 +16,7 @@ The workspace uses a plugin-based architecture where agents and commands are org
 
 ## Key Architecture Concepts
 
-### Three-Layer System
+### Two-Layer System
 
 1. **Plugin Source** (`plugins/dev/`, `plugins/meta/`)
    - Canonical definitions of agents and commands
@@ -28,137 +28,90 @@ The workspace uses a plugin-based architecture where agents and commands are org
    - Configuration file (`config.json`)
    - Claude Code reads plugins from here
 
-3. **Thoughts System** (external, `~/thoughts/`)
-   - Git-backed context management
-   - Shared across all worktrees
-   - Initialized per-project via `init-project.sh`
+### Linear Documents System
+
+Workflow documents (research, plans, handoffs, PR descriptions) are stored as **Linear documents**
+attached to tickets:
+
+- **Research**: Created by `/research-codebase`, titled "Research: ..."
+- **Plans**: Created by `/create-plan`, titled "Plan: ..."
+- **Handoffs**: Created by `/create-handoff`, titled "Handoff: ..."
+- **PR Descriptions**: Created by `/describe-pr`, titled "PR: ..."
+
+Documents are discovered by querying Linear via `linearis attachments list --issue TICKET-123`.
 
 ### Workflow State Management
 
-Commands track workflow state via `.claude/.workflow-context.json`:
+Commands track the current ticket via `.claude/.workflow-context.json`:
 
-**Purpose**: Enable workflow commands to auto-discover recent documents without manual paths.
+**Purpose**: Enable workflow commands to auto-discover documents attached to the current ticket.
 
 **How it works**:
 
-- `/research-codebase` saves research → `/create-plan` auto-references it
-- `/create-plan` saves plan → `/implement-plan` auto-finds it
-- `/create-handoff` saves handoff → `/resume-handoff` auto-finds it
+- `/research-codebase PROJ-123` sets ticket → saves research to Linear
+- `/create-plan` reads research from Linear → saves plan to Linear
+- `/implement-plan` reads plan from Linear → implements phases
+- `/create-handoff` saves handoff to Linear
+- `/resume-handoff PROJ-123` finds handoff from Linear
 
 **Structure**:
 
 ```json
 {
   "lastUpdated": "2025-10-26T10:30:00Z",
-  "currentTicket": "PROJ-123",
-  "mostRecentDocument": {
-    "type": "plans",
-    "path": "thoughts/shared/plans/2025-10-26-PROJ-123-feature.md",
-    "created": "2025-10-26T10:30:00Z",
-    "ticket": "PROJ-123"
-  },
-  "workflow": {
-    "research": [...],  // Recent research documents
-    "plans": [...],     // Recent plans
-    "handoffs": [...],  // Recent handoffs
-    "prs": [...]        // Recent PR descriptions
-  }
+  "currentTicket": "PROJ-123"
 }
 ```
 
-**Key benefit**: Users don't need to remember or specify file paths. Commands chain together
-automatically.
+**Key benefit**: Commands chain together by querying Linear for documents attached to the current
+ticket. No file paths to remember.
 
-**Management**: Automatically updated by workflow commands. Tracked per-worktree (not committed to
-git).
+**Management**: Set via `workflow-context.sh set-ticket`, read via `workflow-context.sh get-ticket`.
+Tracked per-worktree (not committed to git).
 
-### Three-Layer Memory System
+### Linear Documents Architecture
 
-Catalyst uses a three-layer memory architecture to manage context across multiple projects:
+Catalyst uses Linear documents attached to tickets for persistent workflow context:
 
-**1. Project Configuration** (`.claude/config.json`)
-
-- Specifies which HumanLayer config to use (`configName`)
-- Contains project-specific settings (ticket prefix, Linear team, etc.)
-- Points to the long-term memory repository for this project
-
-**2. Long-term Memory** (HumanLayer thoughts repository)
-
-- Git-backed persistent storage shared across worktrees
-- Contains: `shared/research/`, `shared/plans/`, `shared/prs/`, `shared/handoffs/`
-- Synced via `humanlayer thoughts sync`
-- Survives across sessions and team members
-
-**3. Short-term Memory** (`.claude/.workflow-context.json`)
-
-- Local to each worktree (not committed to git)
-- Contains pointers to recent documents in long-term memory
-- Enables command chaining (e.g., `/create-plan` auto-finds recent research)
-- Refreshed each session
-
-**How They Work Together:**
+**How It Works:**
 
 ```
 ┌─────────────────────────────────────┐
-│  .claude/config.json                │
-│  {                                  │
-│    "configName": "acme",            │ ← Which thoughts repo?
-│    "project": {                     │
-│      "ticketPrefix": "ACME"         │
-│    }                                │
-│  }                                  │
+│  Linear Ticket: PROJ-123            │
+│  ├─ Research: OAuth Implementation  │ ← From /research-codebase
+│  ├─ Plan: OAuth Implementation      │ ← From /create-plan
+│  ├─ Handoff: Session 2025-01-08     │ ← From /create-handoff
+│  └─ PR: #456 - Add OAuth Support    │ ← From /describe-pr
 └─────────────────────────────────────┘
           │
-          ├──→ Points to HumanLayer config "acme"
-          │
-          ▼
-┌─────────────────────────────────────┐
-│  ~/thoughts/repos/acme/             │
-│  ├─ shared/research/                │ ← Long-term memory
-│  ├─ shared/plans/                   │   (git-backed)
-│  ├─ shared/prs/                     │
-│  └─ shared/handoffs/                │
-└─────────────────────────────────────┘
-          │
-          ├──→ Commands read/write here
+          ├──→ Queried via: linearis attachments list --issue PROJ-123
           │
           ▼
 ┌─────────────────────────────────────┐
 │  .claude/.workflow-context.json     │
-│  {                                  │ ← Short-term memory
-│    "mostRecentDocument": {          │   (session pointers)
-│      "type": "plans",               │
-│      "path": "thoughts/shared/..."  │ ← Points into long-term
-│    },                                │
-│    "workflow": {                    │
-│      "research": [...],             │ ← Recent docs
-│      "plans": [...]                 │
-│    }                                │
+│  {                                  │
+│    "currentTicket": "PROJ-123"      │ ← Tracks active ticket
 │  }                                  │
 └─────────────────────────────────────┘
 ```
 
-**Why This Matters:**
+**Benefits:**
 
-This architecture enables you to:
-
-- Work on multiple separate projects (work/personal, unrelated clients)
-- Keep project contexts isolated via different HumanLayer configs
-- Share long-term knowledge across worktrees within a project
-- Chain commands together without remembering file paths
-- Avoid committing secrets or session state to git
+- All workflow documents attached to the relevant ticket
+- Easy to find: query by ticket ID
+- Team collaboration: everyone sees same documents
+- No file path management
+- Documents survive across sessions and worktrees
 
 **Example Flow:**
 
-1. Project config says "use acme thoughts repo"
-2. `/research-codebase` saves to `~/thoughts/repos/acme/shared/research/`
-3. Workflow-context tracks this as `mostRecentDocument`
-4. `/create-plan` auto-references the research (no manual path needed)
-5. Plan saves to `~/thoughts/repos/acme/shared/plans/`
-6. Workflow-context updates to point to the new plan
-7. `/implement-plan` auto-finds the plan
+1. `/research-codebase PROJ-123` sets ticket, creates "Research: ..." document
+2. `/create-plan` queries PROJ-123 for research, creates "Plan: ..." document
+3. `/implement-plan` queries PROJ-123 for plan, implements phases
+4. `/describe-pr` creates "PR: ..." document
+5. `/create-handoff` creates "Handoff: ..." document if pausing work
 
-All while keeping different projects completely isolated.
+All documents attached to the same ticket for easy discovery.
 
 ### Agent Philosophy
 
@@ -186,7 +139,7 @@ Commands are organized into namespaces for clarity and discoverability:
 All commands:
 
 - Orchestrate multi-step processes via sub-agents
-- Use the thoughts system for persistent context
+- Use Linear documents for persistent context
 - Are configuration-driven (see `.claude/config.json`)
 - Spawn parallel sub-agents for efficiency
 
@@ -250,121 +203,81 @@ Catalyst uses a **two-layer config system** to keep secrets out of git:
     "ticketPrefix": "ACME",
     "name": "Acme Corp Project"
   },
-  "thoughts": {
-    "user": null
+  "catalyst": {
+    "linear": {
+      "teamKey": "ACME"
+    }
   }
 }
 ```
 
-**Layer 2: Secrets Config** (`~/.config/catalyst/config-{projectKey}.json` - NEVER committed):
-```json
-{
-  "linear": {
-    "apiToken": "lin_api_...",
-    "teamKey": "ACME",
-    "defaultTeam": "ACME"
-  },
-  "sentry": {
-    "org": "acme-corp",
-    "project": "acme-web",
-    "authToken": "sntrys_..."
-  },
-  "railway": {
-    "token": "...",
-    "projectId": "..."
-  },
-  "posthog": {
-    "apiKey": "...",
-    "projectId": "..."
-  },
-  "exa": {
-    "apiKey": "..."
-  }
-}
-```
-
-**Setup**:
+**Layer 2: Environment Variables** (set in shell or `.env` - NEVER committed):
 ```bash
-./scripts/setup-catalyst-config.sh
+export LINEAR_API_TOKEN="lin_api_..."
 ```
 
 **Benefits**:
-- ✅ Secrets never in git
-- ✅ Consistent project key across HumanLayer and Catalyst
+- ✅ Secrets never in git (use environment variables)
 - ✅ Multiple projects per machine (work/personal/clients)
 - ✅ `.claude/config.json` only has non-sensitive metadata
 
-**Switching projects**: Just update `projectKey` in `.claude/config.json`
+**Switching projects**: Just update `projectKey` and team settings in `.claude/config.json`
 
 Commands read config to customize behavior per-project.
 
-### Thoughts System (REQUIRED)
+### Linear Integration (REQUIRED)
 
-Catalyst **requires** the thoughts system for all workflow commands. This provides:
+Catalyst **requires** Linear for workflow document storage. This provides:
 
-- 📁 **Persistent context**: Research, plans, handoffs survive across sessions
-- 🔄 **Team collaboration**: Git-backed, synced via HumanLayer
-- 🌲 **Worktree sharing**: Same context across multiple feature branches
+- 📁 **Persistent context**: Research, plans, handoffs stored as Linear documents
+- 🔄 **Team collaboration**: Documents attached to tickets are visible to all
+- 🎫 **Ticket-centric**: All workflow artifacts tied to the work they support
 
-**Required Structure:**
+**Prerequisites:**
 
-```
-thoughts/shared/
-├── research/       # Research documents from /research-codebase
-├── plans/          # Implementation plans from /create-plan
-├── handoffs/       # Session handoffs from /create-handoff
-├── prs/            # PR descriptions from /describe-pr
-└── reports/        # PM reports (cycles, milestones, daily)
-    ├── cycles/
-    ├── milestones/
-    ├── daily/
-    ├── backlog/
-    └── pr-sync/
-```
-
-**Setup:**
-
-```bash
-# Initialize thoughts system for your project
-./scripts/humanlayer/init-project.sh . acme-corp
-
-# Sync thoughts
-humanlayer thoughts sync
-```
+1. **Linearis CLI** installed: `npm install -g linearis`
+2. **LINEAR_API_TOKEN** environment variable set
 
 **Validation:**
 
-Commands automatically validate thoughts system is configured. If not, you'll see:
+Commands automatically validate Linear is configured. If not, you'll see:
 
 ```
-❌ ERROR: Thoughts system not configured
-Run: ./scripts/humanlayer/init-project.sh . {project-name}
+❌ Linearis CLI not found
+Install with: npm install -g linearis
+
+❌ LINEAR_API_TOKEN not set
+Get a token from: https://linear.app/settings/api
+Then: export LINEAR_API_TOKEN=your_token
 ```
 
 **Why Required?**
 
-Unlike optional fallbacks, Catalyst requires thoughts because:
-1. Workflow commands chain together (research → plan → implement)
-2. Commands auto-find recent documents via workflow context
-3. Team members need shared context
-4. Worktrees need shared memory
+Catalyst requires Linear because:
+1. Workflow commands chain together via ticket documents (research → plan → implement)
+2. Commands auto-find documents by querying the current ticket
+3. Team members see the same documents
+4. Documents survive across sessions and worktrees
 
-Without thoughts, the workflow breaks.
+**PM Reports:**
 
-See `docs/THOUGHTS_SETUP.md` for comprehensive setup guide.
+Unlike workflow documents, PM reports (cycles, milestones, daily) are saved to git in `reports/`
+directory since they're not tied to single tickets.
+
+See `plugins/dev/LINEAR_DOCUMENTS.md` for comprehensive guide.
 
 ## Directory Structure
 
 ```
-ryan-claude-workspace/
+catalyst/
 ├── plugins/                 # Plugin packages for distribution
 │   ├── dev/                 # Development workflow plugin (catalyst-dev)
 │   │   ├── agents/          # Specialized research agents
 │   │   │   ├── codebase-locator.md
 │   │   │   ├── codebase-analyzer.md
 │   │   │   ├── codebase-pattern-finder.md
-│   │   │   ├── thoughts-locator.md
-│   │   │   ├── thoughts-analyzer.md
+│   │   │   ├── linear-document-locator.md  # Find docs attached to tickets
+│   │   │   ├── linear-document-analyzer.md # Analyze Linear documents
 │   │   │   ├── external-research.md
 │   │   │   └── README.md
 │   │   ├── commands/        # Core workflow commands
@@ -380,43 +293,33 @@ ryan-claude-workspace/
 │   │   │   ├── check-prerequisites.sh
 │   │   │   ├── create-worktree.sh
 │   │   │   └── workflow-context.sh
+│   │   ├── LINEAR_DOCUMENTS.md  # Linear documents conventions
 │   │   └── plugin.json      # Plugin manifest
 │   ├── pm/                  # Project management plugin (catalyst-pm)
 │   │   ├── agents/          # PM analysis agents
 │   │   │   ├── cycle-analyzer.md
-│   │   │   ├── backlog-groomer.md
-│   │   │   └── pr-correlator.md
+│   │   │   ├── backlog-analyzer.md
+│   │   │   └── github-linear-analyzer.md
 │   │   ├── commands/        # PM workflow commands
-│   │   │   ├── cycle_status.md
-│   │   │   ├── team_daily.md
-│   │   │   ├── backlog_groom.md
-│   │   │   └── pr_sync.md
+│   │   │   ├── analyze_cycle.md
+│   │   │   ├── analyze_milestone.md
+│   │   │   ├── report_daily.md
+│   │   │   ├── groom_backlog.md
+│   │   │   └── sync_prs.md
 │   │   ├── scripts/         # PM utility scripts
-│   │   │   ├── check-prerequisites.sh
-│   │   │   └── pm-utils.sh
+│   │   │   └── check-prerequisites.sh
 │   │   ├── README.md        # PM plugin documentation
-│   │   └── .claude-plugin/
-│   │       └── plugin.json  # Plugin manifest
-│   ├── analytics/           # Analytics plugin (catalyst-analytics)
-│   ├── debugging/           # Debugging plugin (catalyst-debugging)
+│   │   └── plugin.json      # Plugin manifest
 │   └── meta/                # Meta/workflow management plugin (catalyst-meta)
 │       ├── commands/        # Workflow discovery & creation
 │       │   ├── create_workflow.md
 │       │   ├── discover_workflows.md
 │       │   ├── import_workflow.md
-│       │   ├── validate_frontmatter.md
-│       │   └── workflow_help.md
+│       │   └── validate_frontmatter.md
 │       ├── scripts/         # Runtime scripts for meta commands
 │       │   └── validate-frontmatter.sh
 │       └── plugin.json      # Plugin manifest
 ├── scripts/                 # One-time setup scripts (not bundled in plugins)
-│   ├── humanlayer/          # HumanLayer/thoughts setup
-│   │   ├── setup-thoughts.sh
-│   │   ├── init-project.sh
-│   │   ├── add-client-config
-│   │   └── setup-personal-thoughts.sh
-│   ├── linear/              # Linear workflow setup
-│   │   └── setup-linear-workflow
 │   └── README.md            # Setup scripts documentation
 ├── docs/                    # Documentation
 │   ├── USAGE.md                  # Comprehensive usage guide
@@ -425,13 +328,15 @@ ryan-claude-workspace/
 │   ├── CONTEXT_ENGINEERING.md
 │   ├── CONFIGURATION.md
 │   ├── AGENTIC_WORKFLOW_GUIDE.md
-│   ├── WORKFLOW_DISCOVERY_SYSTEM.md
 │   ├── LINEAR_WORKFLOW_AUTOMATION.md
 │   ├── FRONTMATTER_STANDARD.md
-│   ├── DEEPWIKI_INTEGRATION.md
-│   ├── MULTI_CONFIG_GUIDE.md
-│   ├── HUMANLAYER_COMMANDS_ANALYSIS.md
 │   └── PR_LIFECYCLE.md
+├── reports/                 # PM reports (git-tracked, not in Linear)
+│   ├── cycles/              # Cycle analysis reports
+│   ├── milestones/          # Milestone progress reports
+│   ├── daily/               # Daily standup reports
+│   ├── backlog/             # Backlog grooming reports
+│   └── pr-sync/             # GitHub-Linear sync reports
 ├── .claude/                 # Local Claude Code installation
 │   ├── config.json          # Configuration (generic template values)
 │   ├── .workflow-context.json # Workflow state (not committed)
@@ -440,59 +345,57 @@ ryan-claude-workspace/
 │       └── meta -> ../../plugins/meta/
 ├── README.md                # Overview and quick start
 ├── QUICKSTART.md            # 5-minute setup guide
-├── COMMANDS_ANALYSIS.md     # Command catalog
 └── CLAUDE.md                # This file
 ```
 
 ## Core Workflows
 
-### Research → Plan → Implement → Validate
+### Research → Plan → Implement (Full Automation)
 
 **1. Research Phase:**
 
 ```
-/research-codebase
+/research-codebase PROJ-123
 > "How does authentication work in the API?"
 ```
 
+- Sets current ticket to PROJ-123
 - Spawns parallel sub-agents (locator, analyzer, pattern-finder)
 - Documents what exists with file:line references
-- Saves to `thoughts/shared/research/YYYY-MM-DD-description.md`
+- Saves to Linear as "Research: ..." document attached to PROJ-123
 
 **2. Planning Phase:**
 
 ```
 /create-plan
-> Reference: thoughts/shared/research/2025-01-08-auth.md
-> Task: Add OAuth support
 ```
 
-- Reads research documents fully
-- Interactive planning with user
+- Auto-finds research from Linear (attached to current ticket)
+- Interactive planning with user (when in interactive mode)
 - Includes automated AND manual success criteria
-- Saves to `thoughts/shared/plans/YYYY-MM-DD-PROJ-XXX-description.md`
+- Saves to Linear as "Plan: ..." document attached to PROJ-123
 
-**3. Implementation Phase:**
+**3. Implementation Phase (AUTOMATED):**
 
 ```
-/implement-plan thoughts/shared/plans/2025-01-08-PROJ-123-oauth.md
+/implement-plan
 ```
 
-- Reads full plan (no partial reads)
+- Reads plan from Linear (attached to current ticket)
 - Implements each phase sequentially
-- Runs automated verification
-- Updates checkboxes as work completes
+- Updates checkboxes in Linear document as work completes
+- **Auto-validates** (self-healing, creates "Validation: ..." doc)
+- **Auto-creates PR** (commits, pushes, creates PR)
+- **Auto-reviews** (runs pr-review-toolkit)
+- **Auto-remediates** (fixes all review items, max 3 attempts each)
+- **Squashes commits** into clean history
+- Reports completion with any items needing manual attention
 
-**4. Validation Phase:**
-
-```
-/validate-plan
-```
-
-- Verifies all phases completed
-- Runs automated test suites
-- Documents deviations
-- Provides manual testing steps
+**Output**: Clean PR ready for human review, all documents linked in Linear:
+- Research: ...
+- Plan: ...
+- Validation: ...
+- PR: ...
 
 ### Worktree Development
 
@@ -507,10 +410,10 @@ This creates:
 - Git worktree at `~/wt/{repo-name}/feature-name/`
 - New branch `PROJ-123-feature-name`
 - `.claude/` copied over
-- `thoughts/` automatically shared (symlinked)
 - Dependencies installed
+- Current ticket set to PROJ-123
 
-**Key benefit:** Multiple features in progress, shared context via thoughts.
+**Key benefit:** Multiple features in progress, context shared via Linear documents.
 
 ### Workflow Discovery
 
@@ -574,17 +477,21 @@ Use `/validate-frontmatter` to check consistency.
 - Claude Code (claude.ai/code)
 - Git
 - Bash
+- Linearis CLI (`linearis`) - For Linear document storage
+- LINEAR_API_TOKEN environment variable
 
 **Optional:**
 
-- HumanLayer CLI (`humanlayer`) - For thoughts system
-- Linear CLI (`linear`) - For Linear integration
-- GitHub CLI (`gh`) - For PR creation
+- GitHub CLI (`gh`) - For PR creation and GitHub operations
 
-**Installation:** The thoughts system requires HumanLayer CLI. Setup with:
+**Installation:**
 
 ```bash
-./scripts/setup-thoughts.sh
+# Install Linearis CLI
+npm install -g linearis
+
+# Set Linear API token
+export LINEAR_API_TOKEN="lin_api_..."
 ```
 
 ## Update Strategy
@@ -634,18 +541,11 @@ For project management workflows with Linear:
 **Architecture**: Research-first (Haiku for data, Sonnet for analysis)
 **Philosophy**: All reports provide actionable insights, not just data dumps
 
-### DeepWiki Integration
+### External Research
 
 - External research via `external-research` agent
 - Queries GitHub repositories for patterns
-- See `docs/DEEPWIKI_INTEGRATION.md`
-
-### HumanLayer Integration
-
-- Thoughts system via `humanlayer` CLI
-- Personal/shared/global directories
-- Git-backed persistence
-- Commands: `humanlayer thoughts sync`, `humanlayer thoughts status`
+- Web search for documentation and best practices
 
 ## Architecture Decision Records
 
@@ -670,64 +570,45 @@ Brief records of key architectural decisions made in this project.
 
 ---
 
-### ADR-002: Per-Project HumanLayer Configuration
+### ADR-002: Linear Documents for Workflow Context
 
-**Decision**: Support multiple HumanLayer configs via `configName` in `.claude/config.json`.
+**Decision**: Store workflow documents (research, plans, handoffs, PRs) as Linear documents attached
+to tickets instead of filesystem-based storage.
 
 **Rationale**:
 
-- Users work on multiple separate projects (work/personal, different clients)
-- Each project needs its own thoughts repository
-- Switching configs should be seamless
-- Config files can be committed (no secrets, just config names)
+- All workflow artifacts are naturally tied to tickets
+- Team members can see documents in Linear UI
+- No filesystem path management
+- Documents automatically shared across worktrees
+- Simplified architecture (no separate "thoughts" system)
 
 **Consequences**:
 
-- HumanLayer CLI must be configured with multiple named configs
-- Scripts must read `configName` from project config
-- Setup requires `scripts/humanlayer/add-client-config` for new projects
-- Projects remain isolated with separate long-term memory
+- Requires Linear and Linearis CLI for all workflow commands
+- Workflow-context.json only tracks `currentTicket`, not document paths
+- Commands query Linear by ticket ID to find documents
+- PM reports still go to git (not ticket-specific)
 
 ---
 
-### ADR-003: Three-Layer Memory Architecture
+### ADR-003: Workflow-Context for Ticket Tracking
 
-**Decision**: Separate project configuration, long-term memory (thoughts), and short-term memory
-(workflow-context).
-
-**Rationale**:
-
-- Config: Project-specific settings, portable, committable
-- Long-term: Git-backed persistence, team collaboration, survives sessions
-- Short-term: Session state, command chaining, not committed
-
-**Consequences**:
-
-- Commands must update workflow-context.json when creating documents
-- Thoughts must be synced via `humanlayer thoughts sync`
-- Workflow-context must be in `.gitignore`
-- System supports multiple projects and worktrees seamlessly
-
----
-
-### ADR-004: Workflow-Context for Session State
-
-**Decision**: Store recent document references in `.claude/.workflow-context.json` for command
-chaining.
+**Decision**: Store current ticket in `.claude/.workflow-context.json` for command chaining.
 
 **Rationale**:
 
-- Users shouldn't remember file paths between commands
-- `/research-codebase` → `/create-plan` → `/implement-plan` should flow naturally
+- Users shouldn't remember ticket IDs between commands
+- `/research-codebase PROJ-123` → `/create-plan` → `/implement-plan` should flow naturally
 - Context must be local to each worktree
 - Must not contain secrets or be committed to git
 
 **Consequences**:
 
-- All workflow commands must update workflow-context.json
-- Helper script `scripts/workflow-context.sh` provides consistent interface
+- Workflow commands set/get ticket via workflow-context.sh
+- Documents are discovered by querying Linear for the current ticket
 - Context is lost when worktree is deleted (by design)
-- Commands can auto-discover recent documents without user input
+- Each worktree can work on a different ticket
 
 ---
 
@@ -772,7 +653,7 @@ Based on Anthropic's context engineering:
 1. **Context is precious** - Use specialized agents, not monoliths
 2. **Just-in-time loading** - Load context dynamically
 3. **Sub-agent architecture** - Parallel research > sequential
-4. **Structured persistence** - Save outside conversation (thoughts/)
+4. **Structured persistence** - Save to Linear documents, not conversation memory
 5. **Read files fully** - No partial reads of key documents
 6. **Wait for agents** - Don't proceed until research completes
 
@@ -786,7 +667,7 @@ When researching, spawn multiple agents at once:
 
 ```
 @catalyst-dev:codebase-locator find authentication files
-@catalyst-dev:thoughts-locator find authentication research
+@catalyst-dev:linear-document-locator find research for PROJ-123
 @catalyst-dev:codebase-analyzer analyze auth flow
 ```
 
@@ -866,38 +747,24 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 /plugin install catalyst-dev
 ```
 
-**Setting up thoughts in a new project:**
+**Setting up Linear in a new project:**
 
-```bash
-cd /path/to/new-project
+1. Install Linearis CLI: `npm install -g linearis`
+2. Set `LINEAR_API_TOKEN` environment variable
+3. Configure team in `.claude/config.json`:
 
-# Download init script
-curl -O https://raw.githubusercontent.com/coalesce-labs/catalyst/main/scripts/init-project.sh
-chmod +x init-project.sh
-./init-project.sh . project-name
-
-# Sync thoughts
-humanlayer thoughts sync
+```json
+{
+  "catalyst": {
+    "linear": {
+      "teamKey": "YOUR-TEAM"
+    }
+  }
+}
 ```
 
-**Sharing with team:** Commit `thoughts/` to project repo. Team gets shared context via thoughts
-system. Each team member installs the Catalyst plugin independently.
-
-## Multi-Config Support
-
-For consultants working across clients:
-
-```bash
-# Download multi-config setup
-curl -O https://raw.githubusercontent.com/coalesce-labs/catalyst/main/scripts/setup-multi-config.sh
-chmod +x setup-multi-config.sh
-./setup-multi-config.sh
-
-# Switch between configs
-hl-switch client-name
-```
-
-Manages separate configs per client. See `docs/MULTI_CONFIG_GUIDE.md`.
+**Sharing with team:** Team members see documents in Linear. Each team member installs the Catalyst
+plugin independently and sets their own `LINEAR_API_TOKEN`.
 
 ## Key Principles When Editing
 
@@ -907,7 +774,7 @@ Manages separate configs per client. See `docs/MULTI_CONFIG_GUIDE.md`.
 4. **Read fully, not partially** - Especially tickets, plans, research
 5. **Spawn parallel agents** - Maximize efficiency
 6. **Wait for completion** - Don't synthesize partial results
-7. **Preserve context** - Save to thoughts/, not just memory
+7. **Preserve context** - Save to Linear documents, not just memory
 8. **Smart updates** - Merge workspace changes, keep local config
 
 ## Getting Help
@@ -927,15 +794,15 @@ This workspace tracks:
 - Documentation
 - Scripts
 - Configuration templates (generic values)
+- PM reports (`reports/` directory)
 
 **Do NOT commit to this workspace:**
 
 - Specific ticket prefixes (keep "PROJ")
-- Linear team/project IDs (keep null)
-- Personal thoughts user (keep null)
+- Linear team keys (keep generic)
 
 **Do commit to project repos:**
 
-- Real config values
+- Real config values in `.claude/config.json`
 - Project-specific customizations
-- Shared thoughts content
+- PM reports in `reports/`

@@ -18,19 +18,7 @@ Comprehensive backlog health analysis that identifies:
 ## Prerequisites Check
 
 ```bash
-# 1. Validate thoughts system (REQUIRED)
-if [[ -f "scripts/validate-thoughts-setup.sh" ]]; then
-  ./scripts/validate-thoughts-setup.sh || exit 1
-else
-  # Inline validation if script not found
-  if [[ ! -d "thoughts/shared" ]]; then
-    echo "❌ ERROR: Thoughts system not configured"
-    echo "Run: ./scripts/humanlayer/init-project.sh . {project-name}"
-    exit 1
-  fi
-fi
-
-# 2. Determine script directory with fallback
+# 1. Determine script directory with fallback
 if [[ -n "${CLAUDE_PLUGIN_ROOT}" ]]; then
   SCRIPT_DIR="${CLAUDE_PLUGIN_ROOT}/scripts"
 else
@@ -38,12 +26,15 @@ else
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts"
 fi
 
-# 3. Check PM plugin prerequisites
+# 2. Check PM plugin prerequisites (validates Linearis CLI and LINEAR_API_TOKEN)
 if [[ -f "${SCRIPT_DIR}/check-prerequisites.sh" ]]; then
   "${SCRIPT_DIR}/check-prerequisites.sh" || exit 1
 else
   echo "⚠️ Prerequisites check skipped (script not found at: ${SCRIPT_DIR})"
 fi
+
+# 3. Ensure reports directory exists
+mkdir -p "reports/backlog"
 ```
 
 ## Process
@@ -186,7 +177,7 @@ echo "✅ Backlog grooming updates applied"
 
 ```bash
 # Save update script
-UPDATE_SCRIPT="thoughts/shared/reports/backlog/$(date +%Y-%m-%d)-grooming-updates.sh"
+UPDATE_SCRIPT="reports/backlog/$(date +%Y-%m-%d)-grooming-updates.sh"
 mkdir -p "$(dirname "$UPDATE_SCRIPT")"
 # [script contents saved here]
 chmod +x "$UPDATE_SCRIPT"
@@ -195,7 +186,7 @@ chmod +x "$UPDATE_SCRIPT"
 ### Step 6: Save Report
 
 ```bash
-REPORT_DIR="thoughts/shared/reports/backlog"
+REPORT_DIR="reports/backlog"
 mkdir -p "$REPORT_DIR"
 
 REPORT_FILE="$REPORT_DIR/$(date +%Y-%m-%d)-backlog-grooming.md"
@@ -208,11 +199,6 @@ cat > "$REPORT_FILE" << EOF
 EOF
 
 echo "✅ Report saved: $REPORT_FILE"
-
-# Update workflow context
-if [[ -f "${SCRIPT_DIR}/workflow-context.sh" ]]; then
-  "${SCRIPT_DIR}/workflow-context.sh" add reports "$REPORT_FILE" null
-fi
 ```
 
 ## Success Criteria

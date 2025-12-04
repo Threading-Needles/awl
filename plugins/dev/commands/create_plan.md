@@ -3,19 +3,10 @@ description: Create detailed implementation plans through an interactive process
 category: workflow
 tools: Read, Write, Grep, Glob, Task, TodoWrite, Bash
 model: inherit
-version: 1.0.0
+version: 2.0.0
 ---
 
 # Implementation Plan
-
-## Configuration Note
-
-This command uses ticket references like `PROJ-123`. Replace `PROJ` with your Linear team's ticket
-prefix:
-
-- Read from `.claude/config.json` if available
-- Otherwise use a generic format like `TICKET-XXX`
-- Examples: `ENG-123`, `FEAT-456`, `BUG-789`
 
 You are tasked with creating detailed implementation plans through an interactive, iterative
 process. You should be skeptical, thorough, and work collaboratively with the user to produce
@@ -23,22 +14,10 @@ high-quality technical specifications.
 
 ## Prerequisites
 
-Before executing, verify all required tools and systems:
+Before executing, verify Linear integration is available:
 
 ```bash
-# 1. Validate thoughts system (REQUIRED)
-if [[ -f "scripts/validate-thoughts-setup.sh" ]]; then
-  ./scripts/validate-thoughts-setup.sh || exit 1
-else
-  # Inline validation if script not found
-  if [[ ! -d "thoughts/shared" ]]; then
-    echo "❌ ERROR: Thoughts system not configured"
-    echo "Run: ./scripts/humanlayer/init-project.sh . {project-name}"
-    exit 1
-  fi
-fi
-
-# 2. Validate plugin scripts
+# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
 if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
   "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
 fi
@@ -46,55 +25,83 @@ fi
 
 ## Initial Response
 
-**STEP 1: Check for recent research (OPTIONAL)**
+### Step 1: Get Current Ticket
 
-IMMEDIATELY run this bash script to find recent research that might be relevant:
+Check workflow context for current ticket:
 
 ```bash
-# Find recent research that might inform this plan
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" ]]; then
-  RECENT_RESEARCH=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" recent research)
-  if [[ -n "$RECENT_RESEARCH" ]]; then
-    echo "💡 Found recent research: $RECENT_RESEARCH"
-    echo ""
-  fi
-fi
+CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
 ```
 
-**STEP 2: Gather initial input**
+### Step 2: Handle Ticket State
 
-After checking for research, follow this logic:
-
-1. **If user provided parameters** (file path or ticket reference):
-   - Immediately read any provided files FULLY
-   - If RECENT_RESEARCH was found, ask: "Should I reference the recent research document in this plan?"
-   - Begin the research process
-
-2. **If no parameters provided**:
-   - Show any RECENT_RESEARCH that was found
-   - Respond with:
+**If no current ticket:**
 
 ```
-I'll help you create a detailed implementation plan. Let me start by understanding what we're building.
+I need a Linear ticket to attach this plan to.
+
+Please either:
+1. Run `/research-codebase PROJ-123` first (recommended - includes research phase)
+2. Provide a ticket ID now: I'll set it and continue
+
+Which would you prefer?
+```
+
+If user provides ticket, set it:
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
+```
+
+**If current ticket exists:**
+
+```
+I'll create an implementation plan for ticket {CURRENT_TICKET}.
+
+Let me check for existing research on this ticket...
+```
+
+### Step 3: Find Existing Research
+
+Use the linear-document-locator agent to find research documents:
+
+```bash
+linearis attachments list --issue "$CURRENT_TICKET"
+```
+
+Look for documents with title starting with "Research:".
+
+**If research found:**
+
+```
+I found existing research for {CURRENT_TICKET}:
+- Research: {title}
+
+I'll use this as context for the plan. Let me read it...
+```
+
+Read the research document content using linear-document-analyzer.
+
+**If no research found:**
+
+```
+No research document found for {CURRENT_TICKET}.
+
+Would you like me to:
+1. Create a plan without research (you'll provide context)
+2. Run /research-codebase first (recommended)
+```
+
+### Step 4: Gather Planning Input
+
+```
+I'll help you create a detailed implementation plan for {CURRENT_TICKET}.
 
 Please provide:
-1. The task/ticket description (or reference to a ticket file)
-2. Any relevant context, constraints, or specific requirements
-3. Links to related research or previous implementations
-```
+1. What feature/change are we implementing?
+2. Any specific requirements or constraints
+3. Preferred approach (if you have one)
 
-If RECENT_RESEARCH exists, add:
-```
-💡 I found recent research: $RECENT_RESEARCH
-   Would you like me to use this as context for the plan?
-```
-
-Continue with:
-```
-I'll analyze this information and work with you to create a comprehensive plan.
-
-Tip: You can also invoke this command with a ticket file directly: `/create_plan thoughts/allison/tickets/proj_123.md`
-For deeper analysis, try: `/create_plan think deeply about thoughts/allison/tickets/proj_123.md`
+I'll analyze this along with the research and work with you to create a comprehensive plan.
 ```
 
 Then wait for the user's input.
@@ -103,40 +110,19 @@ Then wait for the user's input.
 
 ### Step 1: Context Gathering & Initial Analysis
 
-1. **Read all mentioned files immediately and FULLY**:
-   - Ticket files (e.g., `thoughts/allison/tickets/proj_123.md`)
-   - Research documents
-   - Related implementation plans
-   - Any JSON/data files mentioned
-   - **IMPORTANT**: Use the Read tool WITHOUT limit/offset parameters to read entire files
-   - **CRITICAL**: DO NOT spawn sub-tasks before reading these files yourself in the main context
-   - **NEVER** read files partially - if a file is mentioned, read it completely
+1. **Read the ticket details from Linear**:
+   ```bash
+   linearis issues read "$CURRENT_TICKET"
+   ```
 
-2. **Spawn initial research tasks to gather context**: Before asking the user any questions, use
-   specialized agents to research in parallel:
-   - Use the **codebase-locator** agent to find all files related to the ticket/task
-   - Use the **codebase-analyzer** agent to understand how the current implementation works
-   - If relevant, use the **thoughts-locator** agent to find any existing thoughts documents about
-     this feature
-   - If a Linear ticket is mentioned, use the **linear-ticket-reader** agent to get full details
+2. **Read any research documents** using linear-document-analyzer
 
-   These agents will:
-   - Find relevant source files, configs, and tests
-   - Identify the specific directories to focus on (e.g., if WUI is mentioned, they'll focus on
-     humanlayer-wui/)
-   - Trace data flow and key functions
-   - Return detailed explanations with file:line references
+3. **Spawn initial research tasks to gather codebase context**:
+   - Use the **codebase-locator** agent to find all files related to the task
+   - Use the **codebase-analyzer** agent to understand current implementation
+   - Use the **linear-document-locator** agent to find any existing documents on this ticket
 
-3. **Read all files identified by research tasks**:
-   - After research tasks complete, read ALL files they identified as relevant
-   - Read them FULLY into the main context
-   - This ensures you have complete understanding before proceeding
-
-4. **Analyze and verify understanding**:
-   - Cross-reference the ticket requirements with actual code
-   - Identify any discrepancies or misunderstandings
-   - Note assumptions that need verification
-   - Determine true scope based on codebase reality
+4. **Read all files identified by research tasks** FULLY into main context
 
 5. **Present informed understanding and focused questions**:
 
@@ -154,54 +140,30 @@ Then wait for the user's input.
    - [Design preference that affects implementation]
    ```
 
-   Only ask questions that you genuinely cannot answer through code investigation.
-
 ### Step 2: Research & Discovery
 
 After getting initial clarifications:
 
-1. **If the user corrects any misunderstanding**:
-   - DO NOT just accept the correction
-   - Spawn new research tasks to verify the correct information
-   - Read the specific files/directories they mention
-   - Only proceed once you've verified the facts yourself
-
-2. **Create a research todo list** using TodoWrite to track exploration tasks
-
-3. **Spawn parallel sub-tasks for comprehensive research**:
-   - Create multiple Task agents to research different aspects concurrently
-   - Use the right agent for each type of research:
+1. **Spawn parallel sub-tasks for comprehensive research**:
 
    **For local codebase:**
-   - **codebase-locator** - To find more specific files (e.g., "find all files that handle [specific
-     component]")
-   - **codebase-analyzer** - To understand implementation details (e.g., "analyze how [system]
-     works")
-   - **codebase-pattern-finder** - To find similar features we can model after
+   - **codebase-locator** - Find specific files
+   - **codebase-analyzer** - Understand implementation details
+   - **codebase-pattern-finder** - Find similar features to model after
 
    **For external research:**
-   - **external-research** - To research framework patterns and best practices from popular repos
-   - Ask: "How does [framework] recommend implementing [feature]?"
-   - Ask: "What's the standard approach for [pattern] in [library]?"
-   - Examples: React patterns, Express middleware, Next.js routing, Prisma schemas
+   - **external-research** - Research framework patterns and best practices
 
-   **For historical context:**
-   - **thoughts-locator** - To find any research, plans, or decisions about this area
-   - **thoughts-analyzer** - To extract key insights from the most relevant documents
+   **For existing Linear documents:**
+   - **linear-document-locator** - Find related documents
+   - **linear-document-analyzer** - Extract insights from documents
 
    **For related tickets:**
-   - **linear-searcher** - To find similar issues or past implementations
+   - **linear-research** - Find similar issues or past implementations
 
-   Each agent knows how to:
-   - Find the right files and code patterns
-   - Identify conventions and patterns to follow
-   - Look for integration points and dependencies
-   - Return specific file:line references
-   - Find tests and examples
+2. **Wait for ALL sub-tasks to complete** before proceeding
 
-4. **Wait for ALL sub-tasks to complete** before proceeding
-
-5. **Present findings and design options**:
+3. **Present findings and design options**:
 
    ```
    Based on my research, here's what I found:
@@ -225,7 +187,13 @@ After getting initial clarifications:
 
 Once aligned on approach:
 
-1. **Create initial plan outline**:
+1. **Update Linear ticket status**:
+   ```bash
+   linearis issues update "$CURRENT_TICKET" --state "Plan in Progress"
+   linearis comments create "$CURRENT_TICKET" --body "Starting implementation planning"
+   ```
+
+2. **Create initial plan outline**:
 
    ```
    Here's my proposed plan structure:
@@ -241,24 +209,19 @@ Once aligned on approach:
    Does this phasing make sense? Should I adjust the order or granularity?
    ```
 
-2. **Get feedback on structure** before writing details
+3. **Get feedback on structure** before writing details
 
 ### Step 4: Detailed Plan Writing
 
-After structure approval:
-
-1. **Write the plan** to `thoughts/shared/plans/YYYY-MM-DD-PROJ-XXXX-description.md`
-   - Format: `YYYY-MM-DD-PROJ-XXXX-description.md` where:
-     - YYYY-MM-DD is today's date
-     - PROJ-XXXX is the ticket number (omit if no ticket)
-     - description is a brief kebab-case description
-   - Examples:
-     - With ticket: `2025-01-08-PROJ-123-parent-child-tracking.md`
-     - Without ticket: `2025-01-08-improve-error-handling.md`
-2. **Use this template structure**:
+After structure approval, create the plan document content:
 
 ````markdown
 # [Feature/Task Name] Implementation Plan
+
+**Ticket**: {CURRENT_TICKET}
+**Date**: {date}
+**Branch**: {branch-name}
+**Repository**: {repo-name}
 
 ## Overview
 
@@ -296,7 +259,8 @@ After structure approval:
 
 #### 1. [Component/File Group]
 
-**File**: `path/to/file.ext` **Changes**: [Summary of changes]
+**File**: `path/to/file.ext`
+**Changes**: [Summary of changes]
 
 ```[language]
 // Specific code to add/modify
@@ -310,128 +274,100 @@ After structure approval:
 - [ ] Unit tests pass: `make test-component`
 - [ ] Type checking passes: `npm run typecheck`
 - [ ] Linting passes: `make lint`
-- [ ] Integration tests pass: `make test-integration`
 
 #### Manual Verification:
 
 - [ ] Feature works as expected when tested via UI
 - [ ] Performance is acceptable under load
-- [ ] Edge case handling verified manually
 - [ ] No regressions in related features
 
 ---
 
 ## Phase 2: [Descriptive Name]
 
-[Similar structure with both automated and manual success criteria...]
+[Similar structure...]
 
 ---
 
 ## Testing Strategy
 
 ### Unit Tests:
-
 - [What to test]
 - [Key edge cases]
 
 ### Integration Tests:
-
 - [End-to-end scenarios]
 
 ### Manual Testing Steps:
-
 1. [Specific step to verify feature]
 2. [Another verification step]
-3. [Edge case to test manually]
-
-## Performance Considerations
-
-[Any performance implications or optimizations needed]
-
-## Migration Notes
-
-[If applicable, how to handle existing data/systems]
 
 ## References
 
-- Original ticket: `thoughts/allison/tickets/proj_XXXX.md`
-- Related research: `thoughts/shared/research/[relevant].md`
-- Similar implementation: `[file:line]`
+- Ticket: {CURRENT_TICKET}
+- Research: (attached to ticket in Linear)
 ````
 
-### Step 5: Sync and Review
+### Step 5: Save Plan to Linear
 
-1. **Sync the thoughts directory**:
-   - Run `humanlayer thoughts sync` to sync the newly created plan
-   - This ensures the plan is properly indexed and available
+Create the plan document in Linear:
 
-2. **Track in Workflow Context**:
+```bash
+# Get team key from config
+TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' .claude/config.json)
 
-   After saving the plan document, add it to workflow context:
+# Create Linear document with plan content
+linearis documents create \
+  --title "Plan: ${DESCRIPTION}" \
+  --team "${TEAM_KEY}" \
+  --content "${PLAN_CONTENT}" \
+  --attach-to "${CURRENT_TICKET}" \
+  --icon "Compass" \
+  --color "#f2c94c"
 
-   ```bash
-   if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" ]]; then
-     "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" add plans "$PLAN_FILE" "${TICKET_ID}"
-   fi
-   ```
+# Add completion comment to ticket
+linearis comments create "$CURRENT_TICKET" --body "Implementation plan created and attached to this ticket."
+```
 
-3. **Check context usage and present plan**:
+### Step 6: Present Plan and Check Context
 
-   **Monitor your context** and present:
+```
+✅ Implementation plan created!
 
-   ```
-   ✅ Implementation plan created!
+**Ticket**: {CURRENT_TICKET}
+**Linear Document**: Plan: {description}
 
-   **Plan location**: `thoughts/shared/plans/YYYY-MM-DD-PROJ-XXXX-description.md`
+## 📊 Context Status
 
-   ## 📊 Context Status
+Current usage: {X}% ({Y}K/{Z}K tokens)
 
-   Current usage: {X}% ({Y}K/{Z}K tokens)
+{If >60%}:
+⚠️ **Context Alert**: We're at {X}% context usage.
 
-   {If >60%}:
-   ⚠️ **Context Alert**: We're at {X}% context usage.
+**Recommendation**: Clear context before implementation phase.
 
-   **Recommendation**: Clear context before implementation phase.
+**What to do**:
+1. ✅ Review the plan in Linear
+2. ✅ Close this session (clear context)
+3. ✅ Start fresh session
+4. ✅ Run `/implement-plan`
 
-   **Why?** The implementation phase will:
-   - Load the complete plan file
-   - Read multiple source files
-   - Track progress with TodoWrite
-   - Benefit from fresh context for optimal performance
+{If <60%}:
+✅ Context healthy ({X}%).
 
-   **What to do**:
-   1. ✅ Review the plan (read the file above)
-   2. ✅ Close this session (clear context)
-   3. ✅ Start fresh session in worktree
-   4. ✅ Run `/implement-plan {plan-path}`
+---
 
-   This is normal! Context is meant to be cleared between phases.
+Please review the plan and let me know:
+- Are the phases properly scoped?
+- Are the success criteria specific enough?
+- Any technical details that need adjustment?
+```
 
-   {If <60%}:
-   ✅ Context healthy ({X}%).
+### Step 7: Iterate Based on Feedback
 
-   ---
-
-   Please review the plan and let me know:
-   - Are the phases properly scoped?
-   - Are the success criteria specific enough?
-   - Any technical details that need adjustment?
-   - Missing edge cases or considerations?
-   ```
-
-4. **Iterate based on feedback** - be ready to:
-   - Add missing phases
-   - Adjust technical approach
-   - Clarify success criteria (both automated and manual)
-   - Add/remove scope items
-   - After making changes, run `humanlayer thoughts sync` again
-   - **Monitor context** - if >70% during iterations, warn user to review file offline
-
-5. **Continue refining** until the user is satisfied
-
-6. **Final context check** after approval:
-   - If context >50%, remind user to clear before implementation
-   - Provide clear instructions on next steps with fresh context
+- Update the Linear document with changes
+- Use `linearis documents update <document-id>` to modify content
+- Continue refining until user is satisfied
 
 ## Important Guidelines
 
@@ -452,8 +388,6 @@ After structure approval:
    - Research actual code patterns using parallel sub-tasks
    - Include specific file paths and line numbers
    - Write measurable success criteria with clear automated vs manual distinction
-   - automated steps should use `make` whenever possible - for example
-     `make -C humanlayer-wui check` instead of `cd humanlayer-wui && bun run fmt`
 
 4. **Be Practical**:
    - Focus on incremental, testable changes
@@ -509,79 +443,39 @@ After structure approval:
 - [ ] Feature works correctly on mobile devices
 ```
 
-## Common Patterns
-
-### For Database Changes:
-
-- Start with schema/migration
-- Add store methods
-- Update business logic
-- Expose via API
-- Update clients
-
-### For New Features:
-
-- Research existing patterns first
-- Start with data model
-- Build backend logic
-- Add API endpoints
-- Implement UI last
-
-### For Refactoring:
-
-- Document current behavior
-- Plan incremental changes
-- Maintain backwards compatibility
-- Include migration strategy
-
-## Sub-task Spawning Best Practices
-
-When spawning research sub-tasks:
-
-1. **Spawn multiple tasks in parallel** for efficiency
-2. **Each task should be focused** on a specific area
-3. **Provide detailed instructions** including:
-   - Exactly what to search for
-   - Which directories to focus on
-   - What information to extract
-   - Expected output format
-4. **Be EXTREMELY specific about directories**:
-   - If the ticket mentions "WUI", specify `humanlayer-wui/` directory
-   - If it mentions "daemon", specify `hld/` directory
-   - Never use generic terms like "UI" when you mean "WUI"
-   - Include the full path context in your prompts
-5. **Specify read-only tools** to use
-6. **Request specific file:line references** in responses
-7. **Wait for all tasks to complete** before synthesizing
-8. **Verify sub-task results**:
-   - If a sub-task returns unexpected results, spawn follow-up tasks
-   - Cross-check findings against the actual codebase
-   - Don't accept results that seem incorrect
-
-Example of spawning multiple tasks:
-
-```python
-# Spawn these tasks concurrently:
-tasks = [
-    Task("Research database schema", db_research_prompt),
-    Task("Find API patterns", api_research_prompt),
-    Task("Investigate UI components", ui_research_prompt),
-    Task("Check test patterns", test_research_prompt)
-]
-```
-
-## Example Interaction Flow
+## Integration with Other Commands
 
 ```
-User: /implementation_plan
-Assistant: I'll help you create a detailed implementation plan...
+/research-codebase PROJ-123 → research document
+                  ↓
+           /create-plan → implementation plan (this command)
+                  ↓
+          /implement-plan → code changes
+                  ↓
+              /describe-pr → PR created
+```
 
-User: We need to add parent-child tracking for Claude sub-tasks. See thoughts/allison/tickets/proj_456.md
-Assistant: Let me read that ticket file completely first...
+**How it connects:**
 
-[Reads file fully]
+- **Previous**: Gets research from Linear documents attached to ticket
+- **Next**: `/implement-plan` finds plan via `linear-document-locator`
+- **Workflow context**: Current ticket is already set from research phase
 
-Based on the ticket, I understand we need to track parent-child relationships for Claude sub-task events in the hld daemon. Before I start planning, I have some questions...
+## Example Workflow
 
-[Interactive process continues...]
+```bash
+# After running /research-codebase PROJ-123...
+
+/create-plan
+# You:
+# 1. Get current ticket from workflow context (PROJ-123)
+# 2. Find research document in Linear
+# 3. Read research content
+# 4. Ask for planning input
+# 5. Research codebase further
+# 6. Create plan outline
+# 7. Get user approval
+# 8. Write detailed plan
+# 9. Save to Linear as "Plan: {description}"
+# 10. Present summary
 ```
