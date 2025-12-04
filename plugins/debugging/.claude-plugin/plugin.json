@@ -1,14 +1,14 @@
 {
-  "name": "catalyst-debugging",
+  "name": "awl-debugging",
   "version": "1.0.2",
   "description": "Production error monitoring with Sentry MCP integration. Enable when debugging errors, analyzing stack traces, and investigating incidents. ~20k context tokens when enabled.",
   "author": {
-    "name": "Coalesce Labs",
+    "name": "Awl Team",
     "email": "hello@coalesce.dev",
-    "url": "https://github.com/coalesce-labs"
+    "url": "https://github.com/ralfschimmel"
   },
-  "homepage": "https://github.com/coalesce-labs/catalyst",
-  "repository": "https://github.com/coalesce-labs/catalyst.git",
+  "homepage": "https://github.com/ralfschimmel/awl",
+  "repository": "https://github.com/ralfschimmel/awl.git",
   "keywords": [
     "debugging",
     "sentry",

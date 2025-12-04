@@ -71,7 +71,7 @@ Tracked per-worktree (not committed to git).
 
 ### Linear Documents Architecture
 
-Catalyst uses Linear documents attached to tickets for persistent workflow context:
+Awl uses Linear documents attached to tickets for persistent workflow context:
 
 **How It Works:**
 
@@ -158,20 +158,20 @@ This workspace has no build process - it's markdown files and bash scripts.
 
 ### Distribution and Installation
 
-**Catalyst is distributed as a Claude Code plugin:**
+**Awl is distributed as a Claude Code plugin:**
 
 ```bash
 # Add to marketplace
-/plugin marketplace add coalesce-labs/catalyst
+/plugin marketplace add ralfschimmel/awl
 
 # Install development workflow plugin
-/plugin install catalyst-dev
+/plugin install awl-dev
 
 # Optional: Install meta/workflow creation plugin
-/plugin install catalyst-meta
+/plugin install awl-meta
 ```
 
-**For development on Catalyst itself:**
+**For development on Awl itself:**
 
 This repository is both the source and a working installation (dogfooding).
 
@@ -189,11 +189,11 @@ This means:
 - ✅ Changes to `plugins/dev/` or `plugins/meta/` are immediately available
 - ✅ No hardcoded commands/agents in `.claude/` - uses plugin system like users do
 - ✅ Restart Claude Code to reload after editing plugins
-- ✅ True dogfooding - we use Catalyst exactly as users do
+- ✅ True dogfooding - we use Awl exactly as users do
 
 ### Configuration System
 
-Catalyst uses a **two-layer config system** to keep secrets out of git:
+Awl uses a **two-layer config system** to keep secrets out of git:
 
 **Layer 1: Project Config** (`.claude/config.json` - safe to commit):
 ```json
@@ -203,7 +203,7 @@ Catalyst uses a **two-layer config system** to keep secrets out of git:
     "ticketPrefix": "ACME",
     "name": "Acme Corp Project"
   },
-  "catalyst": {
+  "awl": {
     "linear": {
       "teamKey": "ACME"
     }
@@ -227,7 +227,7 @@ Commands read config to customize behavior per-project.
 
 ### Linear Integration (REQUIRED)
 
-Catalyst **requires** Linear for workflow document storage. This provides:
+Awl **requires** Linear for workflow document storage. This provides:
 
 - 📁 **Persistent context**: Research, plans, handoffs stored as Linear documents
 - 🔄 **Team collaboration**: Documents attached to tickets are visible to all
@@ -253,7 +253,7 @@ Then: export LINEAR_API_TOKEN=your_token
 
 **Why Required?**
 
-Catalyst requires Linear because:
+Awl requires Linear because:
 1. Workflow commands chain together via ticket documents (research → plan → implement)
 2. Commands auto-find documents by querying the current ticket
 3. Team members see the same documents
@@ -269,9 +269,9 @@ See `plugins/dev/LINEAR_DOCUMENTS.md` for comprehensive guide.
 ## Directory Structure
 
 ```
-catalyst/
+awl/
 ├── plugins/                 # Plugin packages for distribution
-│   ├── dev/                 # Development workflow plugin (catalyst-dev)
+│   ├── dev/                 # Development workflow plugin (awl-dev)
 │   │   ├── agents/          # Specialized research agents
 │   │   │   ├── codebase-locator.md
 │   │   │   ├── codebase-analyzer.md
@@ -295,7 +295,7 @@ catalyst/
 │   │   │   └── workflow-context.sh
 │   │   ├── LINEAR_DOCUMENTS.md  # Linear documents conventions
 │   │   └── plugin.json      # Plugin manifest
-│   ├── pm/                  # Project management plugin (catalyst-pm)
+│   ├── pm/                  # Project management plugin (awl-pm)
 │   │   ├── agents/          # PM analysis agents
 │   │   │   ├── cycle-analyzer.md
 │   │   │   ├── backlog-analyzer.md
@@ -310,7 +310,7 @@ catalyst/
 │   │   │   └── check-prerequisites.sh
 │   │   ├── README.md        # PM plugin documentation
 │   │   └── plugin.json      # Plugin manifest
-│   └── meta/                # Meta/workflow management plugin (catalyst-meta)
+│   └── meta/                # Meta/workflow management plugin (awl-meta)
 │       ├── commands/        # Workflow discovery & creation
 │       │   ├── create_workflow.md
 │       │   ├── discover_workflows.md
@@ -496,13 +496,13 @@ export LINEAR_API_TOKEN="lin_api_..."
 
 ## Update Strategy
 
-**When improving Catalyst:**
+**When improving Awl:**
 
 1. Edit plugin files in `plugins/dev/` or `plugins/meta/`
 2. Test locally (symlinks make changes immediately available)
 3. Commit to workspace
 4. Publish plugin updates to marketplace
-5. Users update with `/plugin update catalyst-dev`
+5. Users update with `/plugin update awl-dev`
 
 **Plugin Distribution:**
 
@@ -520,7 +520,7 @@ export LINEAR_API_TOKEN="lin_api_..."
 - Saves config to `.claude/config.json`
 - See `docs/LINEAR_WORKFLOW_AUTOMATION.md`
 
-### PM Plugin (catalyst-pm)
+### PM Plugin (awl-pm)
 
 For project management workflows with Linear:
 
@@ -536,7 +536,7 @@ For project management workflows with Linear:
 - Backlog grooming and cleanup
 - GitHub-Linear PR sync
 
-**Setup**: Install with `/plugin install catalyst-pm`
+**Setup**: Install with `/plugin install awl-pm`
 **Docs**: See `plugins/pm/README.md`
 **Architecture**: Research-first (Haiku for data, Sonnet for analysis)
 **Philosophy**: All reports provide actionable insights, not just data dumps
@@ -553,11 +553,11 @@ Brief records of key architectural decisions made in this project.
 
 ### ADR-001: Plugin-Based Distribution
 
-**Decision**: Distribute Catalyst as Claude Code plugins instead of git clone/install.
+**Decision**: Distribute Awl as Claude Code plugins instead of git clone/install.
 
 **Rationale**:
 
-- Users get updates via `/plugin update catalyst-dev`
+- Users get updates via `/plugin update awl-dev`
 - No manual git pulls or symlink setup
 - Plugin marketplace provides discoverability
 - Local customizations (`.claude/config.json`) are preserved
@@ -641,8 +641,8 @@ by org/repo.
 
 ```
 ~/code-repos/github/
-├── coalesce-labs/catalyst/          # Main branch
-├── coalesce-labs/catalyst-worktrees/ # Feature branches
+├── ralfschimmel/awl/          # Main branch
+├── ralfschimmel/awl-worktrees/ # Feature branches
 └── acme/api/                         # Client project
 ```
 
@@ -666,9 +666,9 @@ See `docs/CONTEXT_ENGINEERING.md` for details.
 When researching, spawn multiple agents at once:
 
 ```
-@catalyst-dev:codebase-locator find authentication files
-@catalyst-dev:linear-document-locator find research for PROJ-123
-@catalyst-dev:codebase-analyzer analyze auth flow
+@awl-dev:codebase-locator find authentication files
+@awl-dev:linear-document-locator find research for PROJ-123
+@awl-dev:codebase-analyzer analyze auth flow
 ```
 
 ### Reading Files Fully
@@ -707,7 +707,7 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 
 1. Make changes to `plugins/dev/agents/*.md`
 2. Restart Claude Code (symlinks ensure changes are visible)
-3. Invoke with `@catalyst-dev:name task description`
+3. Invoke with `@awl-dev:name task description`
 4. Verify output matches expected behavior
 
 **Testing commands:**
@@ -732,7 +732,7 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 
 ```bash
 /plugin list
-# Should show catalyst-dev and optionally catalyst-meta
+# Should show awl-dev and optionally awl-meta
 
 # Test a command
 /research-codebase
@@ -740,11 +740,11 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 
 ## Deployment and Distribution
 
-**Users install Catalyst via Claude Code marketplace:**
+**Users install Awl via Claude Code marketplace:**
 
 ```bash
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-dev
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-dev
 ```
 
 **Setting up Linear in a new project:**
@@ -755,7 +755,7 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 
 ```json
 {
-  "catalyst": {
+  "awl": {
     "linear": {
       "teamKey": "YOUR-TEAM"
     }
@@ -763,7 +763,7 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 }
 ```
 
-**Sharing with team:** Team members see documents in Linear. Each team member installs the Catalyst
+**Sharing with team:** Team members see documents in Linear. Each team member installs the Awl
 plugin independently and sets their own `LINEAR_API_TOKEN`.
 
 ## Key Principles When Editing

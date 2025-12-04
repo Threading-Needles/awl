@@ -1,11 +1,11 @@
-# Catalyst Tooling Integration Plan
+# Awl Tooling Integration Plan
 
-**Date**: 2025-10-25 **Purpose**: Comprehensive plan for integrating external tooling into Catalyst
+**Date**: 2025-10-25 **Purpose**: Comprehensive plan for integrating external tooling into Awl
 v1.0.0
 
 ## Executive Summary
 
-This document outlines the integration of 7 external tools/services into the Catalyst plugin system:
+This document outlines the integration of 7 external tools/services into the Awl plugin system:
 
 - **Exa** (web search MCP)
 - **Linearis** (Linear CLI with cycles support)
@@ -255,7 +255,7 @@ pipx install humanlayer
 - `humanlayer thoughts status`
 - `humanlayer thoughts add <file>`
 
-**Usage in Catalyst**:
+**Usage in Awl**:
 
 - **CRITICAL DEPENDENCY** - Core to entire workflow system
 - `/research-codebase` - Saves research to `thoughts/shared/research/`
@@ -373,7 +373,7 @@ Operations**:
 
 ### 1. `/cycle-plan` Command
 
-**Plugin**: catalyst-pm **Purpose**: Plan work for current or next cycle **Process**:
+**Plugin**: awl-pm **Purpose**: Plan work for current or next cycle **Process**:
 
 1. Get current and next cycle info via `linearis cycles`
 2. List backlog tickets
@@ -382,7 +382,7 @@ Operations**:
 
 ### 2. `/cycle-review` Command
 
-**Plugin**: catalyst-pm **Purpose**: Review cycle progress **Process**:
+**Plugin**: awl-pm **Purpose**: Review cycle progress **Process**:
 
 1. Get active cycle info
 2. List tickets by status
@@ -392,7 +392,7 @@ Operations**:
 
 ### 3. `/roadmap-review` Command
 
-**Plugin**: catalyst-pm **Purpose**: Review project roadmap and milestones **Process**:
+**Plugin**: awl-pm **Purpose**: Review project roadmap and milestones **Process**:
 
 1. List projects and their status
 2. Show milestone progress
@@ -401,7 +401,7 @@ Operations**:
 
 ## Plugin Structure (2 Plugins)
 
-### catalyst-dev Plugin
+### awl-dev Plugin
 
 **Complete development workflow from research to production**
 
@@ -426,7 +426,7 @@ Operations**:
   - workflow-context.sh
   - frontmatter-utils.sh
 
-### catalyst-meta Plugin
+### awl-meta Plugin
 
 **Workflow discovery and creation tools**
 

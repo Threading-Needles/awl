@@ -1,37 +1,37 @@
 ---
 date: 2025-10-25T19:15:00+0000
 author: Claude
-repository: catalyst (formerly ryan-claude-workspace)
-topic: "Catalyst Final Plugin Structure"
+repository: awl (formerly ryan-claude-workspace)
+topic: "Awl Final Plugin Structure"
 tags: [final, plugins, architecture, organization]
 status: aligned
 ---
 
-# Catalyst Final Plugin Structure
+# Awl Final Plugin Structure
 
 ## Overview
 
-Based on alignment discussion, Catalyst will have **4 plugins** organized around clear functional
+Based on alignment discussion, Awl will have **4 plugins** organized around clear functional
 boundaries:
 
-1. **catalyst-research** - Deep codebase understanding (THE differentiator)
-2. **catalyst-dev** - Complete development workflow (research → plan → implement → validate → PR →
+1. **awl-research** - Deep codebase understanding (THE differentiator)
+2. **awl-dev** - Complete development workflow (research → plan → implement → validate → PR →
    merge)
-3. **catalyst-handoff** - Context management
-4. **catalyst-meta** - Workflow discovery and creation tools (inspiration/best practices)
+3. **awl-handoff** - Context management
+4. **awl-meta** - Workflow discovery and creation tools (inspiration/best practices)
 
 ## Key Decisions Made
 
 ✅ **Simplified structure**: Consolidated 7 proposals → 4 focused plugins ✅ **Removed
 /update-project**: Plugin-based installs only, no script-based distribution ✅ **All workflow
 commands in dev**: Research, planning, implementation, validation, commits, PRs all under
-catalyst-dev ✅ **No PM plugin yet**: Current workspace doesn't have true PM functionality to
+awl-dev ✅ **No PM plugin yet**: Current workspace doesn't have true PM functionality to
 package ✅ **Meta is for inspiration**: Commands for discovering/creating workflows, learning best
 practices
 
 ---
 
-## Plugin 1: catalyst-research ⭐
+## Plugin 1: awl-research ⭐
 
 **Tagline**: "Deep codebase understanding with specialized AI agents"
 
@@ -55,12 +55,12 @@ practices
 
 **Dependencies**: None (fully self-contained)
 
-**Value proposition**: "Most plugins provide commands. Catalyst provides comprehensive research
+**Value proposition**: "Most plugins provide commands. Awl provides comprehensive research
 agents that actually understand your codebase."
 
 ---
 
-## Plugin 2: catalyst-dev
+## Plugin 2: awl-dev
 
 **Tagline**: "Research-driven development workflow from research to production"
 
@@ -110,7 +110,7 @@ agents that actually understand your codebase."
 
 **Dependencies**:
 
-- Optional: catalyst-research (works better with it, but can work alone)
+- Optional: awl-research (works better with it, but can work alone)
 - Optional: Linear MCP (for Linear integration features)
 - Optional: HumanLayer CLI (for thoughts system)
 
@@ -121,7 +121,7 @@ validate, commit, PR, merge with optional Linear automation"
 
 ---
 
-## Plugin 3: catalyst-handoff
+## Plugin 3: awl-handoff
 
 **Tagline**: "Context persistence across sessions"
 
@@ -146,7 +146,7 @@ validate, commit, PR, merge with optional Linear automation"
 
 ---
 
-## Plugin 4: catalyst-meta
+## Plugin 4: awl-meta
 
 **Tagline**: "Discover, create, and validate workflows"
 
@@ -159,7 +159,7 @@ validate, commit, PR, merge with optional Linear automation"
   - `/import-workflow` - Import and adapt workflows from external repos
   - `/create-workflow` - Create new agents/commands using patterns
   - `/validate-frontmatter` - Validate frontmatter consistency
-  - `/workflow-help` - Interactive workflow guidance (DUPLICATE from catalyst-dev)
+  - `/workflow-help` - Interactive workflow guidance (DUPLICATE from awl-dev)
 - **1 script**: `scripts/validate-frontmatter.sh` (for Trunk linter)
 
 **Who uses it**:
@@ -181,7 +181,7 @@ patterns"
 
 **Accessibility**: Publicly available (not workspace-only) - anyone can use these for inspiration
 
-**Note**: `/workflow-help` is intentionally duplicated in both catalyst-dev and catalyst-meta for
+**Note**: `/workflow-help` is intentionally duplicated in both awl-dev and awl-meta for
 convenience
 
 ---
@@ -193,19 +193,19 @@ convenience
 **Why removed**: Moving to plugin-based installs only. No need for script-based distribution
 mechanism.
 
-**Migration path**: Users install via `/plugin install catalyst-dev@catalyst` instead of running
+**Migration path**: Users install via `/plugin install awl-dev@awl` instead of running
 `./hack/update-project.sh`
 
 ### ❌ update-project.sh (Script)
 
 **Why removed**: Not needed with plugin distribution
 
-### ❌ catalyst-pm Plugin
+### ❌ awl-pm Plugin
 
 **Why removed**: Current workspace doesn't have true PM-specific functionality. `/create-worktree`
-moved to catalyst-dev.
+moved to awl-dev.
 
-**Future**: May create catalyst-pm later if PM-specific features emerge (e.g., sprint planning,
+**Future**: May create awl-pm later if PM-specific features emerge (e.g., sprint planning,
 capacity management, reporting)
 
 ---
@@ -250,12 +250,12 @@ capacity management, reporting)
 ## Plugin Structure on Disk
 
 ```
-catalyst/
+awl/
 ├── .claude-plugin/
 │   └── marketplace.json              # Marketplace catalog
 │
 ├── plugins/
-│   ├── research/                     # Plugin 1: catalyst-research
+│   ├── research/                     # Plugin 1: awl-research
 │   │   ├── .claude-plugin/
 │   │   │   └── plugin.json
 │   │   ├── agents/
@@ -271,7 +271,7 @@ catalyst/
 │   │       ├── check-prerequisites.sh
 │   │       └── README.md
 │   │
-│   ├── dev/                          # Plugin 2: catalyst-dev
+│   ├── dev/                          # Plugin 2: awl-dev
 │   │   ├── .claude-plugin/
 │   │   │   └── plugin.json
 │   │   ├── commands/
@@ -294,7 +294,7 @@ catalyst/
 │   │       ├── frontmatter-utils.sh
 │   │       └── README.md
 │   │
-│   ├── handoff/                      # Plugin 3: catalyst-handoff
+│   ├── handoff/                      # Plugin 3: awl-handoff
 │   │   ├── .claude-plugin/
 │   │   │   └── plugin.json
 │   │   ├── commands/
@@ -304,7 +304,7 @@ catalyst/
 │   │       ├── check-prerequisites.sh
 │   │       └── README.md
 │   │
-│   └── meta/                         # Plugin 4: catalyst-meta
+│   └── meta/                         # Plugin 4: awl-meta
 │       ├── .claude-plugin/
 │       │   └── plugin.json
 │       ├── commands/
@@ -346,7 +346,7 @@ catalyst/
 
 ### Persona 1: **Junior/Mid Developer**
 
-**Installs**: `catalyst-research` + `catalyst-dev`
+**Installs**: `awl-research` + `awl-dev`
 
 **Why**: Understand codebases, implement features, make commits, create PRs
 
@@ -356,7 +356,7 @@ catalyst/
 
 ### Persona 2: **Senior Developer / Tech Lead**
 
-**Installs**: `catalyst-research` + `catalyst-dev` + `catalyst-handoff`
+**Installs**: `awl-research` + `awl-dev` + `awl-handoff`
 
 **Why**: Full workflow with planning, complex features requiring context management
 
@@ -367,7 +367,7 @@ context
 
 ### Persona 3: **Developer Learning Workflow Patterns**
 
-**Installs**: `catalyst-meta` + `catalyst-research`
+**Installs**: `awl-meta` + `awl-research`
 
 **Why**: Discover how other teams build workflows, get inspiration
 
@@ -390,8 +390,8 @@ context
 ### Scenario 1: "I just want to understand codebases"
 
 ```bash
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-research@catalyst
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-research@awl
 ```
 
 **Gets**: 6 research agents + /research-codebase command
@@ -401,25 +401,25 @@ context
 ### Scenario 2: "I want the full development workflow"
 
 ```bash
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-dev@catalyst
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-dev@awl
 ```
 
 **Gets**: Complete workflow - research, plan, implement, validate, commit, PR, merge
 
 **Note**: This includes `/research-codebase` which uses the research agents, but agents live in
-catalyst-research plugin
+awl-research plugin
 
-**Question**: Should catalyst-dev declare catalyst-research as a dependency?
+**Question**: Should awl-dev declare awl-research as a dependency?
 
 ---
 
 ### Scenario 3: "I hit context limits frequently"
 
 ```bash
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-dev@catalyst
-/plugin install catalyst-handoff@catalyst
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-dev@awl
+/plugin install awl-handoff@awl
 ```
 
 **Gets**: Full workflow + context management
@@ -429,8 +429,8 @@ catalyst-research plugin
 ### Scenario 4: "I want to learn and create workflows"
 
 ```bash
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-meta@catalyst
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-meta@awl
 ```
 
 **Gets**: Workflow discovery, import, creation, validation tools
@@ -439,28 +439,28 @@ catalyst-research plugin
 
 ## Plugin Dependencies
 
-### catalyst-research
+### awl-research
 
 - **Dependencies**: None
 - **Fully self-contained**
 
-### catalyst-dev
+### awl-dev
 
 - **Hard dependencies**: None (works standalone)
 - **Soft dependencies**:
-  - catalyst-research (optional) - `/research-codebase` spawns research agents. If research plugin
+  - awl-research (optional) - `/research-codebase` spawns research agents. If research plugin
     not installed, command will fail when trying to spawn agents.
   - Linear MCP (optional) - Linear commands require MCP server
   - HumanLayer CLI (optional) - Thoughts system features require CLI
 
-**Question to resolve**: Should we make catalyst-research a required dependency, or document it as
+**Question to resolve**: Should we make awl-research a required dependency, or document it as
 optional with graceful failure?
 
-### catalyst-handoff
+### awl-handoff
 
 - **Dependencies**: None (works without thoughts system, just less powerful)
 
-### catalyst-meta
+### awl-meta
 
 - **Dependencies**: None
 
@@ -470,7 +470,7 @@ optional with graceful failure?
 
 ### Decision 1: /research-codebase in dev Plugin
 
-**Problem**: `/research-codebase` command spawns agents from catalyst-research plugin
+**Problem**: `/research-codebase` command spawns agents from awl-research plugin
 
 **Options**:
 
@@ -480,14 +480,14 @@ optional with graceful failure?
 
 **Decision needed**: Which approach?
 
-**Recommendation**: Keep in dev plugin, document that catalyst-research is strongly recommended.
+**Recommendation**: Keep in dev plugin, document that awl-research is strongly recommended.
 Graceful failure message if research agents not available.
 
 ---
 
 ### Decision 2: workflow-help Duplication
 
-**Status**: Decided - intentionally duplicate in both catalyst-dev and catalyst-meta
+**Status**: Decided - intentionally duplicate in both awl-dev and awl-meta
 
 **Rationale**:
 
@@ -499,12 +499,12 @@ Graceful failure message if research agents not available.
 
 ### Decision 3: No PM Plugin Yet
 
-**Status**: Decided - no catalyst-pm plugin in v1.0
+**Status**: Decided - no awl-pm plugin in v1.0
 
 **Rationale**: Current workspace doesn't have PM-specific functionality. `/create-worktree` is a dev
 tool (parallel feature work).
 
-**Future**: Create catalyst-pm if/when PM features emerge (sprint planning, capacity management,
+**Future**: Create awl-pm if/when PM features emerge (sprint planning, capacity management,
 team reporting)
 
 ---
@@ -516,7 +516,7 @@ team reporting)
 ```json
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "catalyst",
+  "name": "awl",
   "version": "1.0.0",
   "description": "Production-ready AI-assisted development workflows from Coalesce Labs",
   "owner": {
@@ -524,13 +524,13 @@ team reporting)
     "url": "https://github.com/coalesce-labs"
   },
   "metadata": {
-    "description": "Catalyst: Research-driven development workflow with specialized AI agents",
-    "homepage": "https://github.com/coalesce-labs/catalyst",
+    "description": "Awl: Research-driven development workflow with specialized AI agents",
+    "homepage": "https://github.com/ralfschimmel/awl",
     "pluginRoot": "./plugins"
   },
   "plugins": [
     {
-      "name": "catalyst-research",
+      "name": "awl-research",
       "source": "./plugins/research",
       "description": "Deep codebase understanding with specialized AI agents: locate, analyze, and document existing code",
       "version": "1.0.0",
@@ -539,7 +539,7 @@ team reporting)
       "featured": true
     },
     {
-      "name": "catalyst-dev",
+      "name": "awl-dev",
       "source": "./plugins/dev",
       "description": "Complete development workflow: research → plan → implement → validate → commit → PR → merge with optional Linear automation",
       "version": "1.0.0",
@@ -547,7 +547,7 @@ team reporting)
       "keywords": ["workflow", "planning", "implementation", "validation", "git", "linear", "pr"]
     },
     {
-      "name": "catalyst-handoff",
+      "name": "awl-handoff",
       "source": "./plugins/handoff",
       "description": "Context persistence: save and restore work across sessions to manage context limits",
       "version": "1.0.0",
@@ -555,9 +555,9 @@ team reporting)
       "keywords": ["context", "handoff", "persistence", "sessions"]
     },
     {
-      "name": "catalyst-meta",
+      "name": "awl-meta",
       "source": "./plugins/meta",
-      "description": "Discover, import, and create workflows: learn from community patterns and extend Catalyst",
+      "description": "Discover, import, and create workflows: learn from community patterns and extend Awl",
       "version": "1.0.0",
       "category": "development",
       "keywords": ["meta", "discovery", "creation", "validation", "best-practices"]
@@ -573,22 +573,22 @@ team reporting)
 ### "Essentials" (Recommended for most developers)
 
 ```bash
-/plugin install catalyst-dev@catalyst
+/plugin install awl-dev@awl
 ```
 
 **Includes**: Complete workflow from research to production
 
-**Optional add-on**: `catalyst-handoff` if hitting context limits
+**Optional add-on**: `awl-handoff` if hitting context limits
 
 ---
 
 ### "Full Suite" (Power users)
 
 ```bash
-/plugin install catalyst-research@catalyst
-/plugin install catalyst-dev@catalyst
-/plugin install catalyst-handoff@catalyst
-/plugin install catalyst-meta@catalyst
+/plugin install awl-research@awl
+/plugin install awl-dev@awl
+/plugin install awl-handoff@awl
+/plugin install awl-meta@awl
 ```
 
 **Includes**: Everything
@@ -598,7 +598,7 @@ team reporting)
 ### "Workflow Learning" (Learning best practices)
 
 ```bash
-/plugin install catalyst-meta@catalyst
+/plugin install awl-meta@awl
 ```
 
 **Includes**: Discovery and creation tools
@@ -633,7 +633,7 @@ team reporting)
 
 ### Question 1: /research-codebase Command Location
 
-**Issue**: `/research-codebase` command is in catalyst-dev but spawns agents from catalyst-research
+**Issue**: `/research-codebase` command is in awl-dev but spawns agents from awl-research
 
 **Options**:
 
@@ -647,11 +647,11 @@ team reporting)
 
 ### Question 2: Research Plugin as Dependency
 
-**Issue**: catalyst-dev uses research agents
+**Issue**: awl-dev uses research agents
 
 **Options**:
 
-1. Hard dependency (catalyst-dev requires catalyst-research)
+1. Hard dependency (awl-dev requires awl-research)
 2. Soft dependency (works without it, graceful failure)
 3. No dependency (users figure it out)
 
@@ -665,7 +665,7 @@ team reporting)
 
 **Options**:
 
-1. Independent (catalyst-research v1.2.0, catalyst-dev v1.0.1)
+1. Independent (awl-research v1.2.0, awl-dev v1.0.1)
 2. Synchronized (all plugins always same version)
 3. Major together, minor independent
 
@@ -677,20 +677,20 @@ team reporting)
 
 **4 Plugins**:
 
-1. `catalyst-research` (6 agents, 1 command) ⭐ THE DIFFERENTIATOR
-2. `catalyst-dev` (13 commands, 3 scripts) - COMPLETE WORKFLOW
-3. `catalyst-handoff` (2 commands, 1 script) - CONTEXT MANAGEMENT
-4. `catalyst-meta` (5 commands, 1 script) - WORKFLOW INSPIRATION
+1. `awl-research` (6 agents, 1 command) ⭐ THE DIFFERENTIATOR
+2. `awl-dev` (13 commands, 3 scripts) - COMPLETE WORKFLOW
+3. `awl-handoff` (2 commands, 1 script) - CONTEXT MANAGEMENT
+4. `awl-meta` (5 commands, 1 script) - WORKFLOW INSPIRATION
 
 **Removed**:
 
 - /update-project (plugin-based installs only)
-- catalyst-pm (no PM functionality yet)
+- awl-pm (no PM functionality yet)
 
 **Key characteristics**:
 
 - **Simplified**: 4 focused plugins vs 7 fragmented ones
-- **Complete**: catalyst-dev has everything for full workflow
+- **Complete**: awl-dev has everything for full workflow
 - **Independent**: Each plugin works standalone
 - **Composable**: Work better together
 - **Practical**: Organized around what devs actually do

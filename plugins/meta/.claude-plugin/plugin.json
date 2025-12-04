@@ -1,14 +1,14 @@
 {
-  "name": "catalyst-meta",
+  "name": "awl-meta",
   "version": "2.0.1",
-  "description": "Workflow discovery and creation tools: learn from community patterns and extend Catalyst with new workflows.",
+  "description": "Workflow discovery and creation tools: learn from community patterns and extend Awl with new workflows.",
   "author": {
-    "name": "Coalesce Labs",
+    "name": "Awl Team",
     "email": "hello@coalesce.dev",
-    "url": "https://github.com/coalesce-labs"
+    "url": "https://github.com/ralfschimmel"
   },
-  "homepage": "https://github.com/coalesce-labs/catalyst",
-  "repository": "https://github.com/coalesce-labs/catalyst.git",
+  "homepage": "https://github.com/ralfschimmel/awl",
+  "repository": "https://github.com/ralfschimmel/awl.git",
   "keywords": [
     "meta",
     "discovery",

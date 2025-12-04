@@ -271,7 +271,7 @@ This command uses configuration from `.claude/config.json`:
 
 ```json
 {
-  "catalyst": {
+  "awl": {
     "project": {
       "ticketPrefix": "PROJ"
     }

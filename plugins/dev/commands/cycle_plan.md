@@ -88,7 +88,7 @@ When fully implemented, this command will:
 - **Team activity report** - Show contribution breakdown by team member
 - **Summary generation** - Create cycle plan document in `reports/cycles/`
 
-Track progress at: https://github.com/coalesce-labs/catalyst/issues
+Track progress at: https://github.com/ralfschimmel/awl/issues
 
 ## Configuration
 

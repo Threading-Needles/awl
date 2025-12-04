@@ -12,7 +12,7 @@ prompt_sentry_config_smart() {
 
   # Check if already configured
   local has_token
-  has_token=$(echo "$config" | jq -r '.catalyst.sentry.authToken // empty')
+  has_token=$(echo "$config" | jq -r '.awl.sentry.authToken // empty')
 
   if [ -n "$has_token" ] && [ "$has_token" != "[NEEDS_SETUP]" ]; then
     echo "✓ Sentry already configured" >&2
@@ -32,10 +32,10 @@ prompt_sentry_config_smart() {
 
   # Source helper functions
   local helpers_script=""
-  if [[ -f "scripts/catalyst-integration-helpers.sh" ]]; then
-    helpers_script="scripts/catalyst-integration-helpers.sh"
-  elif [[ -f "$(dirname "$0")/catalyst-integration-helpers.sh" ]]; then
-    helpers_script="$(dirname "$0")/catalyst-integration-helpers.sh"
+  if [[ -f "scripts/awl-integration-helpers.sh" ]]; then
+    helpers_script="scripts/awl-integration-helpers.sh"
+  elif [[ -f "$(dirname "$0")/awl-integration-helpers.sh" ]]; then
+    helpers_script="$(dirname "$0")/awl-integration-helpers.sh"
   fi
 
   local discovered_token=""
@@ -169,7 +169,7 @@ prompt_sentry_config_smart() {
     echo "  Steps:" >&2
     echo "  1. Go to https://sentry.io/settings/account/api/auth-tokens/" >&2
     echo "  2. Click 'Create New Token'" >&2
-    echo "  3. Give it a name (e.g., 'Catalyst')" >&2
+    echo "  3. Give it a name (e.g., 'Awl')" >&2
     echo "  4. Select scopes: project:read, org:read" >&2
     echo "  5. Copy the token" >&2
     echo "" >&2
@@ -233,7 +233,7 @@ EOF
     echo "$config" | jq \
       --arg org "$sentry_org" \
       --arg token "$sentry_token" \
-      '.catalyst.sentry = {
+      '.awl.sentry = {
         "org": $org,
         "authToken": $token
       }'
@@ -243,7 +243,7 @@ EOF
       --arg org "$sentry_org" \
       --argjson projects "$sentry_project" \
       --arg token "$sentry_token" \
-      '.catalyst.sentry = {
+      '.awl.sentry = {
         "org": $org,
         "projects": $projects,
         "defaultProject": $projects[0],
@@ -255,7 +255,7 @@ EOF
       --arg org "$sentry_org" \
       --arg project "$sentry_project" \
       --arg token "$sentry_token" \
-      '.catalyst.sentry = {
+      '.awl.sentry = {
         "org": $org,
         "project": $project,
         "authToken": $token

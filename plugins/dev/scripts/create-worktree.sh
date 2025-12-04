@@ -110,7 +110,7 @@ elif [ -f "package.json" ]; then
 	fi
 fi
 
-# Initialize thoughts (REQUIRED for Catalyst workflows)
+# Initialize thoughts (REQUIRED for Awl workflows)
 if command -v humanlayer >/dev/null 2>&1; then
 	echo "🧠 Initializing HumanLayer thoughts system..."
 	if humanlayer thoughts init --directory "$REPO_BASE_NAME" >/dev/null 2>&1; then
@@ -128,7 +128,7 @@ if command -v humanlayer >/dev/null 2>&1; then
 		echo -e "${YELLOW}⚠️  Could not initialize thoughts. Run 'humanlayer thoughts init --directory ${REPO_BASE_NAME}' manually.${NC}"
 	fi
 else
-	echo -e "${RED}❌ HumanLayer CLI not found! Catalyst workflows require HumanLayer.${NC}"
+	echo -e "${RED}❌ HumanLayer CLI not found! Awl workflows require HumanLayer.${NC}"
 	echo "   Install: pip install humanlayer"
 	echo "   Then run: humanlayer thoughts init --directory ${REPO_BASE_NAME}"
 	echo "             humanlayer thoughts sync"

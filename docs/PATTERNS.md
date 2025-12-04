@@ -76,7 +76,7 @@ You are a specialist at [specific task]. Your job is to [clear responsibility].
 **name** (required)
 
 - Format: kebab-case
-- Used to invoke: `@catalyst-dev:{name}`
+- Used to invoke: `@awl-dev:{name}`
 - Example: `codebase-locator`
 
 **description** (required)
@@ -1004,7 +1004,7 @@ EOF
 
 ```
 # In Claude Code
-@catalyst-dev:test-agent find all test files
+@awl-dev:test-agent find all test files
 ```
 
 **4. Validate Output**
@@ -1529,19 +1529,19 @@ Agents can inform subsequent agents:
 ```markdown
 ## Step 1: Locate
 
-@catalyst-dev:codebase-locator find webhook files
+@awl-dev:codebase-locator find webhook files
 
 ## Step 2: Analyze
 
 # Using results from step 1
 
-@catalyst-dev:codebase-analyzer explain how webhooks work in [files from step 1]
+@awl-dev:codebase-analyzer explain how webhooks work in [files from step 1]
 
 ## Step 3: Find Patterns
 
 # Using insights from step 2
 
-@catalyst-dev:codebase-pattern-finder show similar async processing patterns
+@awl-dev:codebase-pattern-finder show similar async processing patterns
 ```
 
 ### Conditional Agent Invocation

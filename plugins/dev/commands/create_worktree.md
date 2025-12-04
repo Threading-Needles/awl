@@ -67,9 +67,9 @@ export GITHUB_SOURCE_ROOT="$HOME/code-repos/github"
 **Convention**:
 
 - **Main repository**: `${GITHUB_SOURCE_ROOT}/<org>/<repo>`
-  - Example: `~/code-repos/github/coalesce-labs/catalyst`
+  - Example: `~/code-repos/github/ralfschimmel/awl`
 - **Worktrees**: `${GITHUB_SOURCE_ROOT}/<org>/<repo>-worktrees/<feature>`
-  - Example: `~/code-repos/github/coalesce-labs/catalyst-worktrees/PROJ-123`
+  - Example: `~/code-repos/github/ralfschimmel/awl-worktrees/PROJ-123`
 
 **Fallback behavior** (if `GITHUB_SOURCE_ROOT` not set):
 
@@ -88,8 +88,8 @@ export GITHUB_SOURCE_ROOT="$HOME/code-repos/github"
 ```
 ~/code-repos/github/
 ├── coalesce-labs/
-│   ├── catalyst/                    # Main branch
-│   └── catalyst-worktrees/          # All worktrees
+│   ├── awl/                    # Main branch
+│   └── awl-worktrees/          # All worktrees
 │       ├── PROJ-123-feature/
 │       └── PROJ-456-bugfix/
 └── acme/
@@ -101,5 +101,5 @@ export GITHUB_SOURCE_ROOT="$HOME/code-repos/github"
 ## Example Interaction
 
 ```
-User: /catalyst-dev:create_worktree PROJ-123
+User: /awl-dev:create_worktree PROJ-123
 ```

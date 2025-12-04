@@ -1,12 +1,12 @@
 # Multi-Project Sentry Support
 
-Guide for monitoring multiple Sentry projects with Catalyst.
+Guide for monitoring multiple Sentry projects with Awl.
 
 ---
 
 ## Overview
 
-If you have multiple Sentry projects (e.g., backend, frontend, events), you can configure Catalyst to work across all of them without specifying a single project.
+If you have multiple Sentry projects (e.g., backend, frontend, events), you can configure Awl to work across all of them without specifying a single project.
 
 ## Configuration Options
 
@@ -15,7 +15,7 @@ If you have multiple Sentry projects (e.g., backend, frontend, events), you can 
 **Config**:
 ```json
 {
-  "catalyst": {
+  "awl": {
     "sentry": {
       "org": "your-org-slug",
       "authToken": "sntrys_..."
@@ -35,7 +35,7 @@ If you have multiple Sentry projects (e.g., backend, frontend, events), you can 
 **Config**:
 ```json
 {
-  "catalyst": {
+  "awl": {
     "sentry": {
       "org": "your-org-slug",
       "projects": [
@@ -60,7 +60,7 @@ If you have multiple Sentry projects (e.g., backend, frontend, events), you can 
 **Config**:
 ```json
 {
-  "catalyst": {
+  "awl": {
     "sentry": {
       "org": "your-org-slug",
       "project": "bravo-1-backend",
@@ -80,7 +80,7 @@ If you have multiple Sentry projects (e.g., backend, frontend, events), you can 
 
 ### Using Smart Setup (Auto-Discovery)
 
-When you run `setup-catalyst.sh` with the smart Sentry config:
+When you run `setup-awl.sh` with the smart Sentry config:
 
 ```
 Found 3 projects:
@@ -204,7 +204,7 @@ You have:
 **Recommended config**:
 ```json
 {
-  "catalyst": {
+  "awl": {
     "sentry": {
       "org": "mycompany",
       "authToken": "sntrys_..."
@@ -226,7 +226,7 @@ You have:
 **Recommended config** (working on Product A):
 ```json
 {
-  "catalyst": {
+  "awl": {
     "sentry": {
       "org": "mycompany",
       "projects": ["product-a-api", "product-a-web"],
@@ -247,7 +247,7 @@ You have:
 **Recommended config**:
 ```json
 {
-  "catalyst": {
+  "awl": {
     "sentry": {
       "org": "mycompany",
       "project": "my-api",
@@ -268,7 +268,7 @@ You have:
 **Before**:
 ```json
 {
-  "catalyst": {
+  "awl": {
     "sentry": {
       "org": "your-org",
       "project": "old-project",
@@ -281,7 +281,7 @@ You have:
 **After**:
 ```json
 {
-  "catalyst": {
+  "awl": {
     "sentry": {
       "org": "your-org",
       "authToken": "sntrys_..."
@@ -342,21 +342,21 @@ The Sentry MCP server tools handle all three config formats:
 → Searches only proj-1
 ```
 
-### Catalyst Commands
+### Awl Commands
 
 Commands read config like this:
 
 ```bash
 # Get org (always required)
-ORG=$(jq -r '.catalyst.sentry.org' "$CONFIG_FILE")
+ORG=$(jq -r '.awl.sentry.org' "$CONFIG_FILE")
 
 # Get project(s)
-PROJECT=$(jq -r '.catalyst.sentry.project // empty' "$CONFIG_FILE")
-PROJECTS=$(jq -r '.catalyst.sentry.projects // empty' "$CONFIG_FILE")
+PROJECT=$(jq -r '.awl.sentry.project // empty' "$CONFIG_FILE")
+PROJECTS=$(jq -r '.awl.sentry.projects // empty' "$CONFIG_FILE")
 
 if [[ -n "$PROJECTS" ]]; then
   # Multiple projects - iterate or use default
-  DEFAULT=$(jq -r '.catalyst.sentry.defaultProject' "$CONFIG_FILE")
+  DEFAULT=$(jq -r '.awl.sentry.defaultProject' "$CONFIG_FILE")
 elif [[ -n "$PROJECT" ]]; then
   # Single project
   DEFAULT="$PROJECT"

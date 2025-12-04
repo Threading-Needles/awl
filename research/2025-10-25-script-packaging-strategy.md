@@ -1,17 +1,17 @@
 ---
 date: 2025-10-25T18:45:00+0000
 author: Claude
-repository: ryan-claude-workspace → catalyst
-topic: "Script Packaging Strategy for Catalyst Plugins"
+repository: ryan-claude-workspace → awl
+topic: "Script Packaging Strategy for Awl Plugins"
 tags: [research, scripts, packaging, plugins, utilities]
 status: complete
 ---
 
-# Script Packaging Strategy for Catalyst Plugins
+# Script Packaging Strategy for Awl Plugins
 
 ## Research Question
 
-How should bash scripts in the `hack/` directory be packaged and referenced within the Catalyst
+How should bash scripts in the `hack/` directory be packaged and referenced within the Awl
 plugin structure? Which scripts should be included with plugins vs kept as workspace-only utilities?
 
 ## Summary
@@ -138,7 +138,7 @@ git commit -m "Make scripts executable"
 
 ## Recommended Plugin Structure with Scripts
 
-### Plugin: catalyst-workflow
+### Plugin: awl-workflow
 
 ```
 plugins/workflow/
@@ -162,7 +162,7 @@ if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
 fi
 ```
 
-### Plugin: catalyst-pm
+### Plugin: awl-pm
 
 ```
 plugins/pm/
@@ -195,7 +195,7 @@ plugins/pm/
 "${CLAUDE_PLUGIN_ROOT}/scripts/update-project.sh" "$PROJECT_PATH"
 ```
 
-### Plugin: catalyst-handoff
+### Plugin: awl-handoff
 
 ```
 plugins/handoff/
@@ -208,7 +208,7 @@ plugins/handoff/
     └── README.md
 ```
 
-### Plugin: catalyst-research
+### Plugin: awl-research
 
 ```
 plugins/research/
@@ -267,7 +267,7 @@ utilities.
 
 ### Solution 2: Shared Scripts Plugin (Alternative)
 
-**Create catalyst-utils plugin**:
+**Create awl-utils plugin**:
 
 ```
 plugins/utils/
@@ -281,8 +281,8 @@ plugins/utils/
 
 ```json
 {
-  "name": "catalyst-workflow",
-  "dependencies": ["catalyst-utils"]
+  "name": "awl-workflow",
+  "dependencies": ["awl-utils"]
 }
 ```
 
@@ -301,7 +301,7 @@ plugins/utils/
 
 ### Decision: Use Duplication
 
-For catalyst, **duplicate check-prerequisites.sh** across plugins. It's small (~100 lines), rarely
+For awl, **duplicate check-prerequisites.sh** across plugins. It's small (~100 lines), rarely
 changes, and ensures plugins work independently.
 
 ## Migration Path: hack/ → scripts/
@@ -397,7 +397,7 @@ This allows scripts to work in both plugin and workspace contexts.
 ````markdown
 # Workflow Plugin Scripts
 
-Supporting scripts for catalyst-workflow plugin.
+Supporting scripts for awl-workflow plugin.
 
 ## check-prerequisites.sh
 
@@ -448,7 +448,7 @@ chmod +x scripts/*.sh
 
 **Create test plugin structure**:
 ```bash
-# In catalyst workspace
+# In awl workspace
 mkdir -p test-plugin/{.claude-plugin,commands,scripts}
 
 # Copy script
@@ -527,7 +527,7 @@ fi
 **Structure**:
 
 ```
-catalyst/
+awl/
 ├── hack/                           # Workspace-only scripts
 │   ├── install-user.sh             # Install to ~/.claude/
 │   ├── install-project.sh          # Install to project
@@ -766,5 +766,5 @@ description: Create git worktree for parallel development
 - Backward compatibility with workspace scripts
 - Standard plugin pattern
 
-**Next steps**: Implement the checklist above to complete the script packaging for the Catalyst plugin structure.
+**Next steps**: Implement the checklist above to complete the script packaging for the Awl plugin structure.
 ```

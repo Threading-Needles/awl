@@ -3,7 +3,7 @@ date: 2025-10-26T03:55:01+0000
 researcher: Claude
 git_commit: 62ac1a3ee113ef12c3ce535428101b854e2e6fe7
 branch: main
-repository: catalyst
+repository: awl
 topic: "Complete Documentation Audit for Accuracy and Currency"
 tags: [research, documentation, audit, configuration, installation]
 status: complete
@@ -14,7 +14,7 @@ last_updated_by: Claude
 # Research: Complete Documentation Audit for Accuracy and Currency
 
 **Date**: 2025-10-26T03:55:01+0000 **Researcher**: Claude **Git Commit**:
-62ac1a3ee113ef12c3ce535428101b854e2e6fe7 **Branch**: main **Repository**: catalyst
+62ac1a3ee113ef12c3ce535428101b854e2e6fe7 **Branch**: main **Repository**: awl
 
 ## Research Question
 
@@ -22,7 +22,7 @@ last_updated_by: Claude
 
 ## Summary
 
-Conducted a comprehensive audit of all 129 markdown files across the Catalyst workspace. Found **8
+Conducted a comprehensive audit of all 129 markdown files across the Awl workspace. Found **8
 critical areas needing updates** following the recent migration from directory-based to plugin-based
 architecture. The workspace has modern, well-structured documentation (950 KB total), but key
 user-facing files (QUICKSTART.md, CLAUDE.md, docs/CONFIGURATION.md, docs/USAGE.md) still reference
@@ -37,16 +37,16 @@ This creates confusion for new users trying to get started.
 
 ### 1. Installation Instructions: Plugin vs Scripts (CRITICAL)
 
-**Issue**: Mixed messages about how to install Catalyst
+**Issue**: Mixed messages about how to install Awl
 
 #### Current (Correct) Documentation
 
 **File**: `README.md:26-35`
 
 ```bash
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-dev
-/plugin install catalyst-meta  # Optional
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-dev
+/plugin install awl-meta  # Optional
 ```
 
 **File**: `scripts/README.md:23-34`
@@ -522,7 +522,7 @@ End users: CONFUSED
 **Integration 1: Installation System**
 
 - Old: `hack/install-user.sh` → `~/.claude/`
-- New: `/plugin install catalyst-dev` → Claude Code manages
+- New: `/plugin install awl-dev` → Claude Code manages
 - **Issue**: Documentation shows both without migration guide
 
 **Integration 2: Command Discovery**

@@ -226,7 +226,7 @@ Result aggregation: Bring together findings
 Commands orchestrate multiple agents:
 
 ```markdown
-## /catalyst-dev:create_plan Command Flow
+## /awl-dev:create_plan Command Flow
 
 Step 1: Read ticket file Context loaded: Ticket content (1-2K tokens)
 
@@ -379,7 +379,7 @@ Reusability: Infinite
 **Before (in conversation):**
 
 ```
-@catalyst-dev:codebase-analyzer how does rate limiting work?
+@awl-dev:codebase-analyzer how does rate limiting work?
 
 [Agent reads 5 files, traces logic, explains implementation]
 ← 10K tokens in conversation
@@ -391,7 +391,7 @@ Must re-run analysis or scroll through history
 **After (persisted):**
 
 ```
-@catalyst-dev:codebase-analyzer how does rate limiting work?
+@awl-dev:codebase-analyzer how does rate limiting work?
 
 [Agent analysis: 10K tokens]
 
@@ -438,7 +438,7 @@ Read thoughts/shared/research/rate_limiting_implementation.md
 
 ```
 [Conversation 1]
-/catalyst-dev:create_plan for rate limiting
+/awl-dev:create_plan for rate limiting
 
 [Research: 20K tokens]
 [Create plan]
@@ -446,7 +446,7 @@ Plan saved to thoughts/shared/plans/2025-01-08-rate-limiting.md
 ← 5K tokens, comprehensive
 
 [Conversation 2]
-/catalyst-dev:implement_plan thoughts/shared/plans/2025-01-08-rate-limiting.md
+/awl-dev:implement_plan thoughts/shared/plans/2025-01-08-rate-limiting.md
 
 Read plan: 5K tokens
 ← Full context recovered
@@ -584,7 +584,7 @@ Result: Context full of noise
 **Level 1: Broad Orientation**
 
 ```
-@catalyst-dev:codebase-locator find authentication files
+@awl-dev:codebase-locator find authentication files
 
 Returns:
 - src/auth/ (12 files)
@@ -630,7 +630,7 @@ Learning:
 ```
 Based on Level 3, check tests and usage:
 
-@catalyst-dev:codebase-pattern-finder show JWT usage examples
+@awl-dev:codebase-pattern-finder show JWT usage examples
 
 Context used: 4K tokens (patterns)
 Learning:
@@ -651,7 +651,7 @@ Learning:
 
 ```
 Level 1: Find the files
-@catalyst-dev:codebase-locator find webhook files
+@awl-dev:codebase-locator find webhook files
 
 Result:
 - src/webhooks/handler.js
@@ -731,7 +731,7 @@ Instead of: Sum(agent1, agent2, agent3)
 **Comprehensive Research:**
 
 ```
-/catalyst-dev:create_plan for new feature
+/awl-dev:create_plan for new feature
 
 Need to understand:
 - Codebase state (codebase-analyzer)
@@ -755,14 +755,14 @@ Benefit:
 Task: Debug authentication issue
 
 Question 1: Where is auth code?
-@catalyst-dev:codebase-locator find auth files
+@awl-dev:codebase-locator find auth files
 
 Result: src/auth/handler.js is entry point
 
 ↓ (Depends on Answer 1)
 
 Question 2: How does auth handler work?
-@catalyst-dev:codebase-analyzer explain src/auth/handler.js
+@awl-dev:codebase-analyzer explain src/auth/handler.js
 
 Result: Uses JWT, calls verify() at line 45
 
@@ -780,12 +780,12 @@ Must be sequential - each depends on previous
 Trace webhook processing:
 
 Step 1: Find entry point
-@catalyst-dev:codebase-locator find webhook handler
+@awl-dev:codebase-locator find webhook handler
 
 Result: src/webhooks/handler.js
 
 Step 2: Analyze entry (depends on step 1)
-@catalyst-dev:codebase-analyzer analyze src/webhooks/handler.js
+@awl-dev:codebase-analyzer analyze src/webhooks/handler.js
 
 Result: Calls validateSignature() from validator.js
 
@@ -801,9 +801,9 @@ Sequential because each step informs the next
 
 ```
 Phase 1: Parallel broad research
-  @catalyst-dev:codebase-locator find payment files
-  @catalyst-dev:thoughts-locator search payment docs
-  @catalyst-dev:codebase-pattern-finder show payment patterns
+  @awl-dev:codebase-locator find payment files
+  @awl-dev:thoughts-locator search payment docs
+  @awl-dev:codebase-pattern-finder show payment patterns
 
 [All run in parallel]
 
@@ -816,8 +816,8 @@ Phase 2: Sequential deep dive
 [Sequential - following discovered path]
 
 Phase 3: Parallel validation
-  @catalyst-dev:test-validator verify payment tests
-  @catalyst-dev:integration-checker check payment integrations
+  @awl-dev:test-validator verify payment tests
+  @awl-dev:integration-checker check payment integrations
 
 [Parallel - independent validations]
 
@@ -852,9 +852,9 @@ Good because:
 - Flexible execution
 
 Usage:
-  @catalyst-dev:codebase-locator find authentication files
-  @catalyst-dev:codebase-locator find payment processing code
-  @catalyst-dev:codebase-locator find test files for webhooks
+  @awl-dev:codebase-locator find authentication files
+  @awl-dev:codebase-locator find payment processing code
+  @awl-dev:codebase-locator find test files for webhooks
 ```
 
 **Too General:**
@@ -870,7 +870,7 @@ Bad because:
 - Overlaps with everything
 
 Unclear usage:
-  @catalyst-dev:code-helper do something with auth?
+  @awl-dev:code-helper do something with auth?
 ```
 
 **Too Specific:**
@@ -895,7 +895,7 @@ Overly specific:
 **Good Specificity:**
 
 ```
-Command: /catalyst-dev:create_plan
+Command: /awl-dev:create_plan
 Description: Creates implementation plans through research and collaboration
 
 Good because:
@@ -905,9 +905,9 @@ Good because:
 - Consistent output
 
 Works for:
-  /catalyst-dev:create_plan for authentication
-  /catalyst-dev:create_plan for payment processing
-  /catalyst-dev:create_plan for any feature
+  /awl-dev:create_plan for authentication
+  /awl-dev:create_plan for payment processing
+  /awl-dev:create_plan for any feature
 ```
 
 **Domain-Specific Commands:**
@@ -1203,7 +1203,7 @@ Phase 4: Validation (Conversation 4)
 
   Steps:
   1. Read plan (5K)
-  2. Run /catalyst-dev:validate_plan (30K)
+  2. Run /awl-dev:validate_plan (30K)
   3. Fix issues (25K)
   4. Final verification (15K)
 
@@ -1223,9 +1223,9 @@ All progress tracked
 
 ```
 Step 1: Parallel Investigation (15K tokens)
-  @catalyst-dev:codebase-locator find webhook files
-  @catalyst-dev:thoughts-locator search webhook issues
-  @catalyst-dev:codebase-analyzer trace webhook flow
+  @awl-dev:codebase-locator find webhook files
+  @awl-dev:thoughts-locator search webhook issues
+  @awl-dev:codebase-analyzer trace webhook flow
 
   Results:
   - File locations (2K)

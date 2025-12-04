@@ -2,11 +2,11 @@
 
 ## How Plugin Updates Work
 
-When users have Catalyst plugins installed, they update via:
+When users have Awl plugins installed, they update via:
 
 ```bash
-/plugin update catalyst-dev
-/plugin update catalyst-pm
+/plugin update awl-dev
+/plugin update awl-pm
 ```
 
 Or update all plugins:
@@ -45,7 +45,7 @@ We use **semantic versioning** (MAJOR.MINOR.PATCH):
 Quick version bumping for one or all plugins:
 
 ```bash
-# Bump catalyst-dev by type
+# Bump awl-dev by type
 ./scripts/bump-version.sh dev major    # 1.0.0 → 2.0.0
 ./scripts/bump-version.sh dev minor    # 1.0.0 → 1.1.0
 ./scripts/bump-version.sh dev patch    # 1.0.0 → 1.0.1
@@ -65,7 +65,7 @@ This ensures users see the correct version in the plugin install menu.
 
 **Output:**
 ```
-📦 Plugin: catalyst-dev
+📦 Plugin: awl-dev
    Current version: 1.0.0
    New version: 2.0.0
    ✅ Updated plugin.json and marketplace.json
@@ -92,7 +92,7 @@ Detects when plugin files changed without version bump:
 ⚠️  Plugin files changed but version not bumped!
 
 The following plugins have modified files:
-  📦 catalyst-dev
+  📦 awl-dev
      - plugins/dev/commands/research_codebase.md
      - plugins/dev/commands/create_plan.md
 
@@ -143,10 +143,10 @@ git commit -m "feat: add new feature"
 
 # 4. Commit version bump
 git add plugins/dev/.claude-plugin/plugin.json
-git commit -m "chore: bump catalyst-dev to v1.1.0"
+git commit -m "chore: bump awl-dev to v1.1.0"
 
 # 5. Tag and push
-git tag catalyst-dev-v1.1.0
+git tag awl-dev-v1.1.0
 git push origin main --tags
 ```
 
@@ -186,8 +186,8 @@ After version bump and push:
 
 ```bash
 # Create GitHub release for major/minor versions
-gh release create catalyst-dev-v2.0.0 \
-  --title "catalyst-dev v2.0.0 - Thoughts System Enforcement" \
+gh release create awl-dev-v2.0.0 \
+  --title "awl-dev v2.0.0 - Thoughts System Enforcement" \
   --notes "
 ## Breaking Changes
 - Thoughts system now required for all commands
@@ -201,7 +201,7 @@ gh release create catalyst-dev-v2.0.0 \
 Users must run:
 \`\`\`bash
 ./scripts/humanlayer/init-project.sh . {project-name}
-./scripts/setup-catalyst-config.sh
+./scripts/setup-awl-config.sh
 \`\`\`
 "
 ```
@@ -226,11 +226,11 @@ Check if plugin is outdated:
 
 \`\`\`bash
 CURRENT_VERSION="2.0.0"
-LATEST=$(curl -s https://api.github.com/repos/coalesce-labs/catalyst/releases/latest | jq -r .tag_name)
+LATEST=$(curl -s https://api.github.com/repos/ralfschimmel/awl/releases/latest | jq -r .tag_name)
 
-if [[ "$LATEST" > "catalyst-dev-v$CURRENT_VERSION" ]]; then
+if [[ "$LATEST" > "awl-dev-v$CURRENT_VERSION" ]]; then
   echo "⚠️  Update available: $LATEST"
-  echo "   Run: /plugin update catalyst-dev"
+  echo "   Run: /plugin update awl-dev"
 fi
 \`\`\`
 ```
@@ -252,12 +252,12 @@ git push
 A: Verify:
 1. Version in `plugin.json` was bumped
 2. Changes were pushed to main branch
-3. Users ran `/plugin update catalyst-dev`
+3. Users ran `/plugin update awl-dev`
 
 **Q: How do I test updates locally?**
 
 A: Install from local path during development:
 ```bash
-/plugin uninstall catalyst-dev
-/plugin install /path/to/catalyst/plugins/dev
+/plugin uninstall awl-dev
+/plugin install /path/to/awl/plugins/dev
 ```

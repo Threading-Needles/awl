@@ -127,7 +127,7 @@ cp -r .claude/config.json ../worktree-dir/.claude/
 cp -r .claude/.workflow-context.json ../worktree-dir/.claude/
 cd ../worktree-dir
 humanlayer thoughts init
-/plugin install catalyst-dev
+/plugin install awl-dev
 ```
 
 **Option 2: Symlink State**
@@ -192,8 +192,8 @@ rm -rf .claude/commands/
 Then install our own plugin:
 
 ```bash
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-dev
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-dev
 ```
 
 ### Documentation to UPDATE

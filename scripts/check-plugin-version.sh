@@ -51,7 +51,7 @@ if [[ ${#NEEDS_VERSION_BUMP[@]} -gt 0 ]]; then
   echo ""
   echo "The following plugins have modified files:"
   for plugin in "${NEEDS_VERSION_BUMP[@]}"; do
-    echo "  📦 catalyst-$plugin"
+    echo "  📦 awl-$plugin"
     # Show which files changed
     echo "$CHANGED_FILES" | grep "^plugins/$plugin/" | sed 's/^/     - /'
   done

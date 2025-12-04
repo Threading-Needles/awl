@@ -1,24 +1,24 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "catalyst",
+  "name": "awl",
   "version": "1.0.0",
   "description": "Research-driven development workflow with Linear integration, PM tools, and infrastructure research agents",
   "owner": {
-    "name": "Coalesce Labs",
+    "name": "Awl Team",
     "email": "hello@coalesce.dev"
   },
   "plugins": [
     {
-      "name": "catalyst-dev",
+      "name": "awl-dev",
       "source": "./plugins/dev",
       "description": "Core development workflow: research → plan → implement → validate → ship. Includes 10 research agents, workflow commands, Linear integration, handoff system. Always enabled. ~3.5k context (lightweight MCPs: DeepWiki, Context7).",
       "version": "3.0.1",
       "author": {
-        "name": "Coalesce Labs",
+        "name": "Awl Team",
         "email": "hello@coalesce.dev"
       },
-      "homepage": "https://github.com/coalesce-labs/catalyst",
-      "repository": "https://github.com/coalesce-labs/catalyst.git",
+      "homepage": "https://github.com/ralfschimmel/awl",
+      "repository": "https://github.com/ralfschimmel/awl.git",
       "license": "MIT",
       "category": "development",
       "keywords": [
@@ -32,16 +32,16 @@
       ]
     },
     {
-      "name": "catalyst-pm",
+      "name": "awl-pm",
       "source": "./plugins/pm",
       "description": "Linear-focused project management: cycle tracking, milestone planning, backlog grooming, daily standups, GitHub-Linear sync. Enable when managing Linear projects. ~5k context when enabled.",
       "version": "3.0.1",
       "author": {
-        "name": "Coalesce Labs",
+        "name": "Awl Team",
         "email": "hello@coalesce.dev"
       },
-      "homepage": "https://github.com/coalesce-labs/catalyst",
-      "repository": "https://github.com/coalesce-labs/catalyst.git",
+      "homepage": "https://github.com/ralfschimmel/awl",
+      "repository": "https://github.com/ralfschimmel/awl.git",
       "license": "MIT",
       "category": "productivity",
       "keywords": [
@@ -55,16 +55,16 @@
       ]
     },
     {
-      "name": "catalyst-analytics",
+      "name": "awl-analytics",
       "source": "./plugins/analytics",
       "description": "Product analytics with PostHog MCP integration. Enable when analyzing user behavior, conversion funnels, and product metrics. ~40k context when enabled.",
       "version": "1.0.1",
       "author": {
-        "name": "Coalesce Labs",
+        "name": "Awl Team",
         "email": "hello@coalesce.dev"
       },
-      "homepage": "https://github.com/coalesce-labs/catalyst",
-      "repository": "https://github.com/coalesce-labs/catalyst.git",
+      "homepage": "https://github.com/ralfschimmel/awl",
+      "repository": "https://github.com/ralfschimmel/awl.git",
       "license": "MIT",
       "category": "analytics",
       "keywords": [
@@ -77,16 +77,16 @@
       ]
     },
     {
-      "name": "catalyst-debugging",
+      "name": "awl-debugging",
       "source": "./plugins/debugging",
       "description": "Production error monitoring with Sentry MCP integration. Enable when debugging errors, analyzing stack traces, and investigating incidents. ~20k context when enabled.",
       "version": "1.0.2",
       "author": {
-        "name": "Coalesce Labs",
+        "name": "Awl Team",
         "email": "hello@coalesce.dev"
       },
-      "homepage": "https://github.com/coalesce-labs/catalyst",
-      "repository": "https://github.com/coalesce-labs/catalyst.git",
+      "homepage": "https://github.com/ralfschimmel/awl",
+      "repository": "https://github.com/ralfschimmel/awl.git",
       "license": "MIT",
       "category": "debugging",
       "keywords": [
@@ -99,16 +99,16 @@
       ]
     },
     {
-      "name": "catalyst-meta",
+      "name": "awl-meta",
       "source": "./plugins/meta",
-      "description": "Workflow discovery and creation: learn from community patterns and extend Catalyst. Optional plugin for advanced users.",
+      "description": "Workflow discovery and creation: learn from community patterns and extend Awl. Optional plugin for advanced users.",
       "version": "2.0.1",
       "author": {
-        "name": "Coalesce Labs",
+        "name": "Awl Team",
         "email": "hello@coalesce.dev"
       },
-      "homepage": "https://github.com/coalesce-labs/catalyst",
-      "repository": "https://github.com/coalesce-labs/catalyst.git",
+      "homepage": "https://github.com/ralfschimmel/awl",
+      "repository": "https://github.com/ralfschimmel/awl.git",
       "license": "MIT",
       "category": "development",
       "keywords": [

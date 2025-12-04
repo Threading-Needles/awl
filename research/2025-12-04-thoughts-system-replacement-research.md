@@ -4,7 +4,7 @@
 **Researcher**: Claude
 **Git Commit**: 9391f2309580b5f227a83332c7b158aa3b5330f1
 **Branch**: main
-**Repository**: catalyst
+**Repository**: awl
 
 ## Research Question
 
@@ -12,7 +12,7 @@ Research the codebase to understand how the thoughts system (from HumanLayer) is
 
 ## Summary
 
-The thoughts system is deeply integrated into Catalyst as a **three-layer memory architecture** that provides persistent, git-backed document storage across sessions and worktrees. It currently serves as the backbone for all workflow commands, storing research documents, implementation plans, handoffs, PR descriptions, and PM reports.
+The thoughts system is deeply integrated into Awl as a **three-layer memory architecture** that provides persistent, git-backed document storage across sessions and worktrees. It currently serves as the backbone for all workflow commands, storing research documents, implementation plans, handoffs, PR descriptions, and PM reports.
 
 The system has two main components:
 1. **HumanLayer CLI integration** - External CLI tool that manages git-backed document storage with sync capabilities

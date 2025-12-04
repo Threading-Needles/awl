@@ -21,13 +21,13 @@ Investigate production errors using Sentry's error tracking, stack traces, and c
 ## Usage
 
 ```bash
-/catalyst-dev:debug-production-error <error-description-or-id>
+/awl-dev:debug-production-error <error-description-or-id>
 
 Examples:
-  /catalyst-dev:debug-production-error "TypeError in checkout flow"
-  /catalyst-dev:debug-production-error "ISSUE-123"
-  /catalyst-dev:debug-production-error "errors from last deployment"
-  /catalyst-dev:debug-production-error "unhandled exceptions this week"
+  /awl-dev:debug-production-error "TypeError in checkout flow"
+  /awl-dev:debug-production-error "ISSUE-123"
+  /awl-dev:debug-production-error "errors from last deployment"
+  /awl-dev:debug-production-error "unhandled exceptions this week"
 ```
 
 ## What This Command Does
@@ -84,25 +84,25 @@ When this plugin is enabled, you have access to ~19 Sentry tools:
 ### Investigate Specific Error
 
 ```bash
-/catalyst-dev:debug-production-error "Show me details for MYAPP-456 including stack trace and user context"
+/awl-dev:debug-production-error "Show me details for MYAPP-456 including stack trace and user context"
 ```
 
 ### Search by Error Type
 
 ```bash
-/catalyst-dev:debug-production-error "Find all TypeError exceptions in the last 24 hours"
+/awl-dev:debug-production-error "Find all TypeError exceptions in the last 24 hours"
 ```
 
 ### Deployment Issues
 
 ```bash
-/catalyst-dev:debug-production-error "What new errors appeared after release v2.3.0?"
+/awl-dev:debug-production-error "What new errors appeared after release v2.3.0?"
 ```
 
 ### High-Impact Errors
 
 ```bash
-/catalyst-dev:debug-production-error "Show unresolved errors affecting more than 100 users"
+/awl-dev:debug-production-error "Show unresolved errors affecting more than 100 users"
 ```
 
 ## Output Format
@@ -141,19 +141,19 @@ Analysis typically includes:
 ### Filter by Environment
 
 ```bash
-/catalyst-dev:debug-production-error "production errors in payment service"
+/awl-dev:debug-production-error "production errors in payment service"
 ```
 
 ### Time-Based Analysis
 
 ```bash
-/catalyst-dev:debug-production-error "spike in errors between 2pm-3pm today"
+/awl-dev:debug-production-error "spike in errors between 2pm-3pm today"
 ```
 
 ### User-Specific
 
 ```bash
-/catalyst-dev:debug-production-error "errors for user@example.com"
+/awl-dev:debug-production-error "errors for user@example.com"
 ```
 
 ### Integration with Analytics
@@ -162,8 +162,8 @@ If you have both plugins enabled:
 
 ```bash
 # Enable both
-/plugin enable catalyst-debugging
-/plugin enable catalyst-analytics
+/plugin enable awl-debugging
+/plugin enable awl-analytics
 
 # Combined analysis
 > "Show me errors in checkout AND how many users abandoned checkout today"
@@ -192,7 +192,7 @@ After finding the bug:
 **This plugin adds ~20,670 tokens** to your context window. Disable when debugging is complete:
 
 ```bash
-/plugin disable catalyst-debugging
+/plugin disable awl-debugging
 ```
 
 ---

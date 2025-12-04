@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Integration helper functions for Catalyst setup
+# Integration helper functions for Awl setup
 # Discovers existing tokens and validates them via APIs
 
 set -euo pipefail

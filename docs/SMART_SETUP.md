@@ -1,6 +1,6 @@
 ## Smart Setup Features
 
-The Catalyst setup script includes intelligent token discovery and validation for third-party integrations.
+The Awl setup script includes intelligent token discovery and validation for third-party integrations.
 
 ## How It Works
 
@@ -106,7 +106,7 @@ echo "lin_api_..." > ~/.linear_api_token
 chmod 600 ~/.linear_api_token
 ```
 
-Then `linearis` CLI and Catalyst both auto-discover it.
+Then `linearis` CLI and Awl both auto-discover it.
 
 ### Sentry
 
@@ -124,13 +124,13 @@ EOF
 chmod 600 ~/.sentryclirc
 ```
 
-Then `sentry-cli` and Catalyst both auto-discover it.
+Then `sentry-cli` and Awl both auto-discover it.
 
 ### Railway
 
 **Railway CLI auto-creates**: `~/.railway/config.json`
 
-Just run `railway login` once, and Catalyst will discover it.
+Just run `railway login` once, and Awl will discover it.
 
 ## API Validation Details
 
@@ -215,16 +215,16 @@ Linear API token: _
 
 ## Integration Helpers
 
-The smart discovery is powered by `scripts/catalyst-integration-helpers.sh`:
+The smart discovery is powered by `scripts/awl-integration-helpers.sh`:
 
 ```bash
 # Discover existing tokens
-./scripts/catalyst-integration-helpers.sh discover-linear
-./scripts/catalyst-integration-helpers.sh discover-sentry
+./scripts/awl-integration-helpers.sh discover-linear
+./scripts/awl-integration-helpers.sh discover-sentry
 
 # Validate tokens
-./scripts/catalyst-integration-helpers.sh validate-linear "lin_api_..."
-./scripts/catalyst-integration-helpers.sh validate-sentry "sntrys_..."
+./scripts/awl-integration-helpers.sh validate-linear "lin_api_..."
+./scripts/awl-integration-helpers.sh validate-sentry "sntrys_..."
 ```
 
 These can be used standalone or sourced by other scripts.
@@ -252,5 +252,5 @@ Potential additions:
 ## See Also
 
 - [Configuration Guide](./CONFIGURATION.md)
-- [Setup Script](../setup-catalyst.sh)
-- [Integration Helpers](../scripts/catalyst-integration-helpers.sh)
+- [Setup Script](../setup-awl.sh)
+- [Integration Helpers](../scripts/awl-integration-helpers.sh)

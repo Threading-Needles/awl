@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Catalyst Prerequisites Check
+# Awl Prerequisites Check
 # Validates all required CLI tools are installed
 
 set -euo pipefail
@@ -34,7 +34,7 @@ OPTIONAL_MCPS=(
 	"posthog:Analytics:/plugin marketplace add posthog-mcp"
 )
 
-echo "🔍 Checking Catalyst prerequisites..."
+echo "🔍 Checking Awl prerequisites..."
 echo ""
 
 missing_tools=()

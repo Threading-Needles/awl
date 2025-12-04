@@ -4,23 +4,23 @@
 
 ## What Changed
 
-Catalyst has been restructured from 2 plugins to 4 plugins, organized by **use case** rather than
+Awl has been restructured from 2 plugins to 4 plugins, organized by **use case** rather than
 feature type.
 
 ### Before (2 plugins)
 
-- `catalyst-dev` - Everything + manual MCP toggling
-- `catalyst-meta` - Workflow discovery
+- `awl-dev` - Everything + manual MCP toggling
+- `awl-meta` - Workflow discovery
 
 **Problem**: Heavy MCPs (PostHog ~40k, Sentry ~20k tokens) consumed context even when not needed.
 Required manual `/mcp` toggling every session.
 
 ### After (4 plugins)
 
-1. **catalyst-dev** (Core) - Always enabled, ~3.5k context
-2. **catalyst-analytics** (PostHog) - Enable when needed, +40k context
-3. **catalyst-debugging** (Sentry) - Enable when needed, +20k context
-4. **catalyst-meta** (Discovery) - Optional
+1. **awl-dev** (Core) - Always enabled, ~3.5k context
+2. **awl-analytics** (PostHog) - Enable when needed, +40k context
+3. **awl-debugging** (Sentry) - Enable when needed, +20k context
+4. **awl-meta** (Discovery) - Optional
 
 **Solution**: Plugins bundle MCPs. Enabling/disabling plugin automatically loads/unloads MCPs.
 Session-specific context management with single command.
@@ -71,8 +71,8 @@ From official docs:
 
 This means:
 
-- `/plugin enable catalyst-analytics` → PostHog MCP loads
-- `/plugin disable catalyst-analytics` → PostHog MCP unloads
+- `/plugin enable awl-analytics` → PostHog MCP loads
+- `/plugin disable awl-analytics` → PostHog MCP unloads
 - No restart required
 - Works mid-session
 
@@ -81,7 +81,7 @@ This means:
 ### Regular Development (90% of sessions)
 
 ```bash
-# Start Claude - only catalyst-dev enabled
+# Start Claude - only awl-dev enabled
 claude
 
 # Work with core tools (~3.5k MCP context)
@@ -94,14 +94,14 @@ claude
 
 ```bash
 # Enable when needed
-/plugin enable catalyst-analytics
+/plugin enable awl-analytics
 
 # PostHog now available (+40k context)
 /analyze-user-behavior "checkout conversion rates"
 /product-metrics "MAU and retention"
 
 # Disable when done
-/plugin disable catalyst-analytics
+/plugin disable awl-analytics
 # Back to ~3.5k context
 ```
 
@@ -109,37 +109,37 @@ claude
 
 ```bash
 # Enable for incident
-/plugin enable catalyst-debugging
+/plugin enable awl-debugging
 
 # Sentry now available (+20k context)
 /debug-production-error "TypeError in production"
 
 # Optionally combine with analytics
-/plugin enable catalyst-analytics
+/plugin enable awl-analytics
 # Both active (+60k total)
 
 # Disable both when resolved
-/plugin disable catalyst-debugging catalyst-analytics
+/plugin disable awl-debugging awl-analytics
 ```
 
 ## Migration Impact
 
-### Removed from catalyst-dev
+### Removed from awl-dev
 
 - ❌ `/check-mcp-status` - No longer needed
 - ❌ `/disable-heavy-mcps` - Replaced by `/plugin disable`
-- ❌ `/enable-analytics` - Replaced by `/plugin enable catalyst-analytics`
-- ❌ `/enable-debugging` - Replaced by `/plugin enable catalyst-debugging`
+- ❌ `/enable-analytics` - Replaced by `/plugin enable awl-analytics`
+- ❌ `/enable-debugging` - Replaced by `/plugin enable awl-debugging`
 - ❌ `/mcp-manage` - No longer needed
 - ❌ `/start-lightweight-session` - Default behavior now
 
-### Added to catalyst-analytics
+### Added to awl-analytics
 
 - ✅ `/analyze-user-behavior` - PostHog queries
 - ✅ `/product-metrics` - KPI dashboards
 - ✅ `/segment-analysis` - Cohort analysis
 
-### Added to catalyst-debugging
+### Added to awl-debugging
 
 - ✅ `/debug-production-error` - Error investigation
 - ✅ `/error-impact-analysis` - Assess severity
@@ -170,32 +170,32 @@ Now lists 4 plugins with clear descriptions and context costs.
 
 ```bash
 # Add marketplace
-/plugin marketplace add coalesce-labs/catalyst
+/plugin marketplace add ralfschimmel/awl
 
 # Install core (required)
-/plugin install catalyst-dev
+/plugin install awl-dev
 
 # Install optional plugins as needed
-/plugin install catalyst-analytics  # If you use PostHog
-/plugin install catalyst-debugging  # If you use Sentry
-/plugin install catalyst-meta       # If you want workflow discovery
+/plugin install awl-analytics  # If you use PostHog
+/plugin install awl-debugging  # If you use Sentry
+/plugin install awl-meta       # If you want workflow discovery
 ```
 
 ### For Existing Users
 
 ```bash
 # Update marketplace
-/plugin marketplace update catalyst
+/plugin marketplace update awl
 
 # Existing plugins will be updated
 # New plugins (analytics, debugging) are available but not auto-installed
 # Install them when needed
 
 # Enable analytics when you need it
-/plugin enable catalyst-analytics
+/plugin enable awl-analytics
 
 # Enable debugging when you need it
-/plugin enable catalyst-debugging
+/plugin enable awl-debugging
 ```
 
 ## Prerequisites
@@ -226,7 +226,7 @@ export SENTRY_PROJECT="your-project-slug"
 
 **Plugin Approach** (new):
 
-- ✅ Single command: `/plugin enable catalyst-analytics`
+- ✅ Single command: `/plugin enable awl-analytics`
 - ✅ Automatic MCP load/unload
 - ✅ Impossible to forget (plugin state persists)
 - ✅ Clear mental model (analytics = analytics plugin)
@@ -259,18 +259,18 @@ Updated files to reflect new architecture:
 
 Before publishing:
 
-- [ ] Verify `/plugin enable catalyst-analytics` loads PostHog MCP
+- [ ] Verify `/plugin enable awl-analytics` loads PostHog MCP
 - [ ] Verify `/context` shows PostHog tools after enable
-- [ ] Verify `/plugin disable catalyst-analytics` unloads PostHog MCP
+- [ ] Verify `/plugin disable awl-analytics` unloads PostHog MCP
 - [ ] Verify `/context` shows reduced MCP tokens after disable
-- [ ] Repeat for catalyst-debugging with Sentry
+- [ ] Repeat for awl-debugging with Sentry
 - [ ] Verify both plugins can be enabled simultaneously
 - [ ] Test environment variable expansion in `.mcp.json`
 - [ ] Verify no restart required for enable/disable
 
 ## Breaking Changes
 
-**None for existing catalyst-dev users** - core commands unchanged.
+**None for existing awl-dev users** - core commands unchanged.
 
 **New behavior**:
 
@@ -284,14 +284,14 @@ Before publishing:
 
    ```
    > "Why are users churning?"
-   > Claude: "This requires analytics. Enable catalyst-analytics? [y/n]"
+   > Claude: "This requires analytics. Enable awl-analytics? [y/n]"
    ```
 
 2. **Phase-based workflows**: Auto-suggest plugins for workflow phases
 
    ```
    > /create-plan
-   > Claude: "Planning phase - enable catalyst-analytics for data? [y/n]"
+   > Claude: "Planning phase - enable awl-analytics for data? [y/n]"
    ```
 
 3. **Usage analytics**: Track which plugins are used most

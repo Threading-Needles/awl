@@ -268,7 +268,7 @@ After all plan phases complete successfully, automatically execute the following
 
 3. **Create Validation document**:
    ```bash
-   TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' .claude/config.json)
+   TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' .claude/config.json)
 
    linearis documents create \
      --title "Validation: ${FEATURE_NAME}" \
@@ -290,7 +290,7 @@ After all plan phases complete successfully, automatically execute the following
    Creating pull request...
    ```
 
-   Use SlashCommand tool to invoke `/catalyst-dev:create_pr`
+   Use SlashCommand tool to invoke `/awl-dev:create_pr`
 
    This will:
    - Commit all changes
@@ -363,7 +363,7 @@ After all plan phases complete successfully, automatically execute the following
    ```
 
 4. **Update PR description** (if needed):
-   - Call `/catalyst-dev:describe_pr` to refresh description
+   - Call `/awl-dev:describe_pr` to refresh description
 
 ### Final Report
 

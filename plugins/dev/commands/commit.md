@@ -68,7 +68,7 @@ during this session.
    **Example:**
 
    ```
-   feat(commands): add conventional commit support to /catalyst-dev:commit
+   feat(commands): add conventional commit support to /awl-dev:commit
 
    Updates the commit command to automatically detect commit type
    and scope from changed files, following conventional commits spec.
@@ -99,7 +99,7 @@ Reads from `.claude/config.json`:
 
 ```json
 {
-  "catalyst": {
+  "awl": {
     "commit": {
       "useConventional": true,
       "scopes": ["agents", "commands", "hack", "docs", "claude", "config"],

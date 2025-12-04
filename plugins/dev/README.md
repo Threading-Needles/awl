@@ -1,4 +1,4 @@
-# Catalyst Dev Plugin
+# Awl Dev Plugin
 
 Complete development workflow: research → plan → implement → validate → ship.
 
@@ -104,8 +104,8 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh add plans "path/to/plan.md" "P
 ## Installation
 
 ```bash
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-dev
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-dev
 ```
 
 ## Configuration
@@ -114,7 +114,7 @@ The plugin reads configuration from `.claude/config.json`:
 
 ```json
 {
-  "catalyst": {
+  "awl": {
     "projectKey": "project-name",
     "project": {
       "ticketPrefix": "PROJ"
@@ -126,7 +126,7 @@ The plugin reads configuration from `.claude/config.json`:
 Setup using the unified setup script:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/coalesce-labs/catalyst/main/setup-catalyst.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ralfschimmel/awl/main/setup-awl.sh | bash
 ```
 
 ## Requirements

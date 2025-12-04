@@ -50,7 +50,7 @@ Read all files in src/
 **Good - Just-in-Time:**
 
 ```
-@catalyst-dev:codebase-locator find authentication files
+@awl-dev:codebase-locator find authentication files
 # Then read only the relevant ones
 ```
 
@@ -83,10 +83,10 @@ Read all these files in case we need them later:
 
 ```
 # Step 1: Locate
-@catalyst-dev:codebase-locator find rate limiting code
+@awl-dev:codebase-locator find rate limiting code
 
 # Step 2: Analyze what was found
-@catalyst-dev:codebase-analyzer explain how rate limiting works in src/middleware/rate-limit.js
+@awl-dev:codebase-analyzer explain how rate limiting works in src/middleware/rate-limit.js
 
 # Step 3: Load related code as discovered
 # Agent identifies dependency on Redis
@@ -110,16 +110,16 @@ Read src/cache/redis-client.js
 
 ```
 # Spawn multiple focused agents
-@catalyst-dev:codebase-locator find payment files
-@catalyst-dev:thoughts-locator search payment research
-@catalyst-dev:codebase-pattern-finder show payment patterns
+@awl-dev:codebase-locator find payment files
+@awl-dev:thoughts-locator search payment research
+@awl-dev:codebase-pattern-finder show payment patterns
 ```
 
 **Bad - Monolithic:**
 
 ```
 # Single agent with too much responsibility
-@catalyst-dev:research everything about payments including files, history, patterns, and implementation
+@awl-dev:research everything about payments including files, history, patterns, and implementation
 ```
 
 **Benefits of Sub-Agents:**
@@ -150,8 +150,8 @@ Read src/cache/redis-client.js
 
 ```
 # Research phase (expensive)
-@catalyst-dev:codebase-analyzer deeply analyze authentication system
-@catalyst-dev:thoughts-locator find past auth decisions
+@awl-dev:codebase-analyzer deeply analyze authentication system
+@awl-dev:thoughts-locator find past auth decisions
 
 # Save findings (persistence)
 Write comprehensive analysis to thoughts/shared/research/auth_system.md
@@ -175,18 +175,18 @@ Read thoughts/shared/research/auth_system.md
 
 ```
 # Level 1: Broad search
-@catalyst-dev:codebase-locator find all webhook code
+@awl-dev:codebase-locator find all webhook code
 
 # Level 2: Categorical understanding
 # Based on results, focus on specific areas
-@catalyst-dev:codebase-analyzer explain webhook validation in src/webhooks/validator.js
+@awl-dev:codebase-analyzer explain webhook validation in src/webhooks/validator.js
 
 # Level 3: Deep dive
 # Follow specific code path discovered
 Read src/utils/crypto.js  # Discovered during analysis
 
 # Level 4: Related context
-@catalyst-dev:thoughts-locator find any webhook issues
+@awl-dev:thoughts-locator find any webhook issues
 ```
 
 ---
@@ -243,9 +243,9 @@ Read src/utils/crypto.js  # Discovered during analysis
 
 ```
 # All independent, spawn together
-@catalyst-dev:codebase-locator find database migration files
-@catalyst-dev:thoughts-locator search for database decisions
-@catalyst-dev:codebase-pattern-finder show migration patterns
+@awl-dev:codebase-locator find database migration files
+@awl-dev:thoughts-locator search for database decisions
+@awl-dev:codebase-pattern-finder show migration patterns
 ```
 
 **Use Sequential When:**
@@ -259,10 +259,10 @@ Read src/utils/crypto.js  # Discovered during analysis
 
 ```
 # Step 1
-@catalyst-dev:codebase-locator find rate limiting code
+@awl-dev:codebase-locator find rate limiting code
 
 # Wait for results, then step 2
-@catalyst-dev:codebase-analyzer analyze the rate limiting middleware at [path from step 1]
+@awl-dev:codebase-analyzer analyze the rate limiting middleware at [path from step 1]
 
 # Wait for results, then step 3
 Read the Redis client used by the middleware
@@ -275,13 +275,13 @@ Read the Redis client used by the middleware
 Good:
 
 ```
-@catalyst-dev:codebase-analyzer trace how a webhook request flows from receipt to database storage
+@awl-dev:codebase-analyzer trace how a webhook request flows from receipt to database storage
 ```
 
 Bad:
 
 ```
-@catalyst-dev:codebase-analyzer look at webhooks
+@awl-dev:codebase-analyzer look at webhooks
 ```
 
 **Include Context:**
@@ -289,13 +289,13 @@ Bad:
 Good:
 
 ```
-@catalyst-dev:codebase-locator find all files related to user authentication in the API service, focusing on JWT token handling
+@awl-dev:codebase-locator find all files related to user authentication in the API service, focusing on JWT token handling
 ```
 
 Bad:
 
 ```
-@catalyst-dev:codebase-locator find auth stuff
+@awl-dev:codebase-locator find auth stuff
 ```
 
 **Specify What You Need:**
@@ -303,13 +303,13 @@ Bad:
 Good:
 
 ```
-@catalyst-dev:codebase-pattern-finder show me examples of pagination with cursor-based approaches, including test patterns
+@awl-dev:codebase-pattern-finder show me examples of pagination with cursor-based approaches, including test patterns
 ```
 
 Bad:
 
 ```
-@catalyst-dev:codebase-pattern-finder pagination
+@awl-dev:codebase-pattern-finder pagination
 ```
 
 ---
@@ -747,7 +747,7 @@ cd ~/thoughts
 git pull
 
 # Now your planning includes latest team knowledge
-/catalyst-dev:create_plan thoughts/shared/tickets/eng_1234.md
+/awl-dev:create_plan thoughts/shared/tickets/eng_1234.md
 ```
 
 ### Collaborative Research
@@ -1028,7 +1028,7 @@ Read all files in config/
 
 ```
 # Progressive, targeted loading
-@catalyst-dev:codebase-locator find authentication files
+@awl-dev:codebase-locator find authentication files
 [analyze results]
 Read src/auth/handler.js
 [follow specific code paths]
@@ -1039,7 +1039,7 @@ Read src/auth/handler.js
 **Anti-Pattern:**
 
 ```
-@catalyst-dev:research everything about payments including all files, all history, all patterns, and create a complete analysis
+@awl-dev:research everything about payments including all files, all history, all patterns, and create a complete analysis
 ```
 
 **Why it's bad:**
@@ -1053,9 +1053,9 @@ Read src/auth/handler.js
 
 ```
 # Parallel, focused research
-@catalyst-dev:codebase-locator find payment files
-@catalyst-dev:thoughts-locator search payment research
-@catalyst-dev:codebase-pattern-finder show payment patterns
+@awl-dev:codebase-locator find payment files
+@awl-dev:thoughts-locator search payment research
+@awl-dev:codebase-pattern-finder show payment patterns
 ```
 
 ### 3. Vague Plans
@@ -1130,9 +1130,9 @@ Let's add rate limiting. I'll start coding...
 
 ```
 # Research, plan, then implement
-/catalyst-dev:create_plan thoughts/shared/tickets/eng_1234.md
+/awl-dev:create_plan thoughts/shared/tickets/eng_1234.md
 [collaborative planning with research]
-/catalyst-dev:implement_plan thoughts/shared/plans/2025-01-08-ENG-1234-rate-limiting.md
+/awl-dev:implement_plan thoughts/shared/plans/2025-01-08-ENG-1234-rate-limiting.md
 ```
 
 ### 5. No Context Persistence
@@ -1229,7 +1229,7 @@ I'll create a new pagination approach...
 
 ```
 # Check existing patterns first
-@catalyst-dev:codebase-pattern-finder show pagination implementations
+@awl-dev:codebase-pattern-finder show pagination implementations
 [review existing patterns]
 # Use the same pattern as similar endpoints
 ```

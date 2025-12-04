@@ -16,19 +16,19 @@ A comprehensive guide to using the Ryan Claude Workspace for AI-assisted develop
 
 ## Initial Setup
 
-### Step 1: Install Catalyst Plugin
+### Step 1: Install Awl Plugin
 
-Install Catalyst via the Claude Code plugin marketplace:
+Install Awl via the Claude Code plugin marketplace:
 
 ```bash
 # Add the marketplace repository
-/plugin marketplace add coalesce-labs/catalyst
+/plugin marketplace add ralfschimmel/awl
 
-# Install catalyst-dev (main workflow)
-/plugin install catalyst-dev
+# Install awl-dev (main workflow)
+/plugin install awl-dev
 
-# Optionally install catalyst-meta (workflow discovery)
-/plugin install catalyst-meta
+# Optionally install awl-meta (workflow discovery)
+/plugin install awl-meta
 ```
 
 This makes all agents and commands available in Claude Code across all projects.
@@ -45,7 +45,7 @@ pip install humanlayer
 pipx install humanlayer
 
 # Download and run the thoughts setup script
-curl -O https://raw.githubusercontent.com/coalesce-labs/catalyst/main/scripts/setup-thoughts.sh
+curl -O https://raw.githubusercontent.com/ralfschimmel/awl/main/scripts/setup-thoughts.sh
 chmod +x setup-thoughts.sh
 ./setup-thoughts.sh
 ```
@@ -235,7 +235,7 @@ Finds files and directories relevant to a feature or task.
 **Example:**
 
 ```
-@catalyst-dev:codebase-locator find all files related to authentication
+@awl-dev:codebase-locator find all files related to authentication
 ```
 
 **What it does:**
@@ -277,7 +277,7 @@ Analyzes HOW code works with detailed implementation analysis.
 **Example:**
 
 ```
-@catalyst-dev:codebase-analyzer explain how the authentication flow works from login to session creation
+@awl-dev:codebase-analyzer explain how the authentication flow works from login to session creation
 ```
 
 **What it does:**
@@ -308,7 +308,7 @@ Discovers relevant documents in the thoughts/ directory.
 **Example:**
 
 ```
-@catalyst-dev:thoughts-locator find any documents about rate limiting
+@awl-dev:thoughts-locator find any documents about rate limiting
 ```
 
 **What it does:**
@@ -347,7 +347,7 @@ Finds similar implementations and code patterns to model after.
 **Example:**
 
 ```
-@catalyst-dev:codebase-pattern-finder show me examples of pagination implementations
+@awl-dev:codebase-pattern-finder show me examples of pagination implementations
 ```
 
 **What it does:**
@@ -378,7 +378,7 @@ Deeply analyzes thoughts documents to extract actionable insights.
 **Example:**
 
 ```
-@catalyst-dev:thoughts-analyzer analyze thoughts/shared/research/2025-01-05_rate_limiting.md and extract key decisions
+@awl-dev:thoughts-analyzer analyze thoughts/shared/research/2025-01-05_rate_limiting.md and extract key decisions
 ```
 
 **What it does:**
@@ -404,9 +404,9 @@ Research agents work independently, so spawn multiple for comprehensive research
 ```
 I need to understand the payment system.
 
-@catalyst-dev:codebase-locator find all payment-related files
-@catalyst-dev:thoughts-locator search for any payment research or tickets
-@catalyst-dev:codebase-pattern-finder show me similar payment implementations
+@awl-dev:codebase-locator find all payment-related files
+@awl-dev:thoughts-locator search for any payment research or tickets
+@awl-dev:codebase-pattern-finder show me similar payment implementations
 ```
 
 **Be Specific in Your Requests**
@@ -414,13 +414,13 @@ I need to understand the payment system.
 Good:
 
 ```
-@catalyst-dev:codebase-analyzer trace how a webhook is validated and processed in the webhook handler
+@awl-dev:codebase-analyzer trace how a webhook is validated and processed in the webhook handler
 ```
 
 Bad:
 
 ```
-@catalyst-dev:codebase-analyzer look at webhooks
+@awl-dev:codebase-analyzer look at webhooks
 ```
 
 **Use the Right Agent for the Job**
@@ -437,14 +437,14 @@ Bad:
 
 Commands are slash commands that execute multi-step workflows.
 
-### /catalyst-dev:create_plan
+### /awl-dev:create_plan
 
 Creates comprehensive implementation plans through interactive research and collaboration.
 
 **Basic Usage:**
 
 ```
-/catalyst-dev:create_plan
+/awl-dev:create_plan
 ```
 
 Claude will ask for task details and guide you through the planning process.
@@ -452,13 +452,13 @@ Claude will ask for task details and guide you through the planning process.
 **With Ticket File:**
 
 ```
-/catalyst-dev:create_plan thoughts/shared/tickets/eng_1234.md
+/awl-dev:create_plan thoughts/shared/tickets/eng_1234.md
 ```
 
 **With Deep Analysis:**
 
 ```
-/catalyst-dev:create_plan think deeply about thoughts/shared/tickets/eng_1234.md
+/awl-dev:create_plan think deeply about thoughts/shared/tickets/eng_1234.md
 ```
 
 **The Process:**
@@ -540,14 +540,14 @@ Claude will ask for task details and guide you through the planning process.
 ## References
 ```
 
-### /catalyst-dev:implement_plan
+### /awl-dev:implement_plan
 
 Executes an approved implementation plan phase by phase.
 
 **Usage:**
 
 ```
-/catalyst-dev:implement_plan thoughts/shared/plans/2025-01-08-ENG-1234-rate-limiting.md
+/awl-dev:implement_plan thoughts/shared/plans/2025-01-08-ENG-1234-rate-limiting.md
 ```
 
 **The Process:**
@@ -594,14 +594,14 @@ Why this matters: Plan assumes JSON editing
 How should I proceed?
 ```
 
-### /catalyst-dev:validate_plan
+### /awl-dev:validate_plan
 
 Verifies implementation correctness and identifies deviations.
 
 **Usage:**
 
 ```
-/catalyst-dev:validate_plan
+/awl-dev:validate_plan
 ```
 
 **The Process:**
@@ -669,7 +669,7 @@ Verifies implementation correctness and identifies deviations.
 
 ## Workflow State Management
 
-Catalyst automatically tracks your workflow state in `.claude/.workflow-context.json` to enable
+Awl automatically tracks your workflow state in `.claude/.workflow-context.json` to enable
 intelligent command chaining.
 
 ### What is workflow-context.json?
@@ -875,7 +875,7 @@ git branch
 vim src/rate-limiter.js
 
 # Create plan
-/catalyst-dev:create_plan
+/awl-dev:create_plan
 # Plan saved to thoughts/shared/plans/2025-01-08-ENG-1234-rate-limiting.md
 ```
 
@@ -938,7 +938,7 @@ EOF
 
 ```
 # In Claude Code
-/catalyst-dev:create_plan thoughts/shared/tickets/eng_1234.md
+/awl-dev:create_plan thoughts/shared/tickets/eng_1234.md
 ```
 
 Claude will:
@@ -961,7 +961,7 @@ thoughts/shared/plans/2025-01-08-ENG-1234-rate-limiting.md
 **Step 4: Implement the Plan**
 
 ```
-/catalyst-dev:implement_plan thoughts/shared/plans/2025-01-08-ENG-1234-rate-limiting.md
+/awl-dev:implement_plan thoughts/shared/plans/2025-01-08-ENG-1234-rate-limiting.md
 ```
 
 Claude implements phase by phase, checking boxes as it progresses.
@@ -969,7 +969,7 @@ Claude implements phase by phase, checking boxes as it progresses.
 **Step 5: Validate Implementation**
 
 ```
-/catalyst-dev:validate_plan
+/awl-dev:validate_plan
 ```
 
 Claude runs all success criteria and generates validation report.
@@ -1006,8 +1006,8 @@ git commit -m "Fix button styling"
 cd ~/wt/my-app/new-dashboard
 
 # Create and implement plan
-/catalyst-dev:create_plan thoughts/shared/tickets/eng_1234.md
-/catalyst-dev:implement_plan thoughts/shared/plans/2025-01-08-ENG-1234-new-dashboard.md
+/awl-dev:create_plan thoughts/shared/tickets/eng_1234.md
+/awl-dev:implement_plan thoughts/shared/plans/2025-01-08-ENG-1234-new-dashboard.md
 ```
 
 **Worktree 2 - Major Feature B**
@@ -1020,10 +1020,10 @@ cd ~/projects/my-app
 cd ~/wt/my-app/user-settings
 
 # Can reference research from feature A!
-@catalyst-dev:thoughts-locator find dashboard research
+@awl-dev:thoughts-locator find dashboard research
 
 # Create separate plan
-/catalyst-dev:create_plan thoughts/shared/tickets/eng_1235.md
+/awl-dev:create_plan thoughts/shared/tickets/eng_1235.md
 ```
 
 **Both worktrees share thoughts:**
@@ -1053,9 +1053,9 @@ git branch -d ENG-1234-new-dashboard
 I need to understand why webhooks are failing intermittently.
 
 # Spawn parallel research
-@catalyst-dev:codebase-locator find all webhook-related files
-@catalyst-dev:thoughts-locator search for any webhook issues or research
-@catalyst-dev:codebase-analyzer trace the webhook processing flow from receipt to completion
+@awl-dev:codebase-locator find all webhook-related files
+@awl-dev:thoughts-locator search for any webhook issues or research
+@awl-dev:codebase-analyzer trace the webhook processing flow from receipt to completion
 ```
 
 Claude spawns three agents simultaneously:
@@ -1099,7 +1099,7 @@ Key finding: No timeout handling in processor.js:45
 **Then investigate further:**
 
 ```
-@catalyst-dev:thoughts-analyzer analyze thoughts/shared/tickets/eng_0987.md
+@awl-dev:thoughts-analyzer analyze thoughts/shared/tickets/eng_0987.md
 
 # Returns past solution that was implemented
 # Confirms timeout handling was added but in different location
@@ -1142,10 +1142,10 @@ cd ~/projects/shared-app
 humanlayer thoughts sync
 
 # Can now reference Developer A's research
-/catalyst-dev:create_plan
+/awl-dev:create_plan
 
 # Claude reads shared research automatically
-@catalyst-dev:thoughts-locator find authentication research
+@awl-dev:thoughts-locator find authentication research
 
 # Plan builds on shared context
 ```
@@ -1175,8 +1175,8 @@ ls -lt thoughts/shared/plans/ | head -10
 ### Finding Related Work
 
 ```
-@catalyst-dev:thoughts-locator find anything about [feature area]
-@catalyst-dev:codebase-pattern-finder show similar implementations
+@awl-dev:thoughts-locator find anything about [feature area]
+@awl-dev:codebase-pattern-finder show similar implementations
 ```
 
 ### Resuming Interrupted Work
@@ -1184,7 +1184,7 @@ ls -lt thoughts/shared/plans/ | head -10
 Plans track progress with checkboxes. If interrupted:
 
 ```
-/catalyst-dev:implement_plan thoughts/shared/plans/2025-01-08-ENG-1234-feature.md
+/awl-dev:implement_plan thoughts/shared/plans/2025-01-08-ENG-1234-feature.md
 ```
 
 Claude automatically resumes from first unchecked item.
@@ -1236,7 +1236,7 @@ ls ~/.claude/plugins/
 ls .claude/plugins/
 
 # Reinstall if needed
-/plugin update catalyst-dev
+/plugin update awl-dev
 ```
 
 ### Worktree Thoughts Not Shared

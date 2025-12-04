@@ -1,10 +1,10 @@
-# Catalyst PM Plugin
+# Awl PM Plugin
 
 Linear-focused project management plugin with cycle management, backlog grooming, GitHub-Linear correlation, and team analytics.
 
 ## Overview
 
-The Catalyst PM plugin provides AI-powered project management workflows that integrate Linear issue tracking with GitHub pull requests. It focuses on actionable insights rather than raw data dumps.
+The Awl PM plugin provides AI-powered project management workflows that integrate Linear issue tracking with GitHub pull requests. It focuses on actionable insights rather than raw data dumps.
 
 **Philosophy**: Every report includes specific recommendations, not just metrics. PMs should know exactly what action to take after reading any report.
 
@@ -241,7 +241,7 @@ PM commands read from two config sources:
 **1. Project metadata** (`.claude/config.json` - safe to commit):
 ```json
 {
-  "catalyst": {
+  "awl": {
     "projectKey": "acme",
     "project": {
       "ticketPrefix": "ACME"
@@ -250,7 +250,7 @@ PM commands read from two config sources:
 }
 ```
 
-**2. Secrets** (`~/.config/catalyst/config-acme.json` - NEVER committed):
+**2. Secrets** (`~/.config/awl/config-acme.json` - NEVER committed):
 ```json
 {
   "linear": {
@@ -260,26 +260,26 @@ PM commands read from two config sources:
 }
 ```
 
-**Setup**: Run `./scripts/setup-catalyst-config.sh` to configure your project
+**Setup**: Run `./scripts/setup-awl-config.sh` to configure your project
 
 ## Installation
 
 ### Via Claude Code Marketplace (Coming Soon)
 
 ```bash
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-pm
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-pm
 ```
 
 ### Local Development
 
 ```bash
 # Clone the repository
-git clone https://github.com/coalesce-labs/catalyst.git
+git clone https://github.com/ralfschimmel/awl.git
 
 # Create symlink in your project
 mkdir -p .claude/plugins
-ln -s /path/to/catalyst/plugins/pm .claude/plugins/pm
+ln -s /path/to/awl/plugins/pm .claude/plugins/pm
 
 # Restart Claude Code
 ```
@@ -290,7 +290,7 @@ Check that the plugin is installed:
 
 ```bash
 /plugin list
-# Should show: catalyst-pm
+# Should show: awl-pm
 
 # Run prerequisite check
 cd /path/to/your/project
@@ -406,7 +406,7 @@ Create a cycle in Linear UI or via API.
 
 ## Contributing
 
-Contributions welcome! See the main Catalyst repository for contribution guidelines.
+Contributions welcome! See the main Awl repository for contribution guidelines.
 
 ## License
 
@@ -414,6 +414,6 @@ MIT License - see LICENSE file in main repository
 
 ## Support
 
-- GitHub Issues: https://github.com/coalesce-labs/catalyst/issues
-- Documentation: https://catalyst.dev/docs
-- Community: https://catalyst.dev/community
+- GitHub Issues: https://github.com/ralfschimmel/awl/issues
+- Documentation: https://awl.dev/docs
+- Community: https://awl.dev/community

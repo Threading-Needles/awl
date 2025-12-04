@@ -3,12 +3,12 @@
 
 set -e
 
-CONFIG_DIR="$HOME/.config/catalyst"
+CONFIG_DIR="$HOME/.config/awl"
 mkdir -p "$CONFIG_DIR"
 
-echo "🔧 Catalyst Config Setup"
+echo "🔧 Awl Config Setup"
 echo ""
-echo "This will move secrets from .claude/config.json to ~/.config/catalyst/"
+echo "This will move secrets from .claude/config.json to ~/.config/awl/"
 echo ""
 
 # Get project key from user
@@ -18,7 +18,7 @@ read -p "Enter project key (e.g., 'acme', 'work', 'personal'): " PROJECT_KEY
 if [[ -f ".claude/config.json" ]]; then
   echo "✅ Found existing .claude/config.json"
 
-  # Extract secrets to ~/.config/catalyst/config-$PROJECT_KEY.json
+  # Extract secrets to ~/.config/awl/config-$PROJECT_KEY.json
   jq '{
     linear: .linear,
     sentry: .sentry,
@@ -91,7 +91,7 @@ echo ""
 echo "✅ Config setup complete!"
 echo ""
 echo "📝 Next steps:"
-echo "  1. Edit ~/.config/catalyst/config-$PROJECT_KEY.json to add your API tokens"
+echo "  1. Edit ~/.config/awl/config-$PROJECT_KEY.json to add your API tokens"
 echo "  2. Verify .claude/config.json is safe to commit (no secrets)"
 echo "  3. Add .claude/config.json to git"
 echo ""

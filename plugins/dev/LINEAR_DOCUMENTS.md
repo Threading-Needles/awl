@@ -20,7 +20,7 @@ All workflow documents are stored as Linear documents attached to their associat
 
 ```bash
 # Get team key from config
-TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' .claude/config.json)
+TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' .claude/config.json)
 
 linearis documents create \
   --title "Research: Authentication Flow" \

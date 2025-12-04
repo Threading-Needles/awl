@@ -1,10 +1,10 @@
-# Claude Code Hooks for Catalyst Dev
+# Claude Code Hooks for Awl Dev
 
 Automatic workflow context tracking via Claude Code hooks system.
 
 ## Overview
 
-The Catalyst Dev plugin includes Claude Code hooks that automatically track when you write or edit thoughts documents. No manual script calls needed - it just works!
+The Awl Dev plugin includes Claude Code hooks that automatically track when you write or edit thoughts documents. No manual script calls needed - it just works!
 
 ## What Gets Tracked
 
@@ -25,7 +25,7 @@ The Catalyst Dev plugin includes Claude Code hooks that automatically track when
 
 ### During Plugin Installation
 
-When you install the `catalyst-dev` plugin, Claude Code automatically:
+When you install the `awl-dev` plugin, Claude Code automatically:
 1. Discovers the `hooks.toml` in the plugin
 2. Registers all 8 hooks (4 for Write, 4 for Edit)
 3. Activates them for your session

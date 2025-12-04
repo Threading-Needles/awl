@@ -1,7 +1,7 @@
 #!/bin/bash
-# setup-catalyst.sh - Complete Catalyst setup in one command
-# Usage: curl -fsSL https://raw.githubusercontent.com/coalesce-labs/catalyst/main/setup-catalyst.sh | bash
-#        OR ./setup-catalyst.sh
+# setup-awl.sh - Complete Awl setup in one command
+# Usage: curl -fsSL https://raw.githubusercontent.com/ralfschimmel/awl/main/setup-awl.sh | bash
+#        OR ./setup-awl.sh
 
 set -e
 
@@ -445,7 +445,7 @@ detect_git_repo() {
     echo "Detected repository: ${ORG_NAME}/${REPO_NAME}"
     echo ""
 
-    if ask_yes_no "Set up Catalyst in this repository?"; then
+    if ask_yes_no "Set up Awl in this repository?"; then
       return 0
     else
       determine_project_location
@@ -633,7 +633,7 @@ EOF
       print_success "Created thoughts repository: $THOUGHTS_REPO"
       cd "$PROJECT_DIR"
     else
-      print_error "Thoughts repository required for Catalyst. Exiting."
+      print_error "Thoughts repository required for Awl. Exiting."
       exit 1
     fi
   fi
@@ -694,7 +694,7 @@ setup_project_config() {
 
     # Check if projectKey matches
     local existing_key
-    existing_key=$(jq -r '.catalyst.projectKey // empty' "$config_file")
+    existing_key=$(jq -r '.awl.projectKey // empty' "$config_file")
 
     if [ -n "$existing_key" ] && [ "$existing_key" != "$PROJECT_KEY" ]; then
       echo ""
@@ -738,7 +738,7 @@ setup_project_config() {
   # Create/update config
   cat > "$config_file" <<EOF
 {
-  "catalyst": {
+  "awl": {
     "projectKey": "${PROJECT_KEY}",
     "repository": {
       "org": "${ORG_NAME}",
@@ -826,10 +826,10 @@ EOF
   echo ""
 }
 
-setup_catalyst_secrets() {
-  print_header "Setting Up Catalyst Secrets"
+setup_awl_secrets() {
+  print_header "Setting Up Awl Secrets"
 
-  local config_dir="$HOME/.config/catalyst"
+  local config_dir="$HOME/.config/awl"
   local config_file="${config_dir}/config-${PROJECT_KEY}.json"
 
   mkdir -p "$config_dir"
@@ -854,28 +854,28 @@ setup_catalyst_secrets() {
     existing_config=$(cat "$config_file")
   else
     # Create empty config
-    existing_config='{"catalyst":{}}'
+    existing_config='{"awl":{}}'
   fi
 
   # Prompt for each integration
-  prompt_linear_config "$existing_config" > /tmp/catalyst-config-temp.json
-  existing_config=$(cat /tmp/catalyst-config-temp.json)
+  prompt_linear_config "$existing_config" > /tmp/awl-config-temp.json
+  existing_config=$(cat /tmp/awl-config-temp.json)
 
-  prompt_sentry_config "$existing_config" > /tmp/catalyst-config-temp.json
-  existing_config=$(cat /tmp/catalyst-config-temp.json)
+  prompt_sentry_config "$existing_config" > /tmp/awl-config-temp.json
+  existing_config=$(cat /tmp/awl-config-temp.json)
 
-  prompt_railway_config "$existing_config" > /tmp/catalyst-config-temp.json
-  existing_config=$(cat /tmp/catalyst-config-temp.json)
+  prompt_railway_config "$existing_config" > /tmp/awl-config-temp.json
+  existing_config=$(cat /tmp/awl-config-temp.json)
 
-  prompt_posthog_config "$existing_config" > /tmp/catalyst-config-temp.json
-  existing_config=$(cat /tmp/catalyst-config-temp.json)
+  prompt_posthog_config "$existing_config" > /tmp/awl-config-temp.json
+  existing_config=$(cat /tmp/awl-config-temp.json)
 
-  prompt_exa_config "$existing_config" > /tmp/catalyst-config-temp.json
-  existing_config=$(cat /tmp/catalyst-config-temp.json)
+  prompt_exa_config "$existing_config" > /tmp/awl-config-temp.json
+  existing_config=$(cat /tmp/awl-config-temp.json)
 
   # Save final config
   echo "$existing_config" | jq . > "$config_file"
-  rm /tmp/catalyst-config-temp.json
+  rm /tmp/awl-config-temp.json
 
   print_success "Secrets config saved: $config_file"
   echo ""
@@ -892,7 +892,7 @@ prompt_linear_config() {
 
   # Check if already configured
   local has_token
-  has_token=$(echo "$config" | jq -r '.catalyst.linear.apiToken // empty')
+  has_token=$(echo "$config" | jq -r '.awl.linear.apiToken // empty')
 
   if [ -n "$has_token" ] && [ "$has_token" != "[NEEDS_SETUP]" ]; then
     echo "✓ Linear already configured" >&2
@@ -982,7 +982,7 @@ prompt_linear_config() {
     echo "  Steps:" >&2
     echo "  1. Go to https://linear.app/settings/api" >&2
     echo "  2. Click 'Create key' under Personal API Keys" >&2
-    echo "  3. Give it a name (e.g., 'Catalyst')" >&2
+    echo "  3. Give it a name (e.g., 'Awl')" >&2
     echo "  4. Copy the token (starts with 'lin_api_')" >&2
     echo "" >&2
     echo "  TIP: Save to ~/.linear_api_token to auto-discover next time:" >&2
@@ -1019,7 +1019,7 @@ prompt_linear_config() {
   # Get team key (auto-detect from project config or use validated data)
   if [[ -z "$linear_team" ]]; then
     if [ -f "${PROJECT_DIR}/.claude/config.json" ]; then
-      linear_team=$(jq -r '.catalyst.project.ticketPrefix // "PROJ"' "${PROJECT_DIR}/.claude/config.json")
+      linear_team=$(jq -r '.awl.project.ticketPrefix // "PROJ"' "${PROJECT_DIR}/.claude/config.json")
       echo "" >&2
       echo "Team Key (Identifier): Using '${linear_team}' from project config" >&2
       echo "  (This matches your ticket prefix for consistency)" >&2
@@ -1049,7 +1049,7 @@ prompt_linear_config() {
     --arg token "$linear_token" \
     --arg team "$linear_team" \
     --arg teamName "$linear_team_name" \
-    '.catalyst.linear = {
+    '.awl.linear = {
       "apiToken": $token,
       "teamKey": $team,
       "defaultTeam": $teamName
@@ -1067,7 +1067,7 @@ prompt_sentry_config() {
 
   # Check if already configured
   local has_token
-  has_token=$(echo "$config" | jq -r '.catalyst.sentry.authToken // empty')
+  has_token=$(echo "$config" | jq -r '.awl.sentry.authToken // empty')
 
   if [ -n "$has_token" ] && [ "$has_token" != "[NEEDS_SETUP]" ]; then
     echo "✓ Sentry already configured" >&2
@@ -1214,7 +1214,7 @@ prompt_sentry_config() {
     echo "  Steps:" >&2
     echo "  1. Go to https://sentry.io/settings/account/api/auth-tokens/" >&2
     echo "  2. Click 'Create New Token'" >&2
-    echo "  3. Give it a name (e.g., 'Catalyst')" >&2
+    echo "  3. Give it a name (e.g., 'Awl')" >&2
     echo "  4. Select scopes: project:read, org:read" >&2
     echo "  5. Copy the token" >&2
     echo "" >&2
@@ -1278,7 +1278,7 @@ EOF
     echo "$config" | jq \
       --arg org "$sentry_org" \
       --arg token "$sentry_token" \
-      '.catalyst.sentry = {
+      '.awl.sentry = {
         "org": $org,
         "authToken": $token
       }'
@@ -1288,7 +1288,7 @@ EOF
       --arg org "$sentry_org" \
       --argjson projects "$sentry_project" \
       --arg token "$sentry_token" \
-      '.catalyst.sentry = {
+      '.awl.sentry = {
         "org": $org,
         "projects": $projects,
         "defaultProject": $projects[0],
@@ -1300,7 +1300,7 @@ EOF
       --arg org "$sentry_org" \
       --arg project "$sentry_project" \
       --arg token "$sentry_token" \
-      '.catalyst.sentry = {
+      '.awl.sentry = {
         "org": $org,
         "project": $project,
         "authToken": $token
@@ -1319,7 +1319,7 @@ prompt_railway_config() {
 
   # Check if already configured
   local has_token
-  has_token=$(echo "$config" | jq -r '.catalyst.railway.token // empty')
+  has_token=$(echo "$config" | jq -r '.awl.railway.token // empty')
 
   if [ -n "$has_token" ] && [ "$has_token" != "[NEEDS_SETUP]" ]; then
     echo "✓ Railway already configured" >&2
@@ -1343,7 +1343,7 @@ prompt_railway_config() {
   echo "  Steps:" >&2
   echo "  1. Click your profile icon → Account Settings → Tokens" >&2
   echo "  2. Click 'Create Token'" >&2
-  echo "  3. Give it a name (e.g., 'Catalyst')" >&2
+  echo "  3. Give it a name (e.g., 'Awl')" >&2
   echo "  4. Copy the generated token" >&2
   echo "" >&2
 
@@ -1353,7 +1353,7 @@ prompt_railway_config() {
   echo "$config" | jq \
     --arg token "$railway_token" \
     --arg projectId "$railway_project" \
-    '.catalyst.railway = {
+    '.awl.railway = {
       "token": $token,
       "projectId": $projectId
     }'
@@ -1370,7 +1370,7 @@ prompt_posthog_config() {
 
   # Check if already configured
   local has_token
-  has_token=$(echo "$config" | jq -r '.catalyst.posthog.apiKey // empty')
+  has_token=$(echo "$config" | jq -r '.awl.posthog.apiKey // empty')
 
   if [ -n "$has_token" ] && [ "$has_token" != "[NEEDS_SETUP]" ]; then
     echo "✓ PostHog already configured" >&2
@@ -1405,7 +1405,7 @@ prompt_posthog_config() {
   echo "$config" | jq \
     --arg apiKey "$posthog_key" \
     --arg projectId "$posthog_project" \
-    '.catalyst.posthog = {
+    '.awl.posthog = {
       "apiKey": $apiKey,
       "projectId": $projectId
     }'
@@ -1422,7 +1422,7 @@ prompt_exa_config() {
 
   # Check if already configured
   local has_token
-  has_token=$(echo "$config" | jq -r '.catalyst.exa.apiKey // empty')
+  has_token=$(echo "$config" | jq -r '.awl.exa.apiKey // empty')
 
   if [ -n "$has_token" ] && [ "$has_token" != "[NEEDS_SETUP]" ]; then
     echo "✓ Exa already configured" >&2
@@ -1447,7 +1447,7 @@ prompt_exa_config() {
   echo "  1. Create account at https://exa.ai/ (free tier available)" >&2
   echo "  2. Go to https://dashboard.exa.ai/api-keys" >&2
   echo "  3. Click '+ CREATE NEW KEY'" >&2
-  echo "  4. Name it (e.g., 'Catalyst') and copy the key" >&2
+  echo "  4. Name it (e.g., 'Awl') and copy the key" >&2
   echo "  5. Store it securely (shown only once!)" >&2
   echo "" >&2
 
@@ -1455,7 +1455,7 @@ prompt_exa_config() {
 
   echo "$config" | jq \
     --arg apiKey "$exa_key" \
-    '.catalyst.exa = {
+    '.awl.exa = {
       "apiKey": $apiKey
     }'
 }
@@ -1557,12 +1557,12 @@ validate_setup() {
 
       # Verify structure
       local has_key
-      has_key=$(jq -r '.catalyst.projectKey // empty' "${PROJECT_DIR}/.claude/config.json")
+      has_key=$(jq -r '.awl.projectKey // empty' "${PROJECT_DIR}/.claude/config.json")
 
       if [ -n "$has_key" ]; then
         print_success "✓ projectKey configured: $has_key"
       else
-        print_error "✗ Missing .catalyst.projectKey"
+        print_error "✗ Missing .awl.projectKey"
         validation_failed=true
       fi
     else
@@ -1598,17 +1598,17 @@ validate_setup() {
     validation_failed=true
   fi
 
-  # Check Catalyst secrets
-  local secrets_config="$HOME/.config/catalyst/config-${PROJECT_KEY}.json"
+  # Check Awl secrets
+  local secrets_config="$HOME/.config/awl/config-${PROJECT_KEY}.json"
   if [ -f "$secrets_config" ]; then
     if jq empty "$secrets_config" 2>/dev/null; then
-      print_success "✓ Catalyst secrets config is valid JSON"
+      print_success "✓ Awl secrets config is valid JSON"
     else
-      print_error "✗ Catalyst secrets config is invalid JSON"
+      print_error "✗ Awl secrets config is invalid JSON"
       validation_failed=true
     fi
   else
-    print_warning "⚠ Catalyst secrets config not found (okay if skipped integrations)"
+    print_warning "⚠ Awl secrets config not found (okay if skipped integrations)"
   fi
 
   # Check thoughts symlinks
@@ -1641,7 +1641,7 @@ print_summary() {
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
-  print_header "🎉 Catalyst Setup Complete!"
+  print_header "🎉 Awl Setup Complete!"
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
@@ -1664,7 +1664,7 @@ print_summary() {
   echo "⚙️  Configuration Files:"
   echo "   Project: ${PROJECT_DIR}/.claude/config.json"
   echo "   HumanLayer: ~/.config/humanlayer/config-${PROJECT_KEY}.json"
-  echo "   Secrets: ~/.config/catalyst/config-${PROJECT_KEY}.json"
+  echo "   Secrets: ~/.config/awl/config-${PROJECT_KEY}.json"
   echo ""
 
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -1672,9 +1672,9 @@ print_summary() {
   print_header "Next Steps"
   echo ""
 
-  echo "1. Install Catalyst plugin in Claude Code:"
-  echo "   /plugin marketplace add coalesce-labs/catalyst"
-  echo "   /plugin install catalyst-dev"
+  echo "1. Install Awl plugin in Claude Code:"
+  echo "   /plugin marketplace add ralfschimmel/awl"
+  echo "   /plugin install awl-dev"
   echo ""
 
   echo "2. Restart Claude Code to load configuration"
@@ -1691,8 +1691,8 @@ print_summary() {
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
   echo "📚 Documentation:"
-  echo "   Quick Start: https://github.com/coalesce-labs/catalyst/blob/main/QUICKSTART.md"
-  echo "   Full Guide: https://github.com/coalesce-labs/catalyst/blob/main/docs/USAGE.md"
+  echo "   Quick Start: https://github.com/ralfschimmel/awl/blob/main/QUICKSTART.md"
+  echo "   Full Guide: https://github.com/ralfschimmel/awl/blob/main/docs/USAGE.md"
   echo ""
 
   echo "💡 Tip: This script is idempotent. Run again anytime to:"
@@ -1781,7 +1781,7 @@ main() {
   # Print banner
   echo ""
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-  echo "           🚀 Catalyst Complete Setup"
+  echo "           🚀 Awl Complete Setup"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
 
@@ -1792,7 +1792,7 @@ main() {
   setup_worktree_directory
   setup_project_config
   setup_humanlayer_config
-  setup_catalyst_secrets
+  setup_awl_secrets
   init_humanlayer_thoughts
   sync_thoughts
 

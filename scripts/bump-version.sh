@@ -50,7 +50,7 @@ bump_plugin() {
 
   # Get current version
   local current_version=$(jq -r '.version' "$manifest")
-  echo "📦 Plugin: catalyst-$plugin_name"
+  echo "📦 Plugin: awl-$plugin_name"
   echo "   Current version: $current_version"
 
   # Calculate new version
@@ -88,7 +88,7 @@ bump_plugin() {
   # Update version in marketplace.json
   local marketplace=".claude-plugin/marketplace.json"
   if [[ -f "$marketplace" ]]; then
-    jq --arg name "catalyst-$plugin_name" --arg version "$new_version" \
+    jq --arg name "awl-$plugin_name" --arg version "$new_version" \
       '(.plugins[] | select(.name == $name) | .version) = $version' \
       "$marketplace" > "$marketplace.tmp"
     mv "$marketplace.tmp" "$marketplace"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Smart Linear configuration with auto-discovery and validation
-# Usage: source this in setup-catalyst.sh
+# Usage: source this in setup-awl.sh
 
 prompt_linear_config_smart() {
   local config="$1"
@@ -13,7 +13,7 @@ prompt_linear_config_smart() {
 
   # Check if already configured
   local has_token
-  has_token=$(echo "$config" | jq -r '.catalyst.linear.apiToken // empty')
+  has_token=$(echo "$config" | jq -r '.awl.linear.apiToken // empty')
 
   if [ -n "$has_token" ] && [ "$has_token" != "[NEEDS_SETUP]" ]; then
     echo "✓ Linear already configured" >&2
@@ -33,10 +33,10 @@ prompt_linear_config_smart() {
 
   # Source helper functions
   local helpers_script=""
-  if [[ -f "scripts/catalyst-integration-helpers.sh" ]]; then
-    helpers_script="scripts/catalyst-integration-helpers.sh"
-  elif [[ -f "$(dirname "$0")/catalyst-integration-helpers.sh" ]]; then
-    helpers_script="$(dirname "$0")/catalyst-integration-helpers.sh"
+  if [[ -f "scripts/awl-integration-helpers.sh" ]]; then
+    helpers_script="scripts/awl-integration-helpers.sh"
+  elif [[ -f "$(dirname "$0")/awl-integration-helpers.sh" ]]; then
+    helpers_script="$(dirname "$0")/awl-integration-helpers.sh"
   fi
 
   local discovered_token=""
@@ -113,7 +113,7 @@ prompt_linear_config_smart() {
     echo "  Steps:" >&2
     echo "  1. Go to https://linear.app/settings/api" >&2
     echo "  2. Click 'Create key' under Personal API Keys" >&2
-    echo "  3. Give it a name (e.g., 'Catalyst')" >&2
+    echo "  3. Give it a name (e.g., 'Awl')" >&2
     echo "  4. Copy the token (starts with 'lin_api_')" >&2
     echo "" >&2
     echo "  TIP: Save to ~/.linear_api_token to auto-discover next time:" >&2
@@ -150,7 +150,7 @@ prompt_linear_config_smart() {
   # Get team key (auto-detect from project config or use validated data)
   if [[ -z "$linear_team" ]]; then
     if [ -f "${PROJECT_DIR}/.claude/config.json" ]; then
-      linear_team=$(jq -r '.catalyst.project.ticketPrefix // "PROJ"' "${PROJECT_DIR}/.claude/config.json")
+      linear_team=$(jq -r '.awl.project.ticketPrefix // "PROJ"' "${PROJECT_DIR}/.claude/config.json")
       echo "" >&2
       echo "Team Key (Identifier): Using '${linear_team}' from project config" >&2
       echo "  (This matches your ticket prefix for consistency)" >&2
@@ -180,7 +180,7 @@ prompt_linear_config_smart() {
     --arg token "$linear_token" \
     --arg team "$linear_team" \
     --arg teamName "$linear_team_name" \
-    '.catalyst.linear = {
+    '.awl.linear = {
       "apiToken": $token,
       "teamKey": $team,
       "defaultTeam": $teamName

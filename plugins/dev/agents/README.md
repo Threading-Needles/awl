@@ -8,12 +8,12 @@ Agents are invoked by commands using the `Task` tool to perform focused research
 **Agents vs Commands:**
 
 - **Commands** (`/command-name`) - User-facing workflows you invoke directly
-- **Agents** (`@catalyst-dev:name`) - Specialized research tools spawned by commands
+- **Agents** (`@awl-dev:name`) - Specialized research tools spawned by commands
 
 **Invocation:** Commands spawn agents using the Task tool:
 
 ```markdown
-Task(subagent_type="catalyst-dev:codebase-locator", prompt="Find authentication files")
+Task(subagent_type="awl-dev:codebase-locator", prompt="Find authentication files")
 ```
 
 **Philosophy:** All agents follow a **documentarian, not critic** approach:
@@ -42,7 +42,7 @@ Task(subagent_type="catalyst-dev:codebase-locator", prompt="Find authentication 
 **Example invocation:**
 
 ```markdown
-Task( subagent_type="catalyst-dev:codebase-locator", prompt="Find all authentication-related files" )
+Task( subagent_type="awl-dev:codebase-locator", prompt="Find all authentication-related files" )
 ```
 
 **Returns**: Organized list of file locations categorized by purpose
@@ -65,7 +65,7 @@ Task( subagent_type="catalyst-dev:codebase-locator", prompt="Find all authentica
 **Example invocation:**
 
 ```markdown
-Task( subagent_type="catalyst-dev:codebase-analyzer", prompt="Analyze the authentication middleware
+Task( subagent_type="awl-dev:codebase-analyzer", prompt="Analyze the authentication middleware
 implementation and document how it works" )
 ```
 
@@ -89,7 +89,7 @@ implementation and document how it works" )
 **Example invocation:**
 
 ```markdown
-Task( subagent_type="catalyst-dev:codebase-pattern-finder", prompt="Find examples of how other components handle
+Task( subagent_type="awl-dev:codebase-pattern-finder", prompt="Find examples of how other components handle
 error logging" )
 ```
 
@@ -113,7 +113,7 @@ error logging" )
 **Example invocation:**
 
 ```markdown
-Task( subagent_type="catalyst-dev:thoughts-locator", prompt="Find all thoughts documents about authentication" )
+Task( subagent_type="awl-dev:thoughts-locator", prompt="Find all thoughts documents about authentication" )
 ```
 
 **Returns**: List of relevant thought documents with paths
@@ -136,7 +136,7 @@ Task( subagent_type="catalyst-dev:thoughts-locator", prompt="Find all thoughts d
 **Example invocation:**
 
 ```markdown
-Task( subagent_type="catalyst-dev:thoughts-analyzer", prompt="Analyze the authentication research document and
+Task( subagent_type="awl-dev:thoughts-analyzer", prompt="Analyze the authentication research document and
 extract key findings" )
 ```
 
@@ -160,7 +160,7 @@ extract key findings" )
 **Example invocation:**
 
 ```markdown
-Task( subagent_type="catalyst-dev:external-research", prompt="Research how Next.js implements middleware
+Task( subagent_type="awl-dev:external-research", prompt="Research how Next.js implements middleware
 authentication patterns" )
 ```
 
@@ -211,8 +211,8 @@ Commands spawn multiple agents concurrently for efficiency:
 ```markdown
 # Spawn three agents in parallel
 
-Task(subagent_type="catalyst-dev:codebase-locator", ...) Task(subagent_type="catalyst-dev:thoughts-locator", ...)
-Task(subagent_type="catalyst-dev:codebase-analyzer", ...)
+Task(subagent_type="awl-dev:codebase-locator", ...) Task(subagent_type="awl-dev:thoughts-locator", ...)
+Task(subagent_type="awl-dev:codebase-analyzer", ...)
 
 # Wait for all to complete
 
@@ -259,14 +259,14 @@ authentication implementations"
 
 ## Plugin Distribution
 
-Agents are distributed as part of the Catalyst plugin system:
+Agents are distributed as part of the Awl plugin system:
 
 ### Installation
 
-**Install Catalyst plugin**:
+**Install Awl plugin**:
 
 ```bash
-/plugin install catalyst-dev
+/plugin install awl-dev
 ```
 
 This installs all agents automatically.
@@ -276,14 +276,14 @@ This installs all agents automatically.
 **Update plugin**:
 
 ```bash
-/plugin update catalyst-dev
+/plugin update awl-dev
 ```
 
 Agents are pure research logic with no project-specific configuration, so updates are always safe.
 
 ### Per-Project Availability
 
-Agents are available in any project where the catalyst-dev plugin is installed. No per-project setup
+Agents are available in any project where the awl-dev plugin is installed. No per-project setup
 needed.
 
 ## Creating New Agents
@@ -354,11 +354,11 @@ You are a specialist at [specific research task].
 ```markdown
 # First, find files
 
-Task(subagent_type="catalyst-dev:codebase-locator", ...)
+Task(subagent_type="awl-dev:codebase-locator", ...)
 
 # Then analyze the most relevant ones
 
-Task(subagent_type="catalyst-dev:codebase-analyzer", ...)
+Task(subagent_type="awl-dev:codebase-analyzer", ...)
 ```
 
 ### Pattern 2: Parallel Search
@@ -366,7 +366,7 @@ Task(subagent_type="catalyst-dev:codebase-analyzer", ...)
 ```markdown
 # Search codebase and thoughts simultaneously
 
-Task(subagent_type="catalyst-dev:codebase-locator", ...) Task(subagent_type="catalyst-dev:thoughts-locator", ...)
+Task(subagent_type="awl-dev:codebase-locator", ...) Task(subagent_type="awl-dev:thoughts-locator", ...)
 ```
 
 ### Pattern 3: Pattern Discovery
@@ -374,7 +374,7 @@ Task(subagent_type="catalyst-dev:codebase-locator", ...) Task(subagent_type="cat
 ```markdown
 # Find patterns after understanding the code
 
-Task(subagent_type="catalyst-dev:codebase-analyzer", ...) Task(subagent_type="catalyst-dev:codebase-pattern-finder", ...)
+Task(subagent_type="awl-dev:codebase-analyzer", ...) Task(subagent_type="awl-dev:codebase-pattern-finder", ...)
 ```
 
 ## Tool Access
@@ -414,7 +414,7 @@ Agents specify required tools in frontmatter:
 
 ```bash
 # Update plugin
-/plugin update catalyst-dev
+/plugin update awl-dev
 
 # Restart Claude Code
 ```

@@ -10,9 +10,9 @@
 
 **Current Architecture** (2 plugins):
 
-- `catalyst-dev` - Everything: workflow commands, agents, AND implicit dependency on PostHog/Sentry
+- `awl-dev` - Everything: workflow commands, agents, AND implicit dependency on PostHog/Sentry
   MCPs
-- `catalyst-meta` - Workflow discovery
+- `awl-meta` - Workflow discovery
 
 **Issues**:
 
@@ -25,14 +25,14 @@
 
 Organize by **use case** rather than **feature type**:
 
-### 1. `catalyst-dev` (Core Development)
+### 1. `awl-dev` (Core Development)
 
 **Purpose**: Essential development workflow - no heavy MCPs
 
 **Includes**:
 
 - Core workflow commands: `/research-codebase`, `/create-plan`, `/implement-plan`
-- Development commands: `/catalyst-dev:commit`, `/describe-pr`, `/create-worktree`
+- Development commands: `/awl-dev:commit`, `/describe-pr`, `/create-worktree`
 - Handoff system: `/create-handoff`, `/resume-handoff`
 - All research agents (codebase-locator, analyzer, pattern-finder, etc.)
 - Lightweight MCPs: DeepWiki (~1.9k), Context7 (~1.7k)
@@ -43,7 +43,7 @@ Organize by **use case** rather than **feature type**:
 
 ---
 
-### 2. `catalyst-analytics` (Product Analytics)
+### 2. `awl-analytics` (Product Analytics)
 
 **Purpose**: PostHog integration for product metrics and user behavior
 
@@ -69,7 +69,7 @@ Organize by **use case** rather than **feature type**:
 
 ---
 
-### 3. `catalyst-debugging` (Error Monitoring)
+### 3. `awl-debugging` (Error Monitoring)
 
 **Purpose**: Sentry integration for production error analysis
 
@@ -95,7 +95,7 @@ Organize by **use case** rather than **feature type**:
 
 ---
 
-### 4. `catalyst-meta` (Workflow Discovery)
+### 4. `awl-meta` (Workflow Discovery)
 
 **Purpose**: Learn from community, create custom workflows
 
@@ -117,13 +117,13 @@ Organize by **use case** rather than **feature type**:
 ### Scenario 1: Regular Development (90% of sessions)
 
 ```bash
-# Only catalyst-dev installed
+# Only awl-dev installed
 # Context: ~3.5k MCP tokens
 
 /research-codebase "authentication flow"
 /create-plan "Add OAuth support"
 /implement-plan
-/catalyst-dev:commit
+/awl-dev:commit
 ```
 
 **No heavy MCPs loaded** ✅
@@ -134,14 +134,14 @@ Organize by **use case** rather than **feature type**:
 
 ```bash
 # Enable analytics plugin when needed
-/plugin enable catalyst-analytics
+/plugin enable awl-analytics
 
 # Now PostHog MCP available
 /analyze-user-behavior "checkout abandonment"
 /product-metrics "conversion rate last 30 days"
 
 # Disable when done
-/plugin disable catalyst-analytics
+/plugin disable awl-analytics
 ```
 
 **PostHog only loaded when explicitly enabled** ✅
@@ -152,18 +152,18 @@ Organize by **use case** rather than **feature type**:
 
 ```bash
 # Enable debugging plugin for incident
-/plugin enable catalyst-debugging
+/plugin enable awl-debugging
 
 # Now Sentry MCP available
-/catalyst-dev:debug-production-error "TypeError in checkout"
+/awl-dev:debug-production-error "TypeError in checkout"
 /error-impact-analysis
 
 # Optional: Also enable analytics for user impact
-/plugin enable catalyst-analytics
+/plugin enable awl-analytics
 /segment-analysis "users affected by checkout error"
 
 # Disable both when incident resolved
-/plugin disable catalyst-debugging catalyst-analytics
+/plugin disable awl-debugging awl-analytics
 ```
 
 **Sentry + PostHog only loaded during incidents** ✅
@@ -176,10 +176,10 @@ Organize by **use case** rather than **feature type**:
 
 Each plugin needs a `.mcp.json` file to bundle its MCPs:
 
-**catalyst-analytics/**.claude-plugin/`:
+**awl-analytics/**.claude-plugin/`:
 
 ```
-catalyst-analytics/
+awl-analytics/
 ├── .claude-plugin/
 │   ├── plugin.json
 │   └── .mcp.json          # PostHog MCP config
@@ -191,7 +191,7 @@ catalyst-analytics/
     └── analytics-insights.md
 ```
 
-**catalyst-analytics/.claude-plugin/.mcp.json**:
+**awl-analytics/.claude-plugin/.mcp.json**:
 
 ```json
 {
@@ -240,21 +240,21 @@ MCPs should also be unloaded.
 
 ### Phase 2: Plugin Restructuring (if tests pass)
 
-- [ ] Create `catalyst-analytics` plugin structure
+- [ ] Create `awl-analytics` plugin structure
 - [ ] Move PostHog MCP config to analytics plugin
 - [ ] Create analytics-specific commands
 - [ ] Test analytics plugin enable/disable
 
 ### Phase 3: Debugging Plugin
 
-- [ ] Create `catalyst-debugging` plugin structure
+- [ ] Create `awl-debugging` plugin structure
 - [ ] Move Sentry MCP config to debugging plugin
 - [ ] Create debugging-specific commands
 - [ ] Test debugging plugin enable/disable
 
 ### Phase 4: Core Plugin Cleanup
 
-- [ ] Remove MCP management commands from catalyst-dev
+- [ ] Remove MCP management commands from awl-dev
 - [ ] Update documentation
 - [ ] Remove PostHog/Sentry references from core
 - [ ] Test all plugins together
@@ -309,10 +309,10 @@ MCPs should also be unloaded.
 # Session starts lightweight automatically (no analytics/debugging plugins)
 
 # Later: need analytics
-/plugin enable catalyst-analytics  # One command, automatic MCP load
+/plugin enable awl-analytics  # One command, automatic MCP load
 
 # Done with analytics
-/plugin disable catalyst-analytics # One command, automatic MCP unload
+/plugin disable awl-analytics # One command, automatic MCP unload
 ```
 
 **Simpler, clearer, more reliable** ✅

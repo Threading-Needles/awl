@@ -1,14 +1,14 @@
 {
-  "name": "catalyst-analytics",
+  "name": "awl-analytics",
   "version": "1.0.1",
   "description": "Product analytics with PostHog MCP integration. Enable when analyzing user behavior, conversion metrics, and product usage. ~40k context tokens when enabled.",
   "author": {
-    "name": "Coalesce Labs",
+    "name": "Awl Team",
     "email": "hello@coalesce.dev",
-    "url": "https://github.com/coalesce-labs"
+    "url": "https://github.com/ralfschimmel"
   },
-  "homepage": "https://github.com/coalesce-labs/catalyst",
-  "repository": "https://github.com/coalesce-labs/catalyst.git",
+  "homepage": "https://github.com/ralfschimmel/awl",
+  "repository": "https://github.com/ralfschimmel/awl.git",
   "keywords": [
     "analytics",
     "posthog",

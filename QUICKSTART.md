@@ -1,6 +1,6 @@
-# Catalyst Installation & Configuration Guide
+# Awl Installation & Configuration Guide
 
-Complete guide to installing and configuring Catalyst for Claude Code.
+Complete guide to installing and configuring Awl for Claude Code.
 
 ## Table of Contents
 
@@ -21,11 +21,11 @@ Complete guide to installing and configuring Catalyst for Claude Code.
 **Download and run setup script:**
 ```bash
 # Download the setup script
-curl -O https://raw.githubusercontent.com/coalesce-labs/catalyst/main/setup-catalyst.sh
-chmod +x setup-catalyst.sh
+curl -O https://raw.githubusercontent.com/ralfschimmel/awl/main/setup-awl.sh
+chmod +x setup-awl.sh
 
 # Run it (requires interactive input)
-./setup-catalyst.sh
+./setup-awl.sh
 ```
 
 **What this does:**
@@ -39,8 +39,8 @@ chmod +x setup-catalyst.sh
 **Then:**
 ```bash
 # In Claude Code:
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-dev
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-dev
 
 # Restart Claude Code
 ```
@@ -64,60 +64,60 @@ You're ready! Try `/research-codebase` in your next session.
   humanlayer --version
   ```
 
-### Install Catalyst Plugins
+### Install Awl Plugins
 
-Catalyst is distributed as a 5-plugin system. Install what you need:
+Awl is distributed as a 5-plugin system. Install what you need:
 
 ```bash
 # Add the marketplace
-/plugin marketplace add coalesce-labs/catalyst
+/plugin marketplace add ralfschimmel/awl
 
 # Core workflow (required)
-/plugin install catalyst-dev
+/plugin install awl-dev
 
 # Optional: Project management (Linear integration)
-/plugin install catalyst-pm
+/plugin install awl-pm
 
 # Optional: Analytics (PostHog integration)
-/plugin install catalyst-analytics
+/plugin install awl-analytics
 
 # Optional: Debugging (Sentry integration)
-/plugin install catalyst-debugging
+/plugin install awl-debugging
 
 # Optional: Workflow discovery
-/plugin install catalyst-meta
+/plugin install awl-meta
 ```
 
 ### What You Get
 
-**catalyst-dev** (Always enabled):
+**awl-dev** (Always enabled):
 - 11 research agents
 - 18 workflow commands
 - Linear integration
 - Handoff system
 - ~3.5k context (lightweight)
 
-**catalyst-pm** (Enable for project management):
+**awl-pm** (Enable for project management):
 - Cycle tracking, milestone planning
 - Backlog grooming, daily standups
 - GitHub-Linear sync
 
-**catalyst-analytics** (Enable when analyzing metrics):
+**awl-analytics** (Enable when analyzing metrics):
 - PostHog MCP integration
 - ~40k context when enabled
 
-**catalyst-debugging** (Enable for incident response):
+**awl-debugging** (Enable for incident response):
 - Sentry MCP integration
 - ~20k context when enabled
 
-**catalyst-meta** (Advanced users):
+**awl-meta** (Advanced users):
 - Discover and import workflows from community
 
 ---
 
 ## Configuration
 
-Catalyst uses a **two-layer configuration system**:
+Awl uses a **two-layer configuration system**:
 
 ### Setup Configuration
 
@@ -125,7 +125,7 @@ Catalyst uses a **two-layer configuration system**:
 
 ```bash
 # Download and run
-curl -fsSL https://raw.githubusercontent.com/coalesce-labs/catalyst/main/setup-catalyst.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ralfschimmel/awl/main/setup-awl.sh | bash
 ```
 
 **What you'll be asked:**
@@ -138,7 +138,7 @@ curl -fsSL https://raw.githubusercontent.com/coalesce-labs/catalyst/main/setup-c
 **Result:**
 - ✅ `.claude/config.json` (committable, no secrets)
 - ✅ `~/.config/humanlayer/config-{projectKey}.json` (thoughts location)
-- ✅ `~/.config/catalyst/config-{projectKey}.json` (API tokens)
+- ✅ `~/.config/awl/config-{projectKey}.json` (API tokens)
 - ✅ Thoughts repository at org level
 - ✅ Worktree directory created
 
@@ -153,7 +153,7 @@ This file contains **non-sensitive** project metadata and is **safe to commit** 
 **Example**:
 ```json
 {
-  "catalyst": {
+  "awl": {
     "projectKey": "acme",
     "repository": {
       "org": "acme-corp",
@@ -171,21 +171,21 @@ This file contains **non-sensitive** project metadata and is **safe to commit** 
 ```
 
 **What goes here**:
-- All Catalyst configuration under the `catalyst` key
-- `catalyst.projectKey` - Links to your secrets config
-- `catalyst.project.ticketPrefix` - Your Linear/project ticket prefix (e.g., "ENG", "PROJ")
+- All Awl configuration under the `awl` key
+- `awl.projectKey` - Links to your secrets config
+- `awl.project.ticketPrefix` - Your Linear/project ticket prefix (e.g., "ENG", "PROJ")
 - Project name and metadata
 
-### Layer 2: Secrets Config (`~/.config/catalyst/`)
+### Layer 2: Secrets Config (`~/.config/awl/`)
 
 This file contains **API tokens and secrets** and is **never committed** to git.
 
-**Location**: `~/.config/catalyst/config-{projectKey}.json`
+**Location**: `~/.config/awl/config-{projectKey}.json`
 
-**Example** (`~/.config/catalyst/config-acme.json`):
+**Example** (`~/.config/awl/config-acme.json`):
 ```json
 {
-  "catalyst": {
+  "awl": {
     "linear": {
       "apiToken": "lin_api_...",
       "teamKey": "ACME",
@@ -223,13 +223,13 @@ Working on multiple projects? Just change the `projectKey`:
 ```json
 // .claude/config.json
 {
-  "catalyst": {
+  "awl": {
     "projectKey": "work"  // Change to "personal", "client-a", etc.
   }
 }
 ```
 
-Each project key points to a different secrets file in `~/.config/catalyst/`.
+Each project key points to a different secrets file in `~/.config/awl/`.
 
 ---
 
@@ -313,7 +313,7 @@ npm install -g --install-links ryanrozich/linearis#feat/cycles-cli
 Project config (`.claude/config.json`):
 ```json
 {
-  "catalyst": {
+  "awl": {
     "project": {
       "ticketPrefix": "ENG"
     }
@@ -321,10 +321,10 @@ Project config (`.claude/config.json`):
 }
 ```
 
-Secrets config (`~/.config/catalyst/config-{projectKey}.json`):
+Secrets config (`~/.config/awl/config-{projectKey}.json`):
 ```json
 {
-  "catalyst": {
+  "awl": {
     "linear": {
       "apiToken": "lin_api_...",
       "teamKey": "ENG",
@@ -349,7 +349,7 @@ railway login
 Secrets config:
 ```json
 {
-  "catalyst": {
+  "awl": {
     "railway": {
       "projectId": "your-project-id",
       "defaultService": "web"
@@ -370,7 +370,7 @@ curl -sL https://sentry.io/get-cli/ | sh
 Secrets config:
 ```json
 {
-  "catalyst": {
+  "awl": {
     "sentry": {
       "org": "your-org",
       "project": "your-project",
@@ -387,7 +387,7 @@ Secrets config:
 Secrets config:
 ```json
 {
-  "catalyst": {
+  "awl": {
     "posthog": {
       "apiKey": "phc_...",
       "projectId": "12345"
@@ -401,7 +401,7 @@ Secrets config:
 Secrets config:
 ```json
 {
-  "catalyst": {
+  "awl": {
     "exa": {
       "apiKey": "exa_..."
     }
@@ -433,8 +433,8 @@ This organizes your code as:
 **Example**:
 ```
 ~/code-repos/github/
-├── coalesce-labs/catalyst/          # Main branch
-├── coalesce-labs/catalyst-worktrees/ # Feature branches
+├── ralfschimmel/awl/          # Main branch
+├── ralfschimmel/awl-worktrees/ # Feature branches
 │   ├── PROJ-123/
 │   └── PROJ-456/
 └── acme/api/                         # Client project
@@ -459,7 +459,7 @@ This creates:
 
 ## Core Workflow
 
-Catalyst provides a research → plan → implement → validate → ship workflow.
+Awl provides a research → plan → implement → validate → ship workflow.
 
 ### 1. Research Phase
 
@@ -531,7 +531,7 @@ Automatically creates a PR with comprehensive description from your research and
 
 ### Workflow Context Auto-Discovery
 
-Catalyst tracks your workflow via `.claude/.workflow-context.json`:
+Awl tracks your workflow via `.claude/.workflow-context.json`:
 
 - `/research-codebase` → `/create-plan` references it
 - `/create-plan` → `/implement-plan` auto-finds it
@@ -557,7 +557,7 @@ Catalyst tracks your workflow via `.claude/.workflow-context.json`:
 | `/create-handoff` | Save context for later |
 | `/resume-handoff` | Restore previous context |
 
-### PM Commands (catalyst-pm plugin)
+### PM Commands (awl-pm plugin)
 
 | Command | Purpose |
 |---------|---------|
@@ -571,15 +571,15 @@ Catalyst tracks your workflow via `.claude/.workflow-context.json`:
 
 | Agent | Purpose |
 |-------|---------|
-| `@catalyst-dev:codebase-locator` | Find files by topic |
-| `@catalyst-dev:codebase-analyzer` | Understand implementation |
-| `@catalyst-dev:thoughts-locator` | Find historical docs |
-| `@catalyst-dev:codebase-pattern-finder` | Find code examples |
-| `@catalyst-dev:thoughts-analyzer` | Extract key insights |
+| `@awl-dev:codebase-locator` | Find files by topic |
+| `@awl-dev:codebase-analyzer` | Understand implementation |
+| `@awl-dev:thoughts-locator` | Find historical docs |
+| `@awl-dev:codebase-pattern-finder` | Find code examples |
+| `@awl-dev:thoughts-analyzer` | Extract key insights |
 
 **Example**:
 ```
-@catalyst-dev:codebase-locator find all files related to authentication
+@awl-dev:codebase-locator find all files related to authentication
 ```
 
 ---
@@ -594,7 +594,7 @@ Catalyst tracks your workflow via `.claude/.workflow-context.json`:
    ```
 2. Reinstall if needed:
    ```bash
-   /plugin install catalyst-dev
+   /plugin install awl-dev
    ```
 3. Restart Claude Code
 
@@ -624,7 +624,7 @@ pipx install humanlayer
 1. File exists: `ls .claude/config.json`
 2. Valid JSON: `cat .claude/config.json | jq`
 3. Correct location: Must be in `.claude/` directory
-4. Secrets file exists: `ls ~/.config/catalyst/config-{projectKey}.json`
+4. Secrets file exists: `ls ~/.config/awl/config-{projectKey}.json`
 
 ### Commands still use generic placeholders
 
@@ -635,13 +635,13 @@ Commands use `PROJ-XXX` as placeholders in examples. When you run them, they'll 
 Check that you've enabled the plugin:
 ```bash
 # Enable PM plugin for Linear
-/plugin enable catalyst-pm
+/plugin enable awl-pm
 
 # Enable analytics for PostHog
-/plugin enable catalyst-analytics
+/plugin enable awl-analytics
 
 # Disable when done to free context
-/plugin disable catalyst-analytics
+/plugin disable awl-analytics
 ```
 
 ---
@@ -658,5 +658,5 @@ Check that you've enabled the plugin:
 - [docs/](docs/) - Full documentation
 
 **Get help**:
-- Visit [GitHub repository](https://github.com/coalesce-labs/catalyst)
+- Visit [GitHub repository](https://github.com/ralfschimmel/awl)
 - Check documentation in [docs/](docs/)
