@@ -130,7 +130,7 @@ You can segment by:
 Plugin uses ~40k tokens. Disable when analysis is complete:
 
 ```bash
-/plugin disable catalyst-analytics
+/plugin disable awl-analytics
 ```
 
 ---

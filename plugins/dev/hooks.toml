@@ -1,4 +1,4 @@
-# Claude Code Hooks for Catalyst Dev Plugin
+# Claude Code Hooks for Awl Dev Plugin
 #
 # Previously contained 8 hooks for tracking thoughts documents.
 # Now empty - Linear documents are tracked via ticket ID, not filesystem events.

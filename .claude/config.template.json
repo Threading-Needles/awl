@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
-  "$comment": "Catalyst Configuration Template - Copy to config.json and fill in [NEEDS_SETUP] values",
+  "$comment": "Awl Configuration Template - Copy to config.json and fill in [NEEDS_SETUP] values",
   "project": {
     "ticketPrefix": "PROJ",
     "defaultTicketPrefix": "PROJ"

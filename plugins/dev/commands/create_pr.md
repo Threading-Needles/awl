@@ -28,7 +28,7 @@ Read team configuration from `.claude/config.json`:
 
 ```bash
 CONFIG_FILE=".claude/config.json"
-TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' "$CONFIG_FILE")
+TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' "$CONFIG_FILE")
 ```
 
 ## Process:
@@ -50,7 +50,7 @@ git status --porcelain
 If there are uncommitted changes:
 
 - Offer to commit: "You have uncommitted changes. Create commits now? [Y/n]"
-- If yes: internally call `/catalyst-dev:commit` workflow
+- If yes: internally call `/awl-dev:commit` workflow
 - If no: proceed (user may want to commit manually later)
 
 ### 3. Verify not on main/master branch
@@ -94,7 +94,7 @@ If behind:
 - Auto-rebase: `git rebase origin/$base`
 - If conflicts:
   - Show conflicting files
-  - Error: "Rebase conflicts detected. Resolve conflicts and run /catalyst-dev:create_pr again."
+  - Error: "Rebase conflicts detected. Resolve conflicts and run /awl-dev:create_pr again."
   - Exit
 
 ### 6. Check for existing PR
@@ -126,7 +126,7 @@ If PR exists:
 - Show: "PR #{number} already exists: {title}\n{url}"
 - Ask: "What would you like to do?\n [D] Describe/update this PR\n [S] Skip (do nothing)\n [A]
   Abort"
-- If D: call `/catalyst-dev:describe_pr` and exit
+- If D: call `/awl-dev:describe_pr` and exit
 - If S: exit with success message
 - If A: exit
 - **This is the ONLY interactive prompt in the happy path**
@@ -205,9 +205,9 @@ gh pr create --title "$title" --body "$body" --base "$base"
 
 Capture PR number and URL from output.
 
-### 11. Auto-call /catalyst-dev:describe_pr
+### 11. Auto-call /awl-dev:describe_pr
 
-Immediately call `/catalyst-dev:describe_pr` with the PR number to:
+Immediately call `/awl-dev:describe_pr` with the PR number to:
 
 - Generate comprehensive description
 - Run verification checks
@@ -290,7 +290,7 @@ Conflicting files:
 Resolve conflicts and run:
   git add <resolved-files>
   git rebase --continue
-  /catalyst-dev:create_pr
+  /awl-dev:create_pr
 ```
 
 **GitHub CLI not configured:**
@@ -328,7 +328,7 @@ Uses `.claude/config.json`:
 
 ```json
 {
-  "catalyst": {
+  "awl": {
     "project": {
       "ticketPrefix": "RCW"
     },
@@ -349,7 +349,7 @@ Extracting ticket: RCW-13
 Generated title: "RCW-13: Implement pr lifecycle"
 Creating PR...
 ✅ PR #2 created
-Calling /catalyst-dev:describe_pr to generate description...
+Calling /awl-dev:describe_pr to generate description...
 Saving PR description to Linear...
 Updating Linear ticket RCW-13 → In Review
 ✅ Complete!
@@ -362,7 +362,7 @@ No ticket found in branch name
 Generated title: "Feature add validation"
 Creating PR...
 ✅ PR #3 created
-Calling /catalyst-dev:describe_pr...
+Calling /awl-dev:describe_pr...
 ⚠️  No Linear ticket to update
 ✅ Complete!
 ```

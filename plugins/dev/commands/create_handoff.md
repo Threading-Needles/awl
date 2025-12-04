@@ -138,7 +138,7 @@ Create the handoff document in Linear:
 
 ```bash
 # Get team key from config
-TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' .claude/config.json)
+TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' .claude/config.json)
 
 # Create Linear document with handoff content
 linearis documents create \

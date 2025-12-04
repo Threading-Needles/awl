@@ -1,4 +1,4 @@
-# Catalyst Configuration File Strategy
+# Awl Configuration File Strategy
 
 ## Problem Statement
 
@@ -112,7 +112,7 @@ config.json
 
 ### 1. Plugin Installation
 
-When user installs catalyst-dev plugin:
+When user installs awl-dev plugin:
 
 ```bash
 # Plugin postinstall script
@@ -144,10 +144,10 @@ fi
 
 ### 3. Interactive Setup (Optional)
 
-Create a `/catalyst-setup` command that walks through configuration:
+Create a `/awl-setup` command that walks through configuration:
 
 ```bash
-/catalyst-setup linear
+/awl-setup linear
 > "Let's configure Linear integration..."
 > "Linear API token: [user pastes]"
 > "Team key (e.g., ENG): [user types]"
@@ -160,7 +160,7 @@ Create a `/catalyst-setup` command that walks through configuration:
 Ensure project root `.gitignore` includes:
 
 ```
-# Catalyst configuration (contains secrets)
+# Awl configuration (contains secrets)
 .claude/config.json
 .claude/*.local.json
 .claude/.workflow-context.json
@@ -171,7 +171,7 @@ Ensure project root `.gitignore` includes:
 ### What Gets Packaged in Plugin:
 
 ```
-catalyst-dev/
+awl-dev/
 ├── agents/
 ├── commands/
 ├── scripts/
@@ -262,7 +262,7 @@ echo "   Restore your values from .claude/config.json.backup"
 ````markdown
 ## Configuration
 
-Catalyst uses `.claude/config.json` for project-specific settings.
+Awl uses `.claude/config.json` for project-specific settings.
 
 ### First-Time Setup
 
@@ -298,7 +298,7 @@ Commands should handle missing config gracefully:
 # Linear command
 if ! LINEAR_CONFIGURED; then
   echo "⚠️  Linear not configured - some features unavailable"
-  echo "   Run: /catalyst-setup linear"
+  echo "   Run: /awl-setup linear"
   # Continue with limited functionality
 fi
 

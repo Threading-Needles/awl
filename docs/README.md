@@ -1,11 +1,11 @@
 # Documentation Index
 
-Catalyst is a Claude Code workspace system built on a three-layer memory architecture. This index
+Awl is a Claude Code workspace system built on a three-layer memory architecture. This index
 helps you find the documentation you need.
 
 ## Core Concepts
 
-**Three-Layer Memory System**: Catalyst separates context into three layers:
+**Three-Layer Memory System**: Awl separates context into three layers:
 
 1. **Short-term Memory** (`.claude/.workflow-context.json`) - Session state, command chaining
 2. **Long-term Memory** (HumanLayer thoughts repo) - Git-backed persistence, shared knowledge
@@ -26,7 +26,7 @@ See [CLAUDE.md](../CLAUDE.md) for complete architecture details.
 
 ## Quick Start
 
-**New to Catalyst?**
+**New to Awl?**
 
 1. [Installation & Configuration Guide](../QUICKSTART.md) - Complete setup and configuration
 2. [USAGE.md](USAGE.md) - Workflow commands and patterns
@@ -94,7 +94,7 @@ Parallel development, feature branches, worktrees, documentation patterns, testi
 Discovering and importing workflows from external repositories using `/discover-workflows`,
 `/import-workflow`, `/create-workflow`.
 
-**Read this when**: Extending Catalyst with new workflows.
+**Read this when**: Extending Awl with new workflows.
 
 ---
 
@@ -212,4 +212,4 @@ YAML frontmatter validation, required fields, valid categories/tools, validation
 
 - Update the relevant document
 - Run `/validate-frontmatter` for agent/command changes
-- Create Linear ticket with `/catalyst-dev:linear` for larger tasks
+- Create Linear ticket with `/awl-dev:linear` for larger tasks

@@ -112,7 +112,7 @@ The command will:
 **This plugin adds ~40,645 tokens** to your context window. Disable when not analyzing metrics:
 
 ```bash
-/plugin disable catalyst-analytics
+/plugin disable awl-analytics
 ```
 
 ---

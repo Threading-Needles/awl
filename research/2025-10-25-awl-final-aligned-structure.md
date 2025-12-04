@@ -1,13 +1,13 @@
 ---
 date: 2025-10-25T19:30:00+0000
 author: Claude
-repository: catalyst
-topic: "Catalyst Final Aligned Structure"
+repository: awl
+topic: "Awl Final Aligned Structure"
 tags: [final, aligned, plugins, prerequisites]
 status: ready-for-implementation
 ---
 
-# Catalyst Final Aligned Structure
+# Awl Final Aligned Structure
 
 ## Core Insight
 
@@ -18,7 +18,7 @@ just understanding something. It's not a standalone activity; it's how dev work 
 
 ## Final Plugin Structure (3 Plugins)
 
-### Plugin 1: catalyst-dev ⭐ **THE COMPLETE WORKFLOW**
+### Plugin 1: awl-dev ⭐ **THE COMPLETE WORKFLOW**
 
 **Tagline**: "Research-driven development from understanding to production"
 
@@ -69,7 +69,7 @@ automation"
 
 ---
 
-### Plugin 2: catalyst-handoff
+### Plugin 2: awl-handoff
 
 **Tagline**: "Context persistence across sessions"
 
@@ -89,7 +89,7 @@ automation"
 
 ---
 
-### Plugin 3: catalyst-meta
+### Plugin 3: awl-meta
 
 **Tagline**: "Learn from the community and create workflows"
 
@@ -107,7 +107,7 @@ automation"
 
 **Who uses it**: Anyone learning patterns, creating workflows
 
-**Value proposition**: "Discover best practices and extend Catalyst"
+**Value proposition**: "Discover best practices and extend Awl"
 
 ---
 
@@ -127,7 +127,7 @@ Commands need to verify that required tools are installed before execution. Curr
 **Implementation**: Add to plugin.json (if supported) or show in README:
 
 ````markdown
-# catalyst-dev Plugin
+# awl-dev Plugin
 
 ## Prerequisites
 
@@ -249,7 +249,7 @@ fi
 
 ### Commands That Need Prerequisite Checks
 
-**catalyst-dev**:
+**awl-dev**:
 
 - `/research-codebase` ✅ Requires HumanLayer, jq, thoughts
 - `/create-plan` ✅ Requires HumanLayer, jq, thoughts
@@ -265,12 +265,12 @@ fi
 - `/create-worktree` ⚠️ Optional: HumanLayer for thoughts integration
 - `/workflow-help` ❌ No special requirements
 
-**catalyst-handoff**:
+**awl-handoff**:
 
 - `/create-handoff` ✅ Requires HumanLayer, jq, thoughts
 - `/resume-handoff` ✅ Requires HumanLayer, jq, thoughts
 
-**catalyst-meta**:
+**awl-meta**:
 
 - All commands ❌ No special requirements (use standard Claude tools)
 
@@ -340,7 +340,7 @@ HumanLayer/thoughts.
 #!/bin/bash
 
 # Allow skipping if checked recently (optional optimization)
-CACHE_FILE="/tmp/.catalyst-prereqs-checked"
+CACHE_FILE="/tmp/.awl-prereqs-checked"
 if [[ -f "$CACHE_FILE" ]]; then
   LAST_CHECK=$(cat "$CACHE_FILE")
   NOW=$(date +%s)
@@ -408,7 +408,7 @@ if [[ $ERRORS -gt 0 ]]; then
   echo ""
   echo "Please install missing tools and try again."
   echo ""
-  echo "For help, see: https://github.com/coalesce-labs/catalyst#setup"
+  echo "For help, see: https://github.com/ralfschimmel/awl#setup"
   exit 1
 fi
 
@@ -416,7 +416,7 @@ fi
 date +%s > "$CACHE_FILE"
 
 echo ""
-echo "✅ All prerequisites met - ready to use Catalyst!"
+echo "✅ All prerequisites met - ready to use Awl!"
 exit 0
 ```
 
@@ -425,7 +425,7 @@ exit 0
 ## Plugin Structure on Disk (Updated)
 
 ```
-catalyst/
+awl/
 ├── .claude-plugin/
 │   └── marketplace.json
 │
@@ -505,15 +505,15 @@ catalyst/
 **Step 1: Install Plugin**
 
 ```bash
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-dev@catalyst
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-dev@awl
 ```
 
 **Step 2: See Setup Instructions** Plugin README automatically shown after install (if Claude Code
 supports it), or user reads it:
 
 ```
-🎉 catalyst-dev installed!
+🎉 awl-dev installed!
 
 ⚠️  Before using, install prerequisites:
 
@@ -529,7 +529,7 @@ supports it), or user reads it:
 Verify setup:
 /path/to/plugin/scripts/check-prerequisites.sh
 
-Documentation: https://github.com/coalesce-labs/catalyst#setup
+Documentation: https://github.com/ralfschimmel/awl#setup
 ```
 
 **Step 3: Install Prerequisites** User follows instructions, installs tools.
@@ -556,19 +556,19 @@ Install with: brew install humanlayer/tap/humanlayer
 
 ## Plugin Manifests
 
-### catalyst-dev/plugin.json
+### awl-dev/plugin.json
 
 ```json
 {
-  "name": "catalyst-dev",
+  "name": "awl-dev",
   "version": "1.0.0",
   "description": "Research-driven development workflow: understand → plan → implement → validate → ship with Linear automation",
   "author": {
     "name": "Coalesce Labs",
     "url": "https://github.com/coalesce-labs"
   },
-  "homepage": "https://github.com/coalesce-labs/catalyst",
-  "repository": "https://github.com/coalesce-labs/catalyst",
+  "homepage": "https://github.com/ralfschimmel/awl",
+  "repository": "https://github.com/ralfschimmel/awl",
   "license": "MIT",
   "keywords": [
     "workflow",
@@ -587,37 +587,37 @@ Install with: brew install humanlayer/tap/humanlayer
 **Note**: No explicit prerequisite declaration in plugin.json (not supported by Claude Code plugin
 system yet). Prerequisites documented in README and checked at runtime.
 
-### catalyst-handoff/plugin.json
+### awl-handoff/plugin.json
 
 ```json
 {
-  "name": "catalyst-handoff",
+  "name": "awl-handoff",
   "version": "1.0.0",
   "description": "Context persistence: save and restore work across sessions",
   "author": {
     "name": "Coalesce Labs",
     "url": "https://github.com/coalesce-labs"
   },
-  "homepage": "https://github.com/coalesce-labs/catalyst",
-  "repository": "https://github.com/coalesce-labs/catalyst",
+  "homepage": "https://github.com/ralfschimmel/awl",
+  "repository": "https://github.com/ralfschimmel/awl",
   "license": "MIT",
   "keywords": ["context", "handoff", "persistence"]
 }
 ```
 
-### catalyst-meta/plugin.json
+### awl-meta/plugin.json
 
 ```json
 {
-  "name": "catalyst-meta",
+  "name": "awl-meta",
   "version": "1.0.0",
   "description": "Discover, import, and create workflows: learn from community patterns",
   "author": {
     "name": "Coalesce Labs",
     "url": "https://github.com/coalesce-labs"
   },
-  "homepage": "https://github.com/coalesce-labs/catalyst",
-  "repository": "https://github.com/coalesce-labs/catalyst",
+  "homepage": "https://github.com/ralfschimmel/awl",
+  "repository": "https://github.com/ralfschimmel/awl",
   "license": "MIT",
   "keywords": ["meta", "discovery", "creation", "validation", "best-practices"]
 }
@@ -630,8 +630,8 @@ system yet). Prerequisites documented in README and checked at runtime.
 ### Scenario 1: "I want the full workflow"
 
 ```bash
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-dev@catalyst
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-dev@awl
 
 # Setup (one-time):
 brew install humanlayer/tap/humanlayer jq
@@ -645,8 +645,8 @@ humanlayer thoughts init
 ### Scenario 2: "I also hit context limits"
 
 ```bash
-/plugin install catalyst-dev@catalyst
-/plugin install catalyst-handoff@catalyst
+/plugin install awl-dev@awl
+/plugin install awl-handoff@awl
 ```
 
 **Gets**: Full workflow + context management
@@ -656,7 +656,7 @@ humanlayer thoughts init
 ### Scenario 3: "I want to learn and create workflows"
 
 ```bash
-/plugin install catalyst-meta@catalyst
+/plugin install awl-meta@awl
 ```
 
 **Gets**: Discovery, import, creation tools (no prerequisites)
@@ -668,7 +668,7 @@ humanlayer thoughts init
 ### Main README.md
 
 ````markdown
-# Catalyst
+# Awl
 
 Production-ready AI-assisted development workflows.
 
@@ -676,8 +676,8 @@ Production-ready AI-assisted development workflows.
 
 1. Install the plugin:
    ```bash
-   /plugin marketplace add coalesce-labs/catalyst
-   /plugin install catalyst-dev@catalyst
+   /plugin marketplace add ralfschimmel/awl
+   /plugin install awl-dev@awl
    ```
 ````
 
@@ -705,7 +705,7 @@ Production-ready AI-assisted development workflows.
 
 ## Prerequisites
 
-catalyst-dev requires:
+awl-dev requires:
 
 - ✅ HumanLayer CLI
 - ✅ jq
@@ -719,7 +719,7 @@ See [SETUP.md](docs/SETUP.md) for detailed instructions.
 ### plugins/dev/scripts/README.md
 
 ```markdown
-# catalyst-dev Scripts
+# awl-dev Scripts
 
 ## check-prerequisites.sh
 
@@ -752,7 +752,7 @@ Verifies that required tools are installed before command execution.
 ## Installation Help
 
 If you see prerequisite errors, follow the instructions in the output or see:
-https://github.com/coalesce-labs/catalyst#setup
+https://github.com/ralfschimmel/awl#setup
 
 ```
 
@@ -761,14 +761,14 @@ https://github.com/coalesce-labs/catalyst#setup
 ## Summary
 
 **3 Plugins**:
-1. `catalyst-dev` (6 agents, 13 commands, 3 scripts) ⭐ **THE COMPLETE WORKFLOW**
-2. `catalyst-handoff` (2 commands, 1 script)
-3. `catalyst-meta` (5 commands, 1 script)
+1. `awl-dev` (6 agents, 13 commands, 3 scripts) ⭐ **THE COMPLETE WORKFLOW**
+2. `awl-handoff` (2 commands, 1 script)
+3. `awl-meta` (5 commands, 1 script)
 
 **Key Decisions**:
 - ✅ Research agents ARE part of dev (not separate plugin)
 - ✅ Prerequisites checked at runtime per command
-- ✅ HumanLayer + thoughts system required for catalyst-dev
+- ✅ HumanLayer + thoughts system required for awl-dev
 - ✅ Linear MCP optional (graceful degradation)
 - ✅ Clear setup documentation
 - ✅ Helpful error messages with installation instructions

@@ -27,8 +27,8 @@ Read team configuration from `.claude/config.json`:
 
 ```bash
 CONFIG_FILE=".claude/config.json"
-TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' "$CONFIG_FILE")
-TEST_CMD=$(jq -r '.catalyst.pr.testCommand // "make test"' "$CONFIG_FILE")
+TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' "$CONFIG_FILE")
+TEST_CMD=$(jq -r '.awl.pr.testCommand // "make test"' "$CONFIG_FILE")
 ```
 
 ## Process:
@@ -156,7 +156,7 @@ Exit with error.
 **Read test command from config:**
 
 ```bash
-test_cmd=$(jq -r '.catalyst.pr.testCommand // "make test"' .claude/config.json)
+test_cmd=$(jq -r '.awl.pr.testCommand // "make test"' .claude/config.json)
 ```
 
 **Execute tests:**
@@ -516,7 +516,7 @@ Uses `.claude/config.json`:
 
 ```json
 {
-  "catalyst": {
+  "awl": {
     "project": {
       "ticketPrefix": "RCW"
     },

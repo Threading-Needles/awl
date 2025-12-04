@@ -1,6 +1,6 @@
 # Thoughts System Setup Guide
 
-The thoughts system is the backbone of Catalyst workflows, providing persistent, git-backed context across sessions.
+The thoughts system is the backbone of Awl workflows, providing persistent, git-backed context across sessions.
 
 ## Quick Setup
 
@@ -31,7 +31,7 @@ humanlayer thoughts sync
 
 ## Why Required?
 
-Unlike optional fallbacks, Catalyst **requires** thoughts because:
+Unlike optional fallbacks, Awl **requires** thoughts because:
 
 1. **Workflow chaining**: Commands chain together (research → plan → implement)
 2. **Auto-discovery**: Commands auto-find recent documents via workflow context

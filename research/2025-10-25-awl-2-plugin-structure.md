@@ -1,17 +1,17 @@
 ---
 date: 2025-10-25T19:45:00+0000
 author: Claude
-repository: catalyst
-topic: "Catalyst Final 2-Plugin Structure"
+repository: awl
+topic: "Awl Final 2-Plugin Structure"
 tags: [final, aligned, plugins, simple]
 status: READY-FOR-PLAN
 ---
 
-# Catalyst: 2-Plugin Structure
+# Awl: 2-Plugin Structure
 
 ## Final Aligned Structure
 
-### Plugin 1: **catalyst-dev** ⭐
+### Plugin 1: **awl-dev** ⭐
 
 **Everything a developer needs from understanding to shipping**
 
@@ -59,7 +59,7 @@ status: READY-FOR-PLAN
 
 ---
 
-### Plugin 2: **catalyst-meta**
+### Plugin 2: **awl-meta**
 
 **Learn from the community and create workflows**
 
@@ -79,14 +79,14 @@ status: READY-FOR-PLAN
 
 **Prerequisites**: None
 
-**Value**: "Discover best practices and extend Catalyst"
+**Value**: "Discover best practices and extend Awl"
 
 ---
 
 ## Structure on Disk
 
 ```
-catalyst/
+awl/
 ├── .claude-plugin/
 │   └── marketplace.json
 │
@@ -149,7 +149,7 @@ catalyst/
 
 ## Why This Makes Sense
 
-### catalyst-dev: The Complete Dev Workflow
+### awl-dev: The Complete Dev Workflow
 
 **Research starts dev work**:
 
@@ -177,7 +177,7 @@ Research → Plan → Implement → Validate → Commit → PR → Merge
 
 ---
 
-### catalyst-meta: Learning and Creating
+### awl-meta: Learning and Creating
 
 **For inspiration and extension**:
 
@@ -195,8 +195,8 @@ Research → Plan → Implement → Validate → Commit → PR → Merge
 ### Most users (developers):
 
 ```bash
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-dev@catalyst
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-dev@awl
 
 # One-time setup:
 brew install humanlayer/tap/humanlayer jq
@@ -210,8 +210,8 @@ humanlayer thoughts init
 ### Power users (learning/creating):
 
 ```bash
-/plugin install catalyst-dev@catalyst
-/plugin install catalyst-meta@catalyst
+/plugin install awl-dev@awl
+/plugin install awl-meta@awl
 ```
 
 **Gets**: Dev workflow + discovery/creation tools
@@ -223,7 +223,7 @@ humanlayer thoughts init
 ```json
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "catalyst",
+  "name": "awl",
   "version": "1.0.0",
   "description": "Research-driven development workflow from Coalesce Labs",
   "owner": {
@@ -232,7 +232,7 @@ humanlayer thoughts init
   },
   "plugins": [
     {
-      "name": "catalyst-dev",
+      "name": "awl-dev",
       "source": "./plugins/dev",
       "description": "Complete development workflow: research → plan → implement → validate → ship with Linear automation. Includes research agents, planning tools, handoff system, and Linear integration.",
       "version": "1.0.0",
@@ -241,9 +241,9 @@ humanlayer thoughts init
       "featured": true
     },
     {
-      "name": "catalyst-meta",
+      "name": "awl-meta",
       "source": "./plugins/meta",
-      "description": "Discover, import, and create workflows: learn from community patterns and extend Catalyst",
+      "description": "Discover, import, and create workflows: learn from community patterns and extend Awl",
       "version": "1.0.0",
       "category": "development",
       "keywords": ["meta", "discovery", "creation", "best-practices"]
@@ -258,8 +258,8 @@ humanlayer thoughts init
 
 **2 Plugins**:
 
-1. **catalyst-dev** (6 agents, 15 commands, 3 scripts) - Complete dev workflow
-2. **catalyst-meta** (5 commands, 1 script) - Workflow inspiration
+1. **awl-dev** (6 agents, 15 commands, 3 scripts) - Complete dev workflow
+2. **awl-meta** (5 commands, 1 script) - Workflow inspiration
 
 **Key insights**:
 

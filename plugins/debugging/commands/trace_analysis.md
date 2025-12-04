@@ -134,7 +134,7 @@ Transaction: POST /api/checkout (2.4s)
 
 ```bash
 # Enable debugging plugin (if not already)
-/plugin enable catalyst-debugging
+/plugin enable awl-debugging
 
 # Combine trace and error analysis
 > "Show me the trace for the transaction that caused error ISSUE-456"
@@ -193,7 +193,7 @@ After identifying bottleneck:
 Plugin uses ~20k tokens. Disable after analysis:
 
 ```bash
-/plugin disable catalyst-debugging
+/plugin disable awl-debugging
 ```
 
 ---

@@ -262,7 +262,7 @@ Create the research document in Linear attached to the ticket:
 
 ```bash
 # Get team key from config
-TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' .claude/config.json)
+TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' .claude/config.json)
 
 # Create Linear document with research content
 linearis documents create \

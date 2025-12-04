@@ -1,7 +1,7 @@
 ---
 date: 2025-10-26T04:30:00+0000
 author: Claude
-repository: catalyst
+repository: awl
 topic: "Remaining Documentation Work - Implementation Plan"
 tags: [planning, documentation, maintenance]
 status: ready-for-implementation
@@ -35,7 +35,7 @@ status: ready-for-implementation
 ```markdown
 ## Workflow Context Auto-Discovery
 
-Catalyst tracks your workflow automatically via `.claude/.workflow-context.json`:
+Awl tracks your workflow automatically via `.claude/.workflow-context.json`:
 
 - `/research-codebase` saves research
 - `/create-plan` saves plan AND auto-finds recent research
@@ -95,7 +95,7 @@ grep -n "hack/" docs/PATTERNS.md
 - **agents/README.md**: Keep as source documentation
   - Remove installation sections (handled by plugin)
   - Focus on agent purpose and tools
-  - Add "Distribution: Bundled in catalyst-dev plugin"
+  - Add "Distribution: Bundled in awl-dev plugin"
 
 - **plugins/dev/agents/README.md**: Consider removing or making it reference-only
   - Or: Make it a symlink to agents/README.md
@@ -116,7 +116,7 @@ grep -n "hack/" docs/PATTERNS.md
 **Changes**:
 
 - Remove installation references
-- Add "Distribution: Bundled in catalyst-dev plugin"
+- Add "Distribution: Bundled in awl-dev plugin"
 - Update examples to use `/command-name` format consistently
 
 **Estimated effort**: 20 minutes
@@ -149,7 +149,7 @@ grep -n "hack/" docs/PATTERNS.md
 
 **Source Files** (`commands/`, `agents/`):
 
-- Edit these when developing Catalyst
+- Edit these when developing Awl
 - Changes are manually synced to plugin structure
 - This is where PRs should update
 
@@ -159,7 +159,7 @@ grep -n "hack/" docs/PATTERNS.md
 - Auto-generated from source (or manually synced for now)
 - Don't edit these directly
 
-**For Catalyst development**: Always edit source files in `commands/` and `agents/` **For Catalyst
+**For Awl development**: Always edit source files in `commands/` and `agents/` **For Awl
 users**: Install via plugin, never see these directories
 ```
 
@@ -242,8 +242,8 @@ Major architectural changes are documented in research/:
 
 - [Plugin Packaging Strategy](research/2025-10-25-claude-code-plugin-packaging-strategy.md) - Why
   plugins over scripts
-- [2-Plugin Structure](research/2025-10-25-catalyst-2-plugin-structure.md) - dev vs meta split
-- [Tooling Integration](research/2025-10-25-catalyst-tooling-integration-plan.md) - External
+- [2-Plugin Structure](research/2025-10-25-awl-2-plugin-structure.md) - dev vs meta split
+- [Tooling Integration](research/2025-10-25-awl-tooling-integration-plan.md) - External
   services
 - [Configuration Strategy](research/2025-10-25-config-file-strategy.md) - Template pattern
 ```
@@ -293,7 +293,7 @@ Major architectural changes are documented in research/:
 **Content**:
 
 ````markdown
-# Migrating to Plugin-Based Catalyst
+# Migrating to Plugin-Based Awl
 
 ## From Script Installation
 
@@ -307,8 +307,8 @@ Major architectural changes are documented in research/:
 **New way**:
 
 ```bash
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-dev
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-dev
 ```
 
 ## Cleaning Up
@@ -328,7 +328,7 @@ rm -rf ~/.claude/commands/
 ## What Changed
 
 - Installation: Script-based → Plugin marketplace
-- Updates: `./hack/update-project.sh` → `/plugin update catalyst-dev`
+- Updates: `./hack/update-project.sh` → `/plugin update awl-dev`
 - Directory: `hack/` → `scripts/` (setup scripts only)
 
 ````

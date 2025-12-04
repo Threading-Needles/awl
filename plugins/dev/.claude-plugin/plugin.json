@@ -1,14 +1,14 @@
 {
-  "name": "catalyst-dev",
+  "name": "awl-dev",
   "version": "3.0.1",
   "description": "Complete development workflow: research → plan → implement → validate → ship. Includes research agents, planning tools, handoff system, Linear integration, and PM commands.",
   "author": {
-    "name": "Coalesce Labs",
+    "name": "Awl Team",
     "email": "github@rozich.com",
-    "url": "https://github.com/coalesce-labs"
+    "url": "https://github.com/ralfschimmel"
   },
-  "homepage": "https://github.com/coalesce-labs/catalyst",
-  "repository": "https://github.com/coalesce-labs/catalyst.git",
+  "homepage": "https://github.com/ralfschimmel/awl",
+  "repository": "https://github.com/ralfschimmel/awl.git",
   "keywords": [
     "workflow",
     "research",

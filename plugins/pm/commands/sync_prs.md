@@ -54,13 +54,13 @@ TEAM_KEY=$(get_team_key)
 ```
 
 **Task 1 - Get GitHub PRs**:
-Use `catalyst-dev:github-research` agent (if exists) or inline `gh` commands:
+Use `awl-dev:github-research` agent (if exists) or inline `gh` commands:
 ```
 Get open and recently merged PRs (last 7 days)
 ```
 
 **Task 2 - Get Linear Issues**:
-Use Task tool with `catalyst-dev:linear-research` agent:
+Use Task tool with `awl-dev:linear-research` agent:
 ```
 Prompt: "Get all in-review and in-progress issues for team ${TEAM_KEY}"
 Model: haiku

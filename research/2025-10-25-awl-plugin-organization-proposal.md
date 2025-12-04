@@ -1,23 +1,23 @@
 ---
 date: 2025-10-25T19:00:00+0000
 author: Claude
-repository: catalyst (formerly ryan-claude-workspace)
-topic: "Catalyst Plugin Organization Proposal"
+repository: awl (formerly ryan-claude-workspace)
+topic: "Awl Plugin Organization Proposal"
 tags: [proposal, plugins, architecture, organization]
 status: draft-for-review
 ---
 
-# Catalyst Plugin Organization Proposal
+# Awl Plugin Organization Proposal
 
 ## Overview
 
 This document proposes a specific organization of the 37 components (7 agents, 25 commands, 5
-scripts) into focused Catalyst plugins. The goal is to create **composable, independently
+scripts) into focused Awl plugins. The goal is to create **composable, independently
 installable plugins** that serve distinct user personas and workflow stages.
 
 ## Proposed Plugin Structure
 
-### Plugin 1: `catalyst-research` ⭐ **THE DIFFERENTIATOR**
+### Plugin 1: `awl-research` ⭐ **THE DIFFERENTIATOR**
 
 **Tagline**: "Deep codebase understanding with specialized AI agents"
 
@@ -41,7 +41,7 @@ actually understand your codebase."
 
 ---
 
-### Plugin 2: `catalyst-workflow`
+### Plugin 2: `awl-workflow`
 
 **Tagline**: "Research-driven implementation workflow"
 
@@ -60,13 +60,13 @@ validation"
 **Why independent**: Can work without research plugin (user provides own research), can work without
 Linear
 
-**Dependencies**: Optional - works better with catalyst-research
+**Dependencies**: Optional - works better with awl-research
 
 **Note**: Includes `/workflow-help` as it guides through the entire workflow system
 
 ---
 
-### Plugin 3: `catalyst-dev`
+### Plugin 3: `awl-dev`
 
 **Tagline**: "Smart development workflows"
 
@@ -87,7 +87,7 @@ Linear
 
 ---
 
-### Plugin 4: `catalyst-pm`
+### Plugin 4: `awl-pm`
 
 **Tagline**: "Project management and parallel work"
 
@@ -111,7 +111,7 @@ projects"
 
 ---
 
-### Plugin 5: `catalyst-linear` ⚠️ **NEEDS DISCUSSION**
+### Plugin 5: `awl-linear` ⚠️ **NEEDS DISCUSSION**
 
 **Tagline**: "Linear integration for the complete development workflow"
 
@@ -132,16 +132,16 @@ projects"
 
 **Questions for you**:
 
-1. Should `/create-pr` and `/merge-pr` be in `catalyst-dev` instead? (They're git operations that
+1. Should `/create-pr` and `/merge-pr` be in `awl-dev` instead? (They're git operations that
    happen to integrate Linear)
-2. Should we split into `catalyst-linear-basic` (linear, linear-setup-workflow) and
-   `catalyst-linear-git` (create-pr, merge-pr)?
+2. Should we split into `awl-linear-basic` (linear, linear-setup-workflow) and
+   `awl-linear-git` (create-pr, merge-pr)?
 3. Are there dev-only Linear operations (like commenting on issues) vs PM operations (creating
    tickets)?
 
 ---
 
-### Plugin 6: `catalyst-handoff`
+### Plugin 6: `awl-handoff`
 
 **Tagline**: "Context persistence across sessions"
 
@@ -162,9 +162,9 @@ projects"
 
 ---
 
-### Plugin 7: `catalyst-meta` ⭐ **YOUR IDEA**
+### Plugin 7: `awl-meta` ⭐ **YOUR IDEA**
 
-**Tagline**: "Tools for creating and managing Catalyst workflows"
+**Tagline**: "Tools for creating and managing Awl workflows"
 
 **What it contains**:
 
@@ -172,7 +172,7 @@ projects"
   `/validate-frontmatter`, `/workflow-help`
 - **1 script**: `validate-frontmatter.sh` (for Trunk integration)
 
-**Who uses it**: Workspace architects, advanced developers extending Catalyst
+**Who uses it**: Workspace architects, advanced developers extending Awl
 
 **When**: Creating new workflows, discovering patterns, maintaining quality
 
@@ -186,7 +186,7 @@ projects"
 
 **Questions for you**:
 
-1. Should `/workflow-help` be here or in `catalyst-workflow`? (It guides users through workflows but
+1. Should `/workflow-help` be here or in `awl-workflow`? (It guides users through workflows but
    is also a meta tool)
 2. Should this be installable by end users, or truly workspace-only?
 
@@ -196,12 +196,12 @@ projects"
 
 ### Option B: Split Linear by Function
 
-**catalyst-linear-pm**: Project management operations
+**awl-linear-pm**: Project management operations
 
 - `/linear` - Ticket CRUD, status updates
 - `/linear-setup-workflow` - Workflow configuration
 
-**catalyst-linear-git**: Git operations with Linear integration
+**awl-linear-git**: Git operations with Linear integration
 
 - `/create-pr` - PR creation with Linear update
 - `/merge-pr` - PR merge with Linear completion
@@ -214,12 +214,12 @@ projects"
 
 ### Option C: Merge Linear into Existing Plugins
 
-**catalyst-pm**:
+**awl-pm**:
 
 - Current: create-worktree, update-project
 - Add: linear, linear-setup-workflow
 
-**catalyst-dev**:
+**awl-dev**:
 
 - Current: commit, describe-pr, debug
 - Add: create-pr, merge-pr
@@ -274,9 +274,9 @@ projects"
 
 **Installs**:
 
-- `catalyst-research` (understand code)
-- `catalyst-dev` (daily work)
-- `catalyst-handoff` (when context fills)
+- `awl-research` (understand code)
+- `awl-dev` (daily work)
+- `awl-handoff` (when context fills)
 
 **Workflow**: Research → implement → commit → handoff when needed
 
@@ -286,12 +286,12 @@ projects"
 
 **Installs**:
 
-- `catalyst-research` (deep analysis)
-- `catalyst-workflow` (structured planning)
-- `catalyst-dev` (implementation)
-- `catalyst-pm` (worktrees for parallel work)
-- `catalyst-linear` (ticket management)
-- `catalyst-handoff` (context management)
+- `awl-research` (deep analysis)
+- `awl-workflow` (structured planning)
+- `awl-dev` (implementation)
+- `awl-pm` (worktrees for parallel work)
+- `awl-linear` (ticket management)
+- `awl-handoff` (context management)
 
 **Workflow**: Full workflow - research → plan → implement in worktree → validate → PR → merge
 
@@ -301,8 +301,8 @@ projects"
 
 **Installs**:
 
-- `catalyst-research` (understand capacity/complexity)
-- `catalyst-linear` (ticket management)
+- `awl-research` (understand capacity/complexity)
+- `awl-linear` (ticket management)
 
 **Workflow**: Create tickets, track progress, understand blockers
 
@@ -312,7 +312,7 @@ projects"
 
 **Installs**:
 
-- `catalyst-meta` (discover, create, validate workflows)
+- `awl-meta` (discover, create, validate workflows)
 - Plus any plugins they're working on
 
 **Workflow**: Discover patterns → import → adapt → validate → distribute
@@ -323,9 +323,9 @@ projects"
 
 **Installs**:
 
-- `catalyst-research` (understand what should happen)
-- `catalyst-workflow` (validation commands)
-- `catalyst-dev` (debug issues)
+- `awl-research` (understand what should happen)
+- `awl-workflow` (validation commands)
+- `awl-dev` (debug issues)
 
 **Workflow**: Read research/plan → validate → debug issues
 
@@ -334,19 +334,19 @@ projects"
 ## Plugin Dependency Graph
 
 ```
-catalyst-research (standalone)
+awl-research (standalone)
     ↓ (optional)
-catalyst-workflow (can use research for context)
+awl-workflow (can use research for context)
     ↓ (optional)
-catalyst-dev (commit, describe-pr used after implementation)
+awl-dev (commit, describe-pr used after implementation)
     ↓ (optional)
-catalyst-linear (PR commands build on dev commands)
+awl-linear (PR commands build on dev commands)
 
-catalyst-pm (standalone - worktrees, project updates)
+awl-pm (standalone - worktrees, project updates)
 
-catalyst-handoff (standalone - context management)
+awl-handoff (standalone - context management)
 
-catalyst-meta (standalone - for workspace maintenance)
+awl-meta (standalone - for workspace maintenance)
 ```
 
 **Key insight**: Most plugins are independent. Optional dependencies make the system more powerful
@@ -359,7 +359,7 @@ but aren't required.
 ### Scenario 1: "I just want to understand codebases"
 
 ```bash
-/plugin install catalyst-research@catalyst
+/plugin install awl-research@awl
 ```
 
 Gets: 6 research agents + /research-codebase command
@@ -369,9 +369,9 @@ Gets: 6 research agents + /research-codebase command
 ### Scenario 2: "I want the full workflow"
 
 ```bash
-/plugin install catalyst-research@catalyst
-/plugin install catalyst-workflow@catalyst
-/plugin install catalyst-dev@catalyst
+/plugin install awl-research@awl
+/plugin install awl-workflow@awl
+/plugin install awl-dev@awl
 ```
 
 Gets: Research → Plan → Implement → Validate → Commit → PR
@@ -381,10 +381,10 @@ Gets: Research → Plan → Implement → Validate → Commit → PR
 ### Scenario 3: "I'm using Linear and want automation"
 
 ```bash
-/plugin install catalyst-research@catalyst
-/plugin install catalyst-workflow@catalyst
-/plugin install catalyst-dev@catalyst
-/plugin install catalyst-linear@catalyst
+/plugin install awl-research@awl
+/plugin install awl-workflow@awl
+/plugin install awl-dev@awl
+/plugin install awl-linear@awl
 ```
 
 Gets: Full workflow + Linear ticket automation
@@ -394,7 +394,7 @@ Gets: Full workflow + Linear ticket automation
 ### Scenario 4: "I manage parallel features"
 
 ```bash
-/plugin install catalyst-pm@catalyst
+/plugin install awl-pm@awl
 ```
 
 Gets: Worktree creation and project updates
@@ -404,7 +404,7 @@ Gets: Worktree creation and project updates
 ### Scenario 5: "I want to extend the workspace"
 
 ```bash
-/plugin install catalyst-meta@catalyst
+/plugin install awl-meta@awl
 ```
 
 Gets: Workflow discovery, creation, validation tools
@@ -416,7 +416,7 @@ Gets: Workflow discovery, creation, validation tools
 ### "Starter Pack" (Recommended for most developers)
 
 ```bash
-catalyst-research + catalyst-dev
+awl-research + awl-dev
 ```
 
 **Why**: Universal value - understand code, make commits, write PRs
@@ -426,7 +426,7 @@ catalyst-research + catalyst-dev
 ### "Full Workflow" (Structured development)
 
 ```bash
-catalyst-research + catalyst-workflow + catalyst-dev
+awl-research + awl-workflow + awl-dev
 ```
 
 **Why**: Complete research → plan → implement → validate flow
@@ -436,7 +436,7 @@ catalyst-research + catalyst-workflow + catalyst-dev
 ### "Linear Team" (Teams using Linear)
 
 ```bash
-catalyst-research + catalyst-workflow + catalyst-dev + catalyst-linear
+awl-research + awl-workflow + awl-dev + awl-linear
 ```
 
 **Why**: Full workflow + ticket automation
@@ -457,13 +457,13 @@ ALL PLUGINS
 
 ### Question 1: Linear Plugin Organization
 
-**Current proposal**: Single `catalyst-linear` plugin with all 4 commands
+**Current proposal**: Single `awl-linear` plugin with all 4 commands
 
 **Alternatives**:
 
 - A) Keep as-is (all Linear in one plugin)
-- B) Split: `catalyst-linear-pm` (tickets) + `catalyst-linear-git` (PRs)
-- C) Merge: Linear tickets → catalyst-pm, Linear PRs → catalyst-dev
+- B) Split: `awl-linear-pm` (tickets) + `awl-linear-git` (PRs)
+- C) Merge: Linear tickets → awl-pm, Linear PRs → awl-dev
 
 **Your preference**:
 
@@ -478,15 +478,15 @@ ALL PLUGINS
 
 ### Question 2: workflow-help Placement
 
-**Current proposal**: In `catalyst-meta` (it's a meta tool for guidance)
+**Current proposal**: In `awl-meta` (it's a meta tool for guidance)
 
-**Alternative**: In `catalyst-workflow` (it guides through workflow)
+**Alternative**: In `awl-workflow` (it guides through workflow)
 
 **Your preference**:
 
-- [ ] catalyst-meta (with other meta tools)
-- [ ] catalyst-workflow (guides the workflow)
-- [ ] Standalone plugin `catalyst-help`
+- [ ] awl-meta (with other meta tools)
+- [ ] awl-workflow (guides the workflow)
+- [ ] Standalone plugin `awl-help`
 - [ ] Duplicate in both (acceptable for small command)
 
 **Why**: **\*\*\*\***\_**\*\*\*\***
@@ -495,7 +495,7 @@ ALL PLUGINS
 
 ### Question 3: Meta Plugin Accessibility
 
-**Current proposal**: `catalyst-meta` is installable like any plugin
+**Current proposal**: `awl-meta` is installable like any plugin
 
 **Current behavior**: Commands marked `workspace_only: true` (excluded from project installations)
 
@@ -519,17 +519,17 @@ ALL PLUGINS
 
 ### Question 4: Plugin Naming Conventions
 
-**Current proposal**: All plugins prefixed with `catalyst-`
+**Current proposal**: All plugins prefixed with `awl-`
 
 **Alternatives**:
 
-- A) `catalyst-research`, `catalyst-workflow`, etc. (current)
+- A) `awl-research`, `awl-workflow`, etc. (current)
 - B) `research`, `workflow`, etc. (simpler, relies on marketplace name)
-- C) `catalyst/research`, `catalyst/workflow` (namespace-style)
+- C) `awl/research`, `awl/workflow` (namespace-style)
 
 **Your preference**:
 
-- [ ] A - catalyst- prefix
+- [ ] A - awl- prefix
 - [ ] B - No prefix
 - [ ] C - Namespace style
 - [ ] Other: **\*\*\*\***\_**\*\*\*\***
@@ -540,7 +540,7 @@ ALL PLUGINS
 
 **Should we create documentation recommending a "starter pack"?**
 
-**Current thinking**: Recommend `catalyst-research + catalyst-dev` for most users
+**Current thinking**: Recommend `awl-research + awl-dev` for most users
 
 **Question**: Should we make this explicit in README?
 
@@ -558,7 +558,7 @@ ALL PLUGINS
 
 **Current proposal**: Duplicate `check-prerequisites.sh` in 4 plugins
 
-**Alternative**: Create shared `catalyst-utils` plugin
+**Alternative**: Create shared `awl-utils` plugin
 
 **Your preference**:
 
@@ -571,21 +571,21 @@ ALL PLUGINS
 
 ### Question 7: describe-pr Placement
 
-**Current proposal**: In `catalyst-dev` (it's a daily dev operation)
+**Current proposal**: In `awl-dev` (it's a daily dev operation)
 
-**Context**: Also called automatically by `/create-pr` in `catalyst-linear`
+**Context**: Also called automatically by `/create-pr` in `awl-linear`
 
 **Question**: Should it be:
 
-- A) In catalyst-dev (current)
-- B) In catalyst-linear (with other PR commands)
+- A) In awl-dev (current)
+- B) In awl-linear (with other PR commands)
 - C) Standalone plugin
 - D) Duplicated in both
 
 **Your preference**:
 
-- [ ] A - catalyst-dev
-- [ ] B - catalyst-linear
+- [ ] A - awl-dev
+- [ ] B - awl-linear
 - [ ] C - Standalone
 - [ ] D - Duplicate
 
@@ -595,23 +595,23 @@ ALL PLUGINS
 
 ### Question 8: create-pr and merge-pr Placement
 
-**Current proposal**: In `catalyst-linear` (they update Linear tickets)
+**Current proposal**: In `awl-linear` (they update Linear tickets)
 
 **Context**: They're primarily git operations that happen to integrate Linear
 
 **Question**: Should they be:
 
-- A) In catalyst-linear (current - emphasizes Linear integration)
-- B) In catalyst-dev (git operations)
-- C) In catalyst-pm (project management)
-- D) New plugin catalyst-git-workflow
+- A) In awl-linear (current - emphasizes Linear integration)
+- B) In awl-dev (git operations)
+- C) In awl-pm (project management)
+- D) New plugin awl-git-workflow
 
 **Your preference**:
 
-- [ ] A - catalyst-linear
-- [ ] B - catalyst-dev
-- [ ] C - catalyst-pm
-- [ ] D - catalyst-git-workflow
+- [ ] A - awl-linear
+- [ ] B - awl-dev
+- [ ] C - awl-pm
+- [ ] D - awl-git-workflow
 
 **Why**: **\*\*\*\***\_**\*\*\*\***
 
@@ -625,7 +625,7 @@ ALL PLUGINS
 
 - A) Optional (current - commands work without it)
 - B) Required (enforce thoughts system usage)
-- C) Separate plugin `catalyst-thoughts` with thoughts-specific features
+- C) Separate plugin `awl-thoughts` with thoughts-specific features
 
 **Your preference**:
 
@@ -643,7 +643,7 @@ ALL PLUGINS
 
 **Question**: Should plugins:
 
-- A) Version independently (catalyst-research v1.2.0, catalyst-dev v1.0.1, etc.)
+- A) Version independently (awl-research v1.2.0, awl-dev v1.0.1, etc.)
 - B) Version together (all plugins always same version)
 - C) Major versions together, minor independent
 
@@ -674,13 +674,13 @@ Once we align on these questions, we'll:
 
 **7 Plugins**:
 
-1. `catalyst-research` (6 agents, 1 command) ⭐
-2. `catalyst-workflow` (4 commands)
-3. `catalyst-dev` (3 commands)
-4. `catalyst-pm` (2 commands, 3 scripts)
-5. `catalyst-linear` (4 commands) ⚠️ needs discussion
-6. `catalyst-handoff` (2 commands)
-7. `catalyst-meta` (5 commands) ⭐ your idea
+1. `awl-research` (6 agents, 1 command) ⭐
+2. `awl-workflow` (4 commands)
+3. `awl-dev` (3 commands)
+4. `awl-pm` (2 commands, 3 scripts)
+5. `awl-linear` (4 commands) ⚠️ needs discussion
+6. `awl-handoff` (2 commands)
+7. `awl-meta` (5 commands) ⭐ your idea
 
 **Key characteristics**:
 

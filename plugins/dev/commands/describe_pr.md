@@ -242,7 +242,7 @@ fi
 
 ```bash
 # Get team key from config
-TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' .claude/config.json)
+TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' .claude/config.json)
 
 # If creating new document
 linearis documents create \
@@ -400,7 +400,7 @@ Uses `.claude/config.json`:
 
 ```json
 {
-  "catalyst": {
+  "awl": {
     "project": {
       "ticketPrefix": "RCW"
     },

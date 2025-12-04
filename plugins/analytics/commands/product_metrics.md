@@ -110,7 +110,7 @@ Add segmentation to any query:
 This plugin consumes ~40k tokens. Disable after viewing metrics:
 
 ```bash
-/plugin disable catalyst-analytics
+/plugin disable awl-analytics
 ```
 
 ---

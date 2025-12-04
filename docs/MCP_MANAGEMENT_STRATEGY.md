@@ -56,7 +56,7 @@ in each session, not just per-project.
 
 ### Complementary Approaches
 
-1. **Workflow Commands** (NEW - Catalyst-specific)
+1. **Workflow Commands** (NEW - Awl-specific)
    - `/enable-analytics` - Instructs Claude to enable PostHog
    - `/enable-debugging` - Instructs Claude to enable Sentry
    - `/disable-heavy-mcps` - Frees ~60k tokens
@@ -72,7 +72,7 @@ in each session, not just per-project.
    - Define which MCPs should be available
    - Users still toggle on/off per session via `/mcp`
 
-## Recommended Strategy for Catalyst
+## Recommended Strategy for Awl
 
 ### 1. Session-Aware MCP Management (PRIMARY STRATEGY)
 
@@ -214,7 +214,7 @@ that USE PostHog.
 
 - 43 tools provide comprehensive analytics capabilities
 - CLI alternative less mature than Sentry
-- Many Catalyst users need product analytics
+- Many Awl users need product analytics
 - Project-scoping prevents global context cost
 
 **Implementation**:
@@ -225,7 +225,7 @@ that USE PostHog.
 
 ### 5. MCP Management Commands (IMPLEMENTED)
 
-**Purpose**: Make MCP toggling discoverable and easy within Catalyst
+**Purpose**: Make MCP toggling discoverable and easy within Awl
 
 **Implemented Commands**:
 
@@ -291,7 +291,7 @@ automated.
 
 - [ ] Document when to enable Sentry MCP
 - [ ] Create `/debug-setup` command (checks for Sentry/PostHog availability)
-- [ ] Integrate Sentry MCP into `/catalyst-dev:debug` workflow
+- [ ] Integrate Sentry MCP into `/awl-dev:debug` workflow
 - [ ] Add error analysis patterns to debugging docs
 - [ ] Create incident response runbook with MCP recommendations
 

@@ -1,6 +1,6 @@
 # Workflow Context System
 
-Complete guide to automatic document tracking and discovery in Catalyst.
+Complete guide to automatic document tracking and discovery in Awl.
 
 ## The Problem We Solved
 
@@ -299,7 +299,7 @@ fi
 
 ### Automatic (On Install)
 
-When you install `catalyst-dev`:
+When you install `awl-dev`:
 1. Claude Code discovers `hooks.toml`
 2. Registers all 8 hooks (Write + Edit × 4 types)
 3. Hooks activate immediately

@@ -19,7 +19,7 @@ print_info() { echo -e "${BLUE}ℹ $1${NC}"; }
 # Get project config
 get_project_key() {
   if [[ -f ".claude/config.json" ]]; then
-    jq -r '.catalyst.projectKey // empty' .claude/config.json
+    jq -r '.awl.projectKey // empty' .claude/config.json
   fi
 }
 
@@ -31,7 +31,7 @@ get_sentry_config() {
     return 1
   fi
 
-  local config_file="$HOME/.config/catalyst/config-${project_key}.json"
+  local config_file="$HOME/.config/awl/config-${project_key}.json"
   if [[ ! -f "$config_file" ]]; then
     print_error "Sentry config not found: $config_file"
     return 1
@@ -43,8 +43,8 @@ get_sentry_config() {
 # List all projects in organization
 list_projects() {
   local config=$(get_sentry_config)
-  local org=$(echo "$config" | jq -r '.catalyst.sentry.org')
-  local token=$(echo "$config" | jq -r '.catalyst.sentry.authToken')
+  local org=$(echo "$config" | jq -r '.awl.sentry.org')
+  local token=$(echo "$config" | jq -r '.awl.sentry.authToken')
 
   if [[ -z "$org" ]] || [[ -z "$token" ]]; then
     print_error "Sentry org or token not configured"
@@ -72,9 +72,9 @@ list_projects() {
 # Get configured projects
 show_config() {
   local config=$(get_sentry_config)
-  local org=$(echo "$config" | jq -r '.catalyst.sentry.org')
-  local project=$(echo "$config" | jq -r '.catalyst.sentry.project // empty')
-  local projects=$(echo "$config" | jq -r '.catalyst.sentry.projects // empty')
+  local org=$(echo "$config" | jq -r '.awl.sentry.org')
+  local project=$(echo "$config" | jq -r '.awl.sentry.project // empty')
+  local projects=$(echo "$config" | jq -r '.awl.sentry.projects // empty')
 
   echo ""
   print_info "Sentry Configuration"
@@ -84,7 +84,7 @@ show_config() {
   if [[ -n "$projects" ]] && [[ "$projects" != "null" ]]; then
     echo "Monitored projects:"
     echo "$projects" | jq -r '.[] | "  - \(.)"'
-    echo "Default: $(echo "$config" | jq -r '.catalyst.sentry.defaultProject')"
+    echo "Default: $(echo "$config" | jq -r '.awl.sentry.defaultProject')"
   elif [[ -n "$project" ]] && [[ "$project" != "null" ]]; then
     echo "Project: $project"
   else
@@ -95,17 +95,17 @@ show_config() {
 # Update config to monitor all projects
 monitor_all() {
   local project_key=$(get_project_key)
-  local config_file="$HOME/.config/catalyst/config-${project_key}.json"
+  local config_file="$HOME/.config/awl/config-${project_key}.json"
 
   local config=$(cat "$config_file")
-  local org=$(echo "$config" | jq -r '.catalyst.sentry.org')
-  local token=$(echo "$config" | jq -r '.catalyst.sentry.authToken')
+  local org=$(echo "$config" | jq -r '.awl.sentry.org')
+  local token=$(echo "$config" | jq -r '.awl.sentry.authToken')
 
   # Remove project/projects fields
   echo "$config" | jq \
     --arg org "$org" \
     --arg token "$token" \
-    '.catalyst.sentry = {
+    '.awl.sentry = {
       "org": $org,
       "authToken": $token
     }' > "$config_file"
@@ -123,11 +123,11 @@ monitor_projects() {
   fi
 
   local project_key=$(get_project_key)
-  local config_file="$HOME/.config/catalyst/config-${project_key}.json"
+  local config_file="$HOME/.config/awl/config-${project_key}.json"
 
   local config=$(cat "$config_file")
-  local org=$(echo "$config" | jq -r '.catalyst.sentry.org')
-  local token=$(echo "$config" | jq -r '.catalyst.sentry.authToken')
+  local org=$(echo "$config" | jq -r '.awl.sentry.org')
+  local token=$(echo "$config" | jq -r '.awl.sentry.authToken')
 
   # Build projects array
   local projects_json="["
@@ -147,7 +147,7 @@ monitor_projects() {
     --arg org "$org" \
     --argjson projects "$projects_json" \
     --arg token "$token" \
-    '.catalyst.sentry = {
+    '.awl.sentry = {
       "org": $org,
       "projects": $projects,
       "defaultProject": $projects[0],

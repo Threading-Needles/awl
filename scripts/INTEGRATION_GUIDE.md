@@ -1,12 +1,12 @@
 ## Integration Guide: Smart Setup Functions
 
-This guide explains how to integrate the smart configuration functions into `setup-catalyst.sh`.
+This guide explains how to integrate the smart configuration functions into `setup-awl.sh`.
 
 ---
 
 ## Files Created
 
-1. **`scripts/catalyst-integration-helpers.sh`** - API discovery and validation functions
+1. **`scripts/awl-integration-helpers.sh`** - API discovery and validation functions
 2. **`scripts/smart-linear-config.sh`** - Smart Linear configuration prompt
 3. **`scripts/smart-sentry-config.sh`** - Smart Sentry configuration prompt
 
@@ -14,9 +14,9 @@ This guide explains how to integrate the smart configuration functions into `set
 
 ## Integration Steps
 
-### Step 1: Add Helper Functions to setup-catalyst.sh
+### Step 1: Add Helper Functions to setup-awl.sh
 
-At the top of `setup-catalyst.sh`, after the utility functions section, add:
+At the top of `setup-awl.sh`, after the utility functions section, add:
 
 ```bash
 #
@@ -41,36 +41,36 @@ else
 fi
 ```
 
-### Step 2: Update setup_catalyst_secrets Function
+### Step 2: Update setup_awl_secrets Function
 
-Replace the prompt calls in `setup_catalyst_secrets()` (around line 649):
+Replace the prompt calls in `setup_awl_secrets()` (around line 649):
 
 **Before:**
 ```bash
 # Prompt for each integration
-prompt_linear_config "$existing_config" > /tmp/catalyst-config-temp.json
-existing_config=$(cat /tmp/catalyst-config-temp.json)
+prompt_linear_config "$existing_config" > /tmp/awl-config-temp.json
+existing_config=$(cat /tmp/awl-config-temp.json)
 
-prompt_sentry_config "$existing_config" > /tmp/catalyst-config-temp.json
-existing_config=$(cat /tmp/catalyst-config-temp.json)
+prompt_sentry_config "$existing_config" > /tmp/awl-config-temp.json
+existing_config=$(cat /tmp/awl-config-temp.json)
 ```
 
 **After:**
 ```bash
 # Prompt for each integration (use smart versions if available)
 if [[ "$USE_SMART_LINEAR" == "true" ]]; then
-  prompt_linear_config_smart "$existing_config" > /tmp/catalyst-config-temp.json
+  prompt_linear_config_smart "$existing_config" > /tmp/awl-config-temp.json
 else
-  prompt_linear_config "$existing_config" > /tmp/catalyst-config-temp.json
+  prompt_linear_config "$existing_config" > /tmp/awl-config-temp.json
 fi
-existing_config=$(cat /tmp/catalyst-config-temp.json)
+existing_config=$(cat /tmp/awl-config-temp.json)
 
 if [[ "$USE_SMART_SENTRY" == "true" ]]; then
-  prompt_sentry_config_smart "$existing_config" > /tmp/catalyst-config-temp.json
+  prompt_sentry_config_smart "$existing_config" > /tmp/awl-config-temp.json
 else
-  prompt_sentry_config "$existing_config" > /tmp/catalyst-config-temp.json
+  prompt_sentry_config "$existing_config" > /tmp/awl-config-temp.json
 fi
-existing_config=$(cat /tmp/catalyst-config-temp.json)
+existing_config=$(cat /tmp/awl-config-temp.json)
 ```
 
 ### Step 3: Make Helper Script Executable
@@ -78,7 +78,7 @@ existing_config=$(cat /tmp/catalyst-config-temp.json)
 Ensure the helper script is executable:
 
 ```bash
-chmod +x scripts/catalyst-integration-helpers.sh
+chmod +x scripts/awl-integration-helpers.sh
 ```
 
 ---
@@ -89,20 +89,20 @@ chmod +x scripts/catalyst-integration-helpers.sh
 
 ```bash
 # Test Linear discovery
-./scripts/catalyst-integration-helpers.sh discover-linear
+./scripts/awl-integration-helpers.sh discover-linear
 
 # Test Sentry discovery
-./scripts/catalyst-integration-helpers.sh discover-sentry
+./scripts/awl-integration-helpers.sh discover-sentry
 ```
 
 ### Test Token Validation
 
 ```bash
 # Test Linear validation (replace with real token)
-./scripts/catalyst-integration-helpers.sh validate-linear "lin_api_..."
+./scripts/awl-integration-helpers.sh validate-linear "lin_api_..."
 
 # Test Sentry validation (replace with real token)
-./scripts/catalyst-integration-helpers.sh validate-sentry "sntrys_..."
+./scripts/awl-integration-helpers.sh validate-sentry "sntrys_..."
 ```
 
 ### Test Full Setup Flow
@@ -113,7 +113,7 @@ echo "lin_api_test..." > ~/.linear_api_token
 echo -e "[auth]\ntoken=sntrys_test..." > ~/.sentryclirc
 
 # Run setup
-./setup-catalyst.sh
+./setup-awl.sh
 
 # Should auto-discover both tokens and validate them
 ```
@@ -258,7 +258,7 @@ The integration is **fully backward compatible**:
 
 If issues arise, rollback is simple:
 
-1. Remove sourcing lines from `setup-catalyst.sh`:
+1. Remove sourcing lines from `setup-awl.sh`:
 ```bash
 # Comment out or remove these lines
 # source "${SCRIPT_DIR}/scripts/smart-linear-config.sh"
@@ -268,8 +268,8 @@ If issues arise, rollback is simple:
 2. Remove conditional calls:
 ```bash
 # Revert to original
-prompt_linear_config "$existing_config" > /tmp/catalyst-config-temp.json
-prompt_sentry_config "$existing_config" > /tmp/catalyst-config-temp.json
+prompt_linear_config "$existing_config" > /tmp/awl-config-temp.json
+prompt_sentry_config "$existing_config" > /tmp/awl-config-temp.json
 ```
 
 3. Keep files for future use
@@ -284,7 +284,7 @@ After integration, update:
 
 1. **README.md** - Add note about smart setup
 2. **QUICKSTART.md** - Mention auto-discovery
-3. **setup-catalyst.sh comments** - Reference helper scripts
+3. **setup-awl.sh comments** - Reference helper scripts
 
 Example addition to README:
 
@@ -309,12 +309,12 @@ For issues or questions:
 
 1. Check token discovery manually:
    ```bash
-   ./scripts/catalyst-integration-helpers.sh discover-linear
+   ./scripts/awl-integration-helpers.sh discover-linear
    ```
 
 2. Test validation manually:
    ```bash
-   ./scripts/catalyst-integration-helpers.sh validate-linear "YOUR_TOKEN"
+   ./scripts/awl-integration-helpers.sh validate-linear "YOUR_TOKEN"
    ```
 
 3. Check file permissions:
@@ -333,5 +333,5 @@ For issues or questions:
 ## See Also
 
 - [Smart Setup Features](../docs/SMART_SETUP.md)
-- [Integration Helpers](./catalyst-integration-helpers.sh)
-- [Setup Script](../setup-catalyst.sh)
+- [Integration Helpers](./awl-integration-helpers.sh)
+- [Setup Script](../setup-awl.sh)

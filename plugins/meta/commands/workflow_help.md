@@ -36,10 +36,10 @@ I can help you navigate the supported workflows in this workspace.
    - `/validate-frontmatter` → Ensure consistency
 
 **3. Utilities**
-   - `/catalyst-dev:commit` → Create structured commits
+   - `/awl-dev:commit` → Create structured commits
    - `/describe-pr` → Generate PR descriptions
-   - `/catalyst-dev:debug` → Investigate issues
-   - `/catalyst-dev:linear` → Linear ticket integration
+   - `/awl-dev:debug` → Investigate issues
+   - `/awl-dev:linear` → Linear ticket integration
 
 ---
 
@@ -254,7 +254,7 @@ cd ~/wt/{project}/PROJ-123-feature
 ### Phase 6: PR Creation 🚀
 **Commands**:
 \`\`\`bash
-/catalyst-dev:commit
+/awl-dev:commit
 gh pr create --fill
 /describe-pr
 \`\`\`

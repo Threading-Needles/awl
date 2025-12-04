@@ -1,15 +1,15 @@
-# Catalyst Plugin Usage Guide
+# Awl Plugin Usage Guide
 
-Complete guide to using Catalyst's 4-plugin architecture for session-aware context management.
+Complete guide to using Awl's 4-plugin architecture for session-aware context management.
 
 ## Overview
 
-Catalyst now uses a **use case-based** plugin architecture:
+Awl now uses a **use case-based** plugin architecture:
 
-1. **catalyst-dev** - Core workflow (always enabled, ~3.5k context)
-2. **catalyst-analytics** - Product analytics (enable when needed, +40k context)
-3. **catalyst-debugging** - Error monitoring (enable when needed, +20k context)
-4. **catalyst-meta** - Workflow discovery (optional)
+1. **awl-dev** - Core workflow (always enabled, ~3.5k context)
+2. **awl-analytics** - Product analytics (enable when needed, +40k context)
+3. **awl-debugging** - Error monitoring (enable when needed, +20k context)
+4. **awl-meta** - Workflow discovery (optional)
 
 **Key insight**: Plugins automatically load/unload their bundled MCPs when enabled/disabled.
 
@@ -17,13 +17,13 @@ Catalyst now uses a **use case-based** plugin architecture:
 
 ```bash
 # One-time setup
-/plugin marketplace add coalesce-labs/catalyst
+/plugin marketplace add ralfschimmel/awl
 
 # Install plugins based on your needs
-/plugin install catalyst-dev           # Required
-/plugin install catalyst-analytics     # If you use PostHog
-/plugin install catalyst-debugging     # If you use Sentry
-/plugin install catalyst-meta          # If you want workflow discovery
+/plugin install awl-dev           # Required
+/plugin install awl-analytics     # If you use PostHog
+/plugin install awl-debugging     # If you use Sentry
+/plugin install awl-meta          # If you want workflow discovery
 ```
 
 ## Daily Usage Patterns
@@ -31,14 +31,14 @@ Catalyst now uses a **use case-based** plugin architecture:
 ### Pattern 1: Regular Development (90% of sessions)
 
 ```bash
-# Start Claude - only catalyst-dev is enabled
+# Start Claude - only awl-dev is enabled
 claude
 
 # Work with full workflow
 /research-codebase "authentication system"
 /create-plan "Add OAuth support"
 /implement-plan
-/catalyst-dev:commit
+/awl-dev:commit
 /describe-pr
 
 # Context stays light (~3.5k MCP tokens)
@@ -52,7 +52,7 @@ claude
 
 ```bash
 # Enable analytics
-/plugin enable catalyst-analytics
+/plugin enable awl-analytics
 
 # Now PostHog MCP is available
 /analyze-user-behavior "checkout abandonment last 30 days"
@@ -60,7 +60,7 @@ claude
 /segment-analysis "power users vs casual users"
 
 # Disable when done
-/plugin disable catalyst-analytics
+/plugin disable awl-analytics
 ```
 
 **When to use**: Planning features based on usage data, analyzing conversion funnels, understanding
@@ -74,15 +74,15 @@ user behavior
 
 ```bash
 # Enable debugging
-/plugin enable catalyst-debugging
+/plugin enable awl-debugging
 
 # Now Sentry MCP is available
-/catalyst-dev:debug-production-error "TypeError in checkout"
+/awl-dev:debug-production-error "TypeError in checkout"
 /error-impact-analysis "errors from last deployment"
 /trace-analysis "slow API requests"
 
 # Disable when incident resolved
-/plugin disable catalyst-debugging
+/plugin disable awl-debugging
 ```
 
 **When to use**: Production errors, incident response, performance debugging, release health
@@ -96,7 +96,7 @@ monitoring
 
 ```bash
 # Enable both for comprehensive incident analysis
-/plugin enable catalyst-debugging catalyst-analytics
+/plugin enable awl-debugging awl-analytics
 
 # Analyze error AND user impact
 > "Show errors in checkout AND how many users abandoned checkout today"
@@ -105,7 +105,7 @@ monitoring
 /segment-analysis "users who hit error X vs users who didn't: did they churn?"
 
 # Disable both when done
-/plugin disable catalyst-debugging catalyst-analytics
+/plugin disable awl-debugging awl-analytics
 ```
 
 **When to use**: Understanding business impact of errors, correlating errors with user behavior
@@ -138,9 +138,9 @@ Shows token breakdown including MCP tools. Use this to verify plugins loaded cor
 /plugin enable <plugin-name>
 
 Examples:
-/plugin enable catalyst-analytics
-/plugin enable catalyst-debugging
-/plugin enable catalyst-analytics catalyst-debugging  # Multiple at once
+/plugin enable awl-analytics
+/plugin enable awl-debugging
+/plugin enable awl-analytics awl-debugging  # Multiple at once
 ```
 
 ### Disable Plugin
@@ -149,18 +149,18 @@ Examples:
 /plugin disable <plugin-name>
 
 Examples:
-/plugin disable catalyst-analytics
-/plugin disable catalyst-debugging
-/plugin disable catalyst-analytics catalyst-debugging  # Multiple at once
+/plugin disable awl-analytics
+/plugin disable awl-debugging
+/plugin disable awl-analytics awl-debugging  # Multiple at once
 ```
 
 ### Update Plugins
 
 ```bash
-/plugin marketplace update catalyst
-/plugin update catalyst-dev
-/plugin update catalyst-analytics
-/plugin update catalyst-debugging
+/plugin marketplace update awl
+/plugin update awl-dev
+/plugin update awl-analytics
+/plugin update awl-debugging
 ```
 
 ## Environment Variables
@@ -191,11 +191,11 @@ Get these from Sentry → Settings → Auth Tokens
 
 ## Decision Guide: Which Plugins to Install?
 
-### catalyst-dev (Required)
+### awl-dev (Required)
 
-**Install if**: You're using Catalyst **Why**: Core workflow, research agents, Linear integration
+**Install if**: You're using Awl **Why**: Core workflow, research agents, Linear integration
 
-### catalyst-analytics (Optional)
+### awl-analytics (Optional)
 
 **Install if**:
 
@@ -206,7 +206,7 @@ Get these from Sentry → Settings → Auth Tokens
 
 **Skip if**: You don't use PostHog or don't need analytics in your coding workflow
 
-### catalyst-debugging (Optional)
+### awl-debugging (Optional)
 
 **Install if**:
 
@@ -217,7 +217,7 @@ Get these from Sentry → Settings → Auth Tokens
 
 **Skip if**: You don't use Sentry or handle errors differently
 
-### catalyst-meta (Optional)
+### awl-meta (Optional)
 
 **Install if**:
 
@@ -231,15 +231,15 @@ Get these from Sentry → Settings → Auth Tokens
 
 | Task                   | Plugin Needed              | Command                                                |
 | ---------------------- | -------------------------- | ------------------------------------------------------ |
-| Regular coding         | catalyst-dev (default)     | Just work normally                                     |
-| View user metrics      | catalyst-analytics         | `/plugin enable catalyst-analytics`                    |
-| Debug production error | catalyst-debugging         | `/plugin enable catalyst-debugging`                    |
-| Incident + impact      | Both analytics & debugging | `/plugin enable catalyst-analytics catalyst-debugging` |
-| Create custom workflow | catalyst-meta              | Use meta commands                                      |
+| Regular coding         | awl-dev (default)     | Just work normally                                     |
+| View user metrics      | awl-analytics         | `/plugin enable awl-analytics`                    |
+| Debug production error | awl-debugging         | `/plugin enable awl-debugging`                    |
+| Incident + impact      | Both analytics & debugging | `/plugin enable awl-analytics awl-debugging` |
+| Create custom workflow | awl-meta              | Use meta commands                                      |
 
 ## Context Budget Management
 
-### Starting Context (catalyst-dev only)
+### Starting Context (awl-dev only)
 
 - System prompt: ~2.4k tokens
 - System tools: ~13.5k tokens
@@ -248,12 +248,12 @@ Get these from Sentry → Settings → Auth Tokens
 - **Total baseline**: ~26k tokens
 - **Available for conversation**: ~174k tokens
 
-### With Analytics Enabled (+catalyst-analytics)
+### With Analytics Enabled (+awl-analytics)
 
 - MCP tools: ~44k tokens (adds PostHog)
 - **Available for conversation**: ~134k tokens
 
-### With Debugging Enabled (+catalyst-debugging)
+### With Debugging Enabled (+awl-debugging)
 
 - MCP tools: ~24k tokens (adds Sentry)
 - **Available for conversation**: ~154k tokens
@@ -272,23 +272,23 @@ immediately after to free context.
 
 ```bash
 # Make sure marketplace is added
-/plugin marketplace add coalesce-labs/catalyst
+/plugin marketplace add ralfschimmel/awl
 
 # Install the plugin
-/plugin install catalyst-analytics
+/plugin install awl-analytics
 ```
 
 ### "MCP server not available"
 
 - Check plugin is enabled: `/plugin list`
-- Enable it: `/plugin enable catalyst-analytics`
+- Enable it: `/plugin enable awl-analytics`
 - Verify environment variables are set
 - Check `/context` to see if MCP loaded
 
 ### "High context usage warning"
 
 - This is expected when analytics/debugging plugins are enabled
-- Disable plugins you're not using: `/plugin disable catalyst-analytics`
+- Disable plugins you're not using: `/plugin disable awl-analytics`
 - Check which plugins are enabled: `/plugin list`
 
 ### Environment variables not working
@@ -308,7 +308,7 @@ source ~/.zshrc
 2. **One task at a time** - Enable plugin, do the task, disable plugin
 3. **Check context regularly** - Use `/context` to monitor token usage
 4. **Combine when relevant** - Enable both plugins for comprehensive incident analysis
-5. **Update regularly** - Keep plugins up to date with `/plugin marketplace update catalyst`
+5. **Update regularly** - Keep plugins up to date with `/plugin marketplace update awl`
 
 ## See Also
 

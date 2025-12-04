@@ -114,8 +114,8 @@ Analysis includes:
 Enable both plugins for deeper impact analysis:
 
 ```bash
-/plugin enable catalyst-debugging
-/plugin enable catalyst-analytics
+/plugin enable awl-debugging
+/plugin enable awl-analytics
 
 /error-impact-analysis "How many users who hit error X churned vs users who didn't?"
 ```
@@ -167,7 +167,7 @@ Based on output:
 Plugin uses ~20k tokens. Disable after analysis:
 
 ```bash
-/plugin disable catalyst-debugging
+/plugin disable awl-debugging
 ```
 
 ---

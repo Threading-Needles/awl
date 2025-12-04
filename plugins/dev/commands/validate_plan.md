@@ -129,7 +129,7 @@ Create a Linear document with validation results:
 
 ```bash
 # Get team key from config
-TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' .claude/config.json)
+TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' .claude/config.json)
 
 linearis documents create \
   --title "Validation: ${FEATURE_NAME}" \

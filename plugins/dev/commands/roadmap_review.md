@@ -83,7 +83,7 @@ When fully implemented, this command will:
 - **Summary generation** - Create roadmap document in `reports/milestones/`
 - **Trend analysis** - Compare progress month-over-month
 
-Track progress at: https://github.com/coalesce-labs/catalyst/issues
+Track progress at: https://github.com/ralfschimmel/awl/issues
 
 ## Configuration
 
@@ -113,5 +113,5 @@ Uses `.claude/config.json`:
 
 - `/cycle-plan` - Plan work within cycles for a project
 - `/cycle-review` - Review cycle progress
-- `/catalyst-dev:linear` - Manage individual tickets
+- `/awl-dev:linear` - Manage individual tickets
 - `/create-plan` - Create implementation plans for tickets

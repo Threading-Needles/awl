@@ -1,4 +1,4 @@
-# Catalyst - Claude Code Workspace
+# Awl - Claude Code Workspace
 
 [Ryan Rozich's](https://ryanrozich.bio/) personal development workflow for Claude Code, now open
 sourced and packaged as a Claude Code plugin marketplace.
@@ -9,37 +9,37 @@ fork it, and contribute ideas back.
 
 ## Tech Stack & Integrations
 
-Catalyst integrates with your development tools through both **CLI-based** (token-efficient) and **MCP-based** (richer features) approaches:
+Awl integrates with your development tools through both **CLI-based** (token-efficient) and **MCP-based** (richer features) approaches:
 
 ### Project Management & Issue Tracking
 - **Linear** - Issue tracking, sprint planning, ticket lifecycle (CLI via [Linearis](https://github.com/ryanrozich/linearis))
-  - `catalyst-dev`: Core research agents and workflow commands
-  - `catalyst-pm`: Advanced PM workflows (cycle analysis, milestone tracking, backlog grooming)
+  - `awl-dev`: Core research agents and workflow commands
+  - `awl-pm`: Advanced PM workflows (cycle analysis, milestone tracking, backlog grooming)
 
 ### Version Control & Code Hosting
 - **GitHub** - Pull requests, code review, repository management (CLI via `gh`)
-  - `catalyst-dev`: PR creation, branch management, worktree workflows
+  - `awl-dev`: PR creation, branch management, worktree workflows
 
 ### Error Monitoring & Debugging
 - **Sentry** - Production error monitoring, stack traces, root cause analysis (MCP + CLI)
-  - `catalyst-debugging`: Sentry MCP integration (~20k tokens when enabled)
+  - `awl-debugging`: Sentry MCP integration (~20k tokens when enabled)
   - Supports single-project and multi-project configurations
 
 ### Deployment & Infrastructure
 - **Railway** - Deployment logs, service health, environment variables (CLI via `railway`)
-  - `catalyst-dev`: Railway research agent for deployment investigation
+  - `awl-dev`: Railway research agent for deployment investigation
 
 ### Product Analytics
 - **PostHog** - User behavior, conversion funnels, feature analytics (MCP)
-  - `catalyst-analytics`: PostHog MCP integration (~40k tokens when enabled)
+  - `awl-analytics`: PostHog MCP integration (~40k tokens when enabled)
 
 ### Documentation & Code Search
 - **Context7** - Library documentation lookup (MCP, ~2k tokens)
-  - `catalyst-dev`: Built-in, always available
+  - `awl-dev`: Built-in, always available
 - **DeepWiki** - GitHub repository documentation (MCP, ~1.5k tokens)
-  - `catalyst-dev`: Built-in, always available
+  - `awl-dev`: Built-in, always available
 - **Exa** - Web research and external documentation (API)
-  - `catalyst-dev`: External research agent
+  - `awl-dev`: External research agent
 
 ### Thoughts & Memory System
 - **HumanLayer** - Persistent memory, shared context, team collaboration (CLI via `humanlayer`)
@@ -49,20 +49,20 @@ Catalyst integrates with your development tools through both **CLI-based** (toke
 
 **Why CLI + lightweight MCP?** Most development sessions don't need heavy integrations:
 
-- Start with `catalyst-dev` (~3.5k tokens): Core workflow + Linear + GitHub + Railway
-- Enable `catalyst-analytics` when analyzing user behavior (~+40k tokens)
-- Enable `catalyst-debugging` when investigating production errors (~+20k tokens)
+- Start with `awl-dev` (~3.5k tokens): Core workflow + Linear + GitHub + Railway
+- Enable `awl-analytics` when analyzing user behavior (~+40k tokens)
+- Enable `awl-debugging` when investigating production errors (~+20k tokens)
 - Disable when done to free context for code and conversation
 
 This keeps your typical session lean while having powerful tools available when needed.
 
 ## What's Inside
 
-**Catalyst** is a 5-plugin system for Claude Code focused on **token efficiency**, **session-aware
+**Awl** is a 5-plugin system for Claude Code focused on **token efficiency**, **session-aware
 MCP management**, and **persistent context** through parallel agent research, structured handoffs,
 and shared memory systems.
 
-**catalyst-dev** (Core - Always enabled)
+**awl-dev** (Core - Always enabled)
 
 - 11 research agents (codebase + infrastructure)
 - 18 commands covering full dev lifecycle
@@ -70,7 +70,7 @@ and shared memory systems.
 - Handoff system for context persistence
 - ~3.5k context (lightweight MCPs: DeepWiki, Context7)
 
-**catalyst-pm** (Optional - Enable for project management)
+**awl-pm** (Optional - Enable for project management)
 
 - Linear-focused project management workflows
 - 5 commands: analyze-cycle, analyze-milestone, report-daily, groom-backlog, sync-prs
@@ -79,21 +79,21 @@ and shared memory systems.
 - Cycle management and milestone tracking with target date feasibility
 - Actionable insights and recommendations (not just data dumps)
 
-**catalyst-analytics** (Optional - Enable when needed)
+**awl-analytics** (Optional - Enable when needed)
 
 - PostHog MCP integration (~40k context)
 - Product analytics and user behavior analysis
 - Conversion funnels and cohort analysis
 - 3 specialized analytics commands
 
-**catalyst-debugging** (Optional - Enable when needed)
+**awl-debugging** (Optional - Enable when needed)
 
 - Sentry MCP integration (~20k context)
 - Production error monitoring and debugging
 - Stack trace analysis and root cause detection
 - 3 specialized debugging commands
 
-**catalyst-meta** (Optional - For advanced users)
+**awl-meta** (Optional - For advanced users)
 
 - Discover workflows from community repos
 - Import and adapt patterns
@@ -105,11 +105,11 @@ Get started in 5 minutes with the unified setup script:
 
 ```bash
 # Download the setup script
-curl -O https://raw.githubusercontent.com/coalesce-labs/catalyst/main/setup-catalyst.sh
-chmod +x setup-catalyst.sh
+curl -O https://raw.githubusercontent.com/ralfschimmel/awl/main/setup-awl.sh
+chmod +x setup-awl.sh
 
 # Run it (requires interactive input)
-./setup-catalyst.sh
+./setup-awl.sh
 ```
 
 This script will guide you through:
@@ -124,8 +124,8 @@ This script will guide you through:
 
 ```bash
 # In Claude Code:
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-dev
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-dev
 
 # Restart Claude Code
 ```
@@ -140,22 +140,22 @@ Alternatively, install plugins manually via Claude Code plugin system:
 
 ```bash
 # Add the marketplace repository
-/plugin marketplace add coalesce-labs/catalyst
+/plugin marketplace add ralfschimmel/awl
 
 # Install core workflow (required)
-/plugin install catalyst-dev
+/plugin install awl-dev
 
 # Optional: Install PM plugin (Linear project management)
-/plugin install catalyst-pm
+/plugin install awl-pm
 
 # Optional: Install analytics plugin (if you use PostHog)
-/plugin install catalyst-analytics
+/plugin install awl-analytics
 
 # Optional: Install debugging plugin (if you use Sentry)
-/plugin install catalyst-debugging
+/plugin install awl-debugging
 
 # Optional: Install meta plugin (workflow discovery)
-/plugin install catalyst-meta
+/plugin install awl-meta
 ```
 
 ### Session-Based MCP Management
@@ -164,32 +164,32 @@ Plugins automatically load/unload MCPs when enabled/disabled:
 
 ```bash
 # Enable PM tools for sprint planning and cycle reviews
-/plugin enable catalyst-pm  # Lightweight CLI-based, minimal context
+/plugin enable awl-pm  # Lightweight CLI-based, minimal context
 
 # Enable analytics when analyzing user behavior
-/plugin enable catalyst-analytics  # Loads PostHog MCP (+40k context)
+/plugin enable awl-analytics  # Loads PostHog MCP (+40k context)
 
 # Disable when done to free context
-/plugin disable catalyst-analytics  # Unloads PostHog MCP (-40k context)
+/plugin disable awl-analytics  # Unloads PostHog MCP (-40k context)
 
 # Enable debugging for incident response
-/plugin enable catalyst-debugging  # Loads Sentry MCP (+20k context)
+/plugin enable awl-debugging  # Loads Sentry MCP (+20k context)
 
 # Can enable multiple plugins simultaneously
-/plugin enable catalyst-pm catalyst-analytics catalyst-debugging
+/plugin enable awl-pm awl-analytics awl-debugging
 ```
 
 **Why this matters**: Most development sessions don't need analytics or debugging MCPs. Starting
-with just `catalyst-dev` keeps your context at ~3.5k tokens instead of ~65k, leaving more room for
+with just `awl-dev` keeps your context at ~3.5k tokens instead of ~65k, leaving more room for
 code and conversation.
 
 ### Updating Plugins
 
-Keep your Catalyst plugins up to date with bug fixes and new features:
+Keep your Awl plugins up to date with bug fixes and new features:
 
 ```bash
 # Update the marketplace to fetch latest from GitHub
-claude plugin marketplace update catalyst
+claude plugin marketplace update awl
 
 # Restart Claude Code to load updated plugins
 # (Exit and reopen, or start a new session)
@@ -299,9 +299,9 @@ When possible, uses CLIs instead of MCPs for token efficiency:
 
 **MCP Tools** (bundled with plugins):
 
-- Context7 & DeepWiki - Built into `catalyst-dev` (~3.5k tokens)
-- PostHog - Built into `catalyst-analytics` (~40k tokens when enabled)
-- Sentry - Built into `catalyst-debugging` (~20k tokens when enabled)
+- Context7 & DeepWiki - Built into `awl-dev` (~3.5k tokens)
+- PostHog - Built into `awl-analytics` (~40k tokens when enabled)
+- Sentry - Built into `awl-debugging` (~20k tokens when enabled)
 
 Run the prerequisite check:
 

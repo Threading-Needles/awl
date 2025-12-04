@@ -1,7 +1,7 @@
 # scripts/ Directory: Setup Utilities
 
 This directory contains **setup scripts** for integrating Linear and other services. These scripts
-are **not bundled in the Catalyst plugin** - they're used during initial setup only.
+are **not bundled in the Awl plugin** - they're used during initial setup only.
 
 **Note**: Runtime scripts (workflow-context.sh, check-prerequisites.sh, create-worktree.sh, etc.)
 are bundled in the plugin at `plugins/dev/scripts/` and `plugins/meta/scripts/`.
@@ -12,8 +12,8 @@ are bundled in the plugin at `plugins/dev/scripts/` and `plugins/meta/scripts/`.
 scripts/
 ├── linear/              # Linear workflow setup
 │   └── setup-linear-workflow
-├── load-catalyst-config.sh
-├── setup-catalyst-config.sh
+├── load-awl-config.sh
+├── setup-awl-config.sh
 └── README.md            # This file
 ```
 
@@ -21,7 +21,7 @@ scripts/
 
 ## Prerequisites
 
-Catalyst requires:
+Awl requires:
 
 1. **Linearis CLI** - For Linear document operations
 2. **LINEAR_API_TOKEN** - Environment variable with your API token
@@ -59,12 +59,12 @@ export LINEAR_API_TOKEN="lin_api_..."
 
 ## Configuration Scripts
 
-### setup-catalyst-config.sh
+### setup-awl-config.sh
 
-**Initialize Catalyst configuration**
+**Initialize Awl configuration**
 
 ```bash
-./scripts/setup-catalyst-config.sh
+./scripts/setup-awl-config.sh
 ```
 
 **What it does**:
@@ -73,12 +73,12 @@ export LINEAR_API_TOKEN="lin_api_..."
 - Configures Linear team key
 - Sets up ticket prefix
 
-### load-catalyst-config.sh
+### load-awl-config.sh
 
-**Load Catalyst configuration in scripts**
+**Load Awl configuration in scripts**
 
 ```bash
-source ./scripts/load-catalyst-config.sh
+source ./scripts/load-awl-config.sh
 ```
 
 **What it does**:
@@ -93,10 +93,10 @@ source ./scripts/load-catalyst-config.sh
 
 ### New Project Setup
 
-1. **Install Catalyst plugin**:
+1. **Install Awl plugin**:
    ```bash
-   /plugin marketplace add coalesce-labs/catalyst
-   /plugin install catalyst-dev
+   /plugin marketplace add ralfschimmel/awl
+   /plugin install awl-dev
    ```
 
 2. **Set Linear API token**:
@@ -113,7 +113,7 @@ source ./scripts/load-catalyst-config.sh
        "ticketPrefix": "PROJ",
        "name": "My Project"
      },
-     "catalyst": {
+     "awl": {
        "linear": {
          "teamKey": "PROJ"
        }
@@ -130,7 +130,7 @@ source ./scripts/load-catalyst-config.sh
 
 ## Scripts in Plugin (Not Here)
 
-These scripts are bundled in the Catalyst plugin:
+These scripts are bundled in the Awl plugin:
 
 - `plugins/dev/scripts/check-prerequisites.sh` - Validates Linear is configured
 - `plugins/dev/scripts/create-worktree.sh` - Creates git worktrees

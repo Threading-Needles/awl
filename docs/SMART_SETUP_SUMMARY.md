@@ -1,12 +1,12 @@
 # Smart Setup System - Complete Summary
 
-Intelligent token discovery and validation for Catalyst setup.
+Intelligent token discovery and validation for Awl setup.
 
 ---
 
 ## What Was Built
 
-### 1. Token Discovery & Validation (`scripts/catalyst-integration-helpers.sh`)
+### 1. Token Discovery & Validation (`scripts/awl-integration-helpers.sh`)
 
 **Functions for Linear:**
 - `discover_linear_token()` - Checks env var and `~/.linear_api_token`
@@ -240,22 +240,22 @@ Good for: Permanent setups, shared with other CLIs
 ### Test Discovery
 ```bash
 # Linear
-./scripts/catalyst-integration-helpers.sh discover-linear
+./scripts/awl-integration-helpers.sh discover-linear
 # Output: "file" or "env" (source) + token
 
 # Sentry
-./scripts/catalyst-integration-helpers.sh discover-sentry
+./scripts/awl-integration-helpers.sh discover-sentry
 # Output: "file" or "env" (source) + token
 ```
 
 ### Test Validation
 ```bash
 # Linear (replace with real token)
-./scripts/catalyst-integration-helpers.sh validate-linear "lin_api_..."
+./scripts/awl-integration-helpers.sh validate-linear "lin_api_..."
 # Output: JSON with viewer, org, teams
 
 # Sentry (replace with real token)
-./scripts/catalyst-integration-helpers.sh validate-sentry "sntrys_..."
+./scripts/awl-integration-helpers.sh validate-sentry "sntrys_..."
 # Output: JSON with orgs and projects
 ```
 
@@ -265,7 +265,7 @@ Good for: Permanent setups, shared with other CLIs
 echo "lin_api_your_token" > ~/.linear_api_token
 
 # Run setup
-./setup-catalyst.sh
+./setup-awl.sh
 
 # Should auto-discover and validate Linear token
 ```
@@ -289,7 +289,7 @@ echo "lin_api_your_token" > ~/.linear_api_token
 
 ### 🚧 Integration Needed
 
-- [ ] Source smart functions in `setup-catalyst.sh`
+- [ ] Source smart functions in `setup-awl.sh`
 - [ ] Replace `prompt_linear_config` with `prompt_linear_config_smart`
 - [ ] Replace `prompt_sentry_config` with `prompt_sentry_config_smart`
 - [ ] Test full setup flow
@@ -363,7 +363,7 @@ See `scripts/INTEGRATION_GUIDE.md` for step-by-step integration instructions.
 
 ```
 scripts/
-├── catalyst-integration-helpers.sh    # Discovery & validation functions
+├── awl-integration-helpers.sh    # Discovery & validation functions
 ├── smart-linear-config.sh             # Smart Linear prompt
 ├── smart-sentry-config.sh             # Smart Sentry prompt
 └── INTEGRATION_GUIDE.md               # Integration instructions
@@ -393,7 +393,7 @@ EOF
 ### 2. Run setup
 
 ```bash
-./setup-catalyst.sh
+./setup-awl.sh
 ```
 
 ### 3. Enjoy auto-discovery!
@@ -434,7 +434,7 @@ Setup will:
 ## Next Steps
 
 1. **Review** the integration guide: `scripts/INTEGRATION_GUIDE.md`
-2. **Integrate** smart functions into `setup-catalyst.sh`
+2. **Integrate** smart functions into `setup-awl.sh`
 3. **Test** with real Linear and Sentry tokens
 4. **Document** in README and QUICKSTART
 5. **Ship** to users!

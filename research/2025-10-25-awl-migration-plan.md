@@ -1,22 +1,22 @@
 ---
 date: 2025-10-25T18:35:00+0000
 author: Claude
-repository: ryan-claude-workspace → catalyst
-topic: "Migration Plan: Restructuring ryan-claude-workspace to Catalyst Multi-Plugin Marketplace"
-tags: [planning, migration, catalyst, plugins, restructure]
+repository: ryan-claude-workspace → awl
+topic: "Migration Plan: Restructuring ryan-claude-workspace to Awl Multi-Plugin Marketplace"
+tags: [planning, migration, awl, plugins, restructure]
 status: draft
 ---
 
-# Migration Plan: ryan-claude-workspace → Catalyst
+# Migration Plan: ryan-claude-workspace → Awl
 
 ## Overview
 
-Restructure the monolithic `ryan-claude-workspace` into `catalyst`, a multi-plugin marketplace that
+Restructure the monolithic `ryan-claude-workspace` into `awl`, a multi-plugin marketplace that
 provides focused, composable development workflows.
 
 **Key changes:**
 
-1. Rename repository: `ryan-claude-workspace` → `catalyst`
+1. Rename repository: `ryan-claude-workspace` → `awl`
 2. Split into 5 focused plugins: `dev`, `pm`, `research`, `workflow`, `handoff`
 3. Create marketplace structure for distribution
 4. Maintain backward compatibility with existing installations
@@ -24,7 +24,7 @@ provides focused, composable development workflows.
 ## Proposed Structure
 
 ```
-catalyst/
+awl/
 ├── .claude-plugin/
 │   └── marketplace.json              # Marketplace catalog
 ├── plugins/
@@ -124,7 +124,7 @@ catalyst/
 
 ```json
 {
-  "name": "catalyst-dev",
+  "name": "awl-dev",
   "description": "AI-powered development workflows: smart commits, debugging, and PR descriptions",
   "version": "1.0.0",
   "keywords": ["git", "commit", "debug", "pr", "development"]
@@ -150,7 +150,7 @@ catalyst/
 
 ```json
 {
-  "name": "catalyst-pm",
+  "name": "awl-pm",
   "description": "Project management workflows: Linear integration, worktrees, and project updates",
   "version": "1.0.0",
   "keywords": ["linear", "project-management", "worktree", "pr"]
@@ -185,7 +185,7 @@ catalyst/
 
 ```json
 {
-  "name": "catalyst-research",
+  "name": "awl-research",
   "description": "Deep codebase research with specialized agents: find, analyze, and document existing code",
   "version": "1.0.0",
   "keywords": ["research", "analysis", "agents", "codebase", "documentation"]
@@ -211,7 +211,7 @@ agents.
 
 ```json
 {
-  "name": "catalyst-workflow",
+  "name": "awl-workflow",
   "description": "Structured development workflow: research-driven planning, implementation, and validation",
   "version": "1.0.0",
   "keywords": ["planning", "implementation", "validation", "workflow"]
@@ -233,7 +233,7 @@ agents.
 
 ```json
 {
-  "name": "catalyst-handoff",
+  "name": "awl-handoff",
   "description": "Context persistence: save and restore work across sessions",
   "version": "1.0.0",
   "keywords": ["context", "handoff", "persistence", "sessions"]
@@ -249,7 +249,7 @@ agents.
 ```json
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "catalyst",
+  "name": "awl",
   "version": "1.0.0",
   "description": "Production-ready AI-assisted development workflows from Coalesce Labs",
   "owner": {
@@ -258,13 +258,13 @@ agents.
     "url": "https://github.com/coalesce-labs"
   },
   "metadata": {
-    "description": "Catalyst accelerates development with AI-powered research, planning, and implementation workflows",
-    "homepage": "https://github.com/coalesce-labs/catalyst",
+    "description": "Awl accelerates development with AI-powered research, planning, and implementation workflows",
+    "homepage": "https://github.com/ralfschimmel/awl",
     "pluginRoot": "./plugins"
   },
   "plugins": [
     {
-      "name": "catalyst-dev",
+      "name": "awl-dev",
       "source": "./plugins/dev",
       "description": "AI-powered development workflows: smart commits, debugging, and PR descriptions",
       "version": "1.0.0",
@@ -272,7 +272,7 @@ agents.
       "keywords": ["git", "commit", "debug", "pr"]
     },
     {
-      "name": "catalyst-pm",
+      "name": "awl-pm",
       "source": "./plugins/pm",
       "description": "Project management workflows: Linear integration, worktrees, and project updates",
       "version": "1.0.0",
@@ -280,7 +280,7 @@ agents.
       "keywords": ["linear", "project-management", "worktree"]
     },
     {
-      "name": "catalyst-research",
+      "name": "awl-research",
       "source": "./plugins/research",
       "description": "Deep codebase research with specialized agents: find, analyze, and document existing code",
       "version": "1.0.0",
@@ -289,7 +289,7 @@ agents.
       "featured": true
     },
     {
-      "name": "catalyst-workflow",
+      "name": "awl-workflow",
       "source": "./plugins/workflow",
       "description": "Structured development workflow: research-driven planning, implementation, and validation",
       "version": "1.0.0",
@@ -297,7 +297,7 @@ agents.
       "keywords": ["planning", "implementation", "validation"]
     },
     {
-      "name": "catalyst-handoff",
+      "name": "awl-handoff",
       "source": "./plugins/handoff",
       "description": "Context persistence: save and restore work across sessions",
       "version": "1.0.0",
@@ -315,38 +315,38 @@ agents.
 **Install all plugins:**
 
 ```bash
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-research@catalyst
-/plugin install catalyst-workflow@catalyst
-/plugin install catalyst-dev@catalyst
-/plugin install catalyst-pm@catalyst
-/plugin install catalyst-handoff@catalyst
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-research@awl
+/plugin install awl-workflow@awl
+/plugin install awl-dev@awl
+/plugin install awl-pm@awl
+/plugin install awl-handoff@awl
 ```
 
 **Install selectively:**
 
 ```bash
 # Just research agents (most unique value)
-/plugin install catalyst-research@catalyst
+/plugin install awl-research@awl
 
 # Add planning workflow
-/plugin install catalyst-workflow@catalyst
+/plugin install awl-workflow@awl
 
 # Add Linear integration
-/plugin install catalyst-pm@catalyst
+/plugin install awl-pm@awl
 ```
 
 **Full workflow:**
 
 ```bash
 # 1. Add marketplace
-/plugin marketplace add coalesce-labs/catalyst
+/plugin marketplace add ralfschimmel/awl
 
 # 2. Browse available plugins
 /plugin
 
 # 3. Install what you need
-/plugin install catalyst-research@catalyst
+/plugin install awl-research@awl
 
 # 4. Use commands
 /research-codebase
@@ -360,11 +360,11 @@ Commands appear with plugin context:
 /help
 
 Available commands:
-  /research-codebase (catalyst-research) - Comprehensive codebase research
-  /create-plan (catalyst-workflow) - Create implementation plan
-  /commit (catalyst-dev) - Smart git commit
-  /linear (catalyst-pm) - Manage Linear tickets
-  /create-handoff (catalyst-handoff) - Save context
+  /research-codebase (awl-research) - Comprehensive codebase research
+  /create-plan (awl-workflow) - Create implementation plan
+  /commit (awl-dev) - Smart git commit
+  /linear (awl-pm) - Manage Linear tickets
+  /create-handoff (awl-handoff) - Save context
 ```
 
 ### Upgrade Path for Existing Users
@@ -376,9 +376,9 @@ Available commands:
 rm -rf ~/.claude/agents ~/.claude/commands
 
 # Install via marketplace
-/plugin marketplace add coalesce-labs/catalyst
-/plugin install catalyst-research@catalyst
-/plugin install catalyst-workflow@catalyst
+/plugin marketplace add ralfschimmel/awl
+/plugin install awl-research@awl
+/plugin install awl-workflow@awl
 ```
 
 **Option 2: Script installation (legacy)**
@@ -408,7 +408,7 @@ rm -rf ~/.claude/agents ~/.claude/commands
 ```bash
 # Rename repo on GitHub first
 # Then locally:
-git remote set-url origin https://github.com/coalesce-labs/catalyst.git
+git remote set-url origin https://github.com/ralfschimmel/awl.git
 git fetch origin
 git branch -u origin/main main
 ```
@@ -479,8 +479,8 @@ Different plugins can evolve at different rates ✅ **Testing**: Test plugins in
 ### For Branding
 
 ✅ **Professional**: Multi-plugin marketplace signals maturity ✅ **Showcase value**: Research
-plugin stands out as unique offering ✅ **Expansion**: Easy to add new plugins under catalyst brand
-✅ **Recognition**: "catalyst-research" becomes known for quality research agents
+plugin stands out as unique offering ✅ **Expansion**: Easy to add new plugins under awl brand
+✅ **Recognition**: "awl-research" becomes known for quality research agents
 
 ## Risks & Mitigations
 
@@ -515,8 +515,8 @@ plugin stands out as unique offering ✅ **Expansion**: Easy to add new plugins 
 
 **Mitigation:**
 
-- Clear README explaining "catalyst" is marketplace name
-- Plugin names include "catalyst-" prefix for clarity
+- Clear README explaining "awl" is marketplace name
+- Plugin names include "awl-" prefix for clarity
 - Good descriptions that explain purpose
 - Examples in documentation
 
@@ -570,7 +570,7 @@ plugin stands out as unique offering ✅ **Expansion**: Easy to add new plugins 
   "thoughts": {
     "user": null
   },
-  "catalyst": {
+  "awl": {
     "installedPlugins": ["research", "workflow", "dev"],
     "version": "1.0.0"
   }
@@ -589,7 +589,7 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 
 - Cross-plugin consistency
 - Single configuration source
-- Project-specific values work across all catalyst plugins
+- Project-specific values work across all awl plugins
 
 ## Success Metrics
 
@@ -623,7 +623,7 @@ Track these to measure migration success:
 
 ## Open Questions
 
-1. **Should we create a "catalyst-all" meta-plugin** that installs all plugins at once?
+1. **Should we create a "awl-all" meta-plugin** that installs all plugins at once?
    - Pro: Easier for users wanting everything
    - Con: Defeats purpose of modularity
    - Recommendation: No, but document recommended bundles
@@ -650,7 +650,7 @@ Track these to measure migration success:
 
 ## Recommended Next Steps
 
-1. ✅ **You've decided on "catalyst"** - Great choice!
+1. ✅ **You've decided on "awl"** - Great choice!
 2. ⏭️ **Review this migration plan** - Adjust based on your preferences
 3. ⏭️ **Decide on timeline** - All at once, or phased?
 4. ⏭️ **Create plugin structure** - Start with restructure

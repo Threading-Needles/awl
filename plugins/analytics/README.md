@@ -1,4 +1,4 @@
-# Catalyst Analytics Plugin
+# Awl Analytics Plugin
 
 Product analytics and user behavior analysis powered by PostHog MCP integration.
 
@@ -14,7 +14,7 @@ Product analytics and user behavior analysis powered by PostHog MCP integration.
 
 ## When to Enable This Plugin
 
-Enable `catalyst-analytics` when you need to:
+Enable `awl-analytics` when you need to:
 
 - ✅ Analyze user behavior and conversion funnels
 - ✅ View product metrics and KPIs
@@ -28,13 +28,13 @@ Disable when you're doing regular development work to save ~40k tokens of contex
 
 ```bash
 # Install from marketplace
-/plugin install catalyst-analytics@catalyst
+/plugin install awl-analytics@awl
 
 # Enable for current session
-/plugin enable catalyst-analytics
+/plugin enable awl-analytics
 
 # Disable when done
-/plugin disable catalyst-analytics
+/plugin disable awl-analytics
 ```
 
 ## Prerequisites
@@ -66,33 +66,33 @@ To get your token:
 
 ```bash
 # Enable plugin
-/plugin enable catalyst-analytics
+/plugin enable awl-analytics
 
 # Query metrics
 /product-metrics "Show MAU, conversion rates, and retention for last 30 days"
 
 # Disable when done
-/plugin disable catalyst-analytics
+/plugin disable awl-analytics
 ```
 
 ### Analyze User Segments
 
 ```bash
-/plugin enable catalyst-analytics
+/plugin enable awl-analytics
 
 /segment-analysis "Compare engagement between free and paid users"
 
-/plugin disable catalyst-analytics
+/plugin disable awl-analytics
 ```
 
 ### Investigate Behavior Patterns
 
 ```bash
-/plugin enable catalyst-analytics
+/plugin enable awl-analytics
 
 /analyze-user-behavior "What's causing checkout abandonment?"
 
-/plugin disable catalyst-analytics
+/plugin disable awl-analytics
 ```
 
 ## Context Management
@@ -144,14 +144,14 @@ When enabled, this plugin provides access to:
 1. **Be specific with queries** - Include time ranges and specific metrics
 2. **Use natural language** - Commands translate to PostHog API calls
 3. **Ask for comparisons** - "vs last month" or "by traffic source"
-4. **Combine with other plugins** - Can enable alongside catalyst-debugging for error impact
+4. **Combine with other plugins** - Can enable alongside awl-debugging for error impact
    analysis
 
 ## Troubleshooting
 
 ### "PostHog MCP not available"
 
-- Plugin may not be enabled: `/plugin enable catalyst-analytics`
+- Plugin may not be enabled: `/plugin enable awl-analytics`
 - Check environment variable is set: `echo $POSTHOG_AUTH_HEADER`
 - Verify token format: `Bearer phx_...`
 
@@ -164,14 +164,14 @@ When enabled, this plugin provides access to:
 ### High context usage warning
 
 - This is expected (~40k tokens)
-- Disable plugin when not analyzing: `/plugin disable catalyst-analytics`
+- Disable plugin when not analyzing: `/plugin disable awl-analytics`
 - Check `/context` to see breakdown
 
 ## Related Plugins
 
-- **catalyst-dev** - Core development workflow (always enabled)
-- **catalyst-debugging** - Sentry error monitoring (enable for debugging)
-- **catalyst-meta** - Workflow discovery and creation
+- **awl-dev** - Core development workflow (always enabled)
+- **awl-debugging** - Sentry error monitoring (enable for debugging)
+- **awl-meta** - Workflow discovery and creation
 
 ## Version
 
@@ -183,5 +183,5 @@ MIT
 
 ## Support
 
-Issues: https://github.com/coalesce-labs/catalyst/issues Docs:
-https://github.com/coalesce-labs/catalyst
+Issues: https://github.com/ralfschimmel/awl/issues Docs:
+https://github.com/ralfschimmel/awl

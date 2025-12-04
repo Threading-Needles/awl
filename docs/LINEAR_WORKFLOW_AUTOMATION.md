@@ -13,12 +13,12 @@ When you run workflow commands, the Linear command automatically updates ticket 
 
 | Command                            | Ticket Status Update               |
 | ---------------------------------- | ---------------------------------- |
-| `/catalyst-dev:research_codebase` (with ticket) | → **Research in Progress**         |
-| `/catalyst-dev:create_plan` (with ticket)       | → **Plan in Progress**             |
-| `/catalyst-dev:implement_plan` (with ticket)    | → **In Dev**                       |
-| `/catalyst-dev:validate_plan` (with ticket)     | → **In Review**                    |
-| `/catalyst-dev:create_pr` (with ticket)         | → **In Review**                    |
-| `/catalyst-dev:merge_pr` (with ticket)          | → **Done**                         |
+| `/awl-dev:research_codebase` (with ticket) | → **Research in Progress**         |
+| `/awl-dev:create_plan` (with ticket)       | → **Plan in Progress**             |
+| `/awl-dev:implement_plan` (with ticket)    | → **In Dev**                       |
+| `/awl-dev:validate_plan` (with ticket)     | → **In Review**                    |
+| `/awl-dev:create_pr` (with ticket)         | → **In Review**                    |
+| `/awl-dev:merge_pr` (with ticket)          | → **Done**                         |
 
 ### How It Detects Tickets
 
@@ -135,7 +135,7 @@ Here's how tickets flow through the granular workflow:
 ### 1. Create Ticket
 
 ```bash
-/catalyst-dev:linear create "Add OAuth support"
+/awl-dev:linear create "Add OAuth support"
 # Creates in Backlog
 # Human triages → moves to "Research Needed"
 ```
@@ -144,7 +144,7 @@ Here's how tickets flow through the granular workflow:
 
 ```bash
 # Agent or human picks up from "Research Needed"
-/catalyst-dev:research_codebase PROJ-123
+/awl-dev:research_codebase PROJ-123
 > "How does authentication currently work?"
 
 # Automatically:
@@ -159,7 +159,7 @@ Here's how tickets flow through the granular workflow:
 
 ```bash
 # Agent or human picks up from "Ready for Plan"
-/catalyst-dev:create_plan
+/awl-dev:create_plan
 # Reference research document
 # User provides task details
 
@@ -182,7 +182,7 @@ Here's how tickets flow through the granular workflow:
 
 ```bash
 # Agent or human picks up from "Ready for Dev"
-/catalyst-dev:implement_plan thoughts/shared/plans/2025-10-04-PROJ-123-oauth.md
+/awl-dev:implement_plan thoughts/shared/plans/2025-10-04-PROJ-123-oauth.md
 
 # Automatically:
 # - Moves ticket to "In Dev"
@@ -193,7 +193,7 @@ Here's how tickets flow through the granular workflow:
 ### 6. Validation Phase
 
 ```bash
-/catalyst-dev:validate_plan
+/awl-dev:validate_plan
 
 # Automatically:
 # - Verifies all success criteria
@@ -205,7 +205,7 @@ Here's how tickets flow through the granular workflow:
 ### 7. Code Review Phase
 
 ```bash
-/catalyst-dev:create_pr
+/awl-dev:create_pr
 
 # Automatically:
 # - Creates PR with description
@@ -217,7 +217,7 @@ Here's how tickets flow through the granular workflow:
 ### 8. Completion
 
 ```bash
-/catalyst-dev:merge_pr
+/awl-dev:merge_pr
 
 # Automatically:
 # - Merges PR after checks pass
@@ -265,7 +265,7 @@ Queue States (waiting for pickup):     Active States (work in progress):
 
 ### Per-Project Configuration
 
-The `/catalyst-dev:linear` command uses a **clever initialization pattern**:
+The `/awl-dev:linear` command uses a **clever initialization pattern**:
 
 1. **First use**: Detects `[NEEDS_SETUP]` markers
 2. **Prompts for config**: Team ID, Project ID, GitHub URL
@@ -289,7 +289,7 @@ mkdir -p .claude/commands/linear
 cp ~/ryan-claude-workspace/commands/linear/linear.md .claude/commands/linear/
 
 # First use
-/catalyst-dev:linear
+/awl-dev:linear
 
 # Output:
 # This Linear command needs one-time configuration...
@@ -312,17 +312,17 @@ cp ~/ryan-claude-workspace/commands/linear/linear.md .claude/commands/linear/
 #   git commit -m "Configure Linear command"
 
 # Now it works:
-/catalyst-dev:linear create thoughts/shared/research/feature.md
+/awl-dev:linear create thoughts/shared/research/feature.md
 ```
 
 ---
 
 ## Automation Details
 
-### During `/catalyst-dev:create_plan`
+### During `/awl-dev:create_plan`
 
 ```javascript
-1. User runs: /catalyst-dev:create_plan
+1. User runs: /awl-dev:create_plan
 2. Command asks: "Is this for a Linear ticket?"
 3. If yes:
    a. Get ticket ID (from user or auto-detect)
@@ -336,10 +336,10 @@ cp ~/ryan-claude-workspace/commands/linear/linear.md .claude/commands/linear/
    c. Ticket stays in "Planning" for team review
 ```
 
-### During `/catalyst-dev:implement_plan`
+### During `/awl-dev:implement_plan`
 
 ```javascript
-1. User runs: /catalyst-dev:implement_plan thoughts/shared/plans/plan.md
+1. User runs: /awl-dev:implement_plan thoughts/shared/plans/plan.md
 2. Read plan document
 3. Check plan frontmatter for ticket ID
 4. If ticket found:
@@ -349,10 +349,10 @@ cp ~/ryan-claude-workspace/commands/linear/linear.md .claude/commands/linear/
 6. Update checkboxes in plan as phases complete
 ```
 
-### During `/catalyst-dev:describe_pr`
+### During `/awl-dev:describe_pr`
 
 ```javascript
-1. User runs: /catalyst-dev:describe_pr
+1. User runs: /awl-dev:describe_pr
 2. Get PR diff and metadata
 3. Check for ticket references in:
    - PR title
@@ -417,7 +417,7 @@ When you create a worktree for a ticket:
 
 ```bash
 # In main repo
-/catalyst-dev:create_worktree PROJ-123
+/awl-dev:create_worktree PROJ-123
 
 # This:
 # 1. Creates worktree with ticket in name
@@ -428,7 +428,7 @@ When you create a worktree for a ticket:
 # In worktree
 cd ~/wt/project/PROJ-123
 
-/catalyst-dev:implement_plan  # Auto-detects PROJ-123 from directory name
+/awl-dev:implement_plan  # Auto-detects PROJ-123 from directory name
 # → Updates Linear ticket to "In Progress"
 ```
 
@@ -511,7 +511,7 @@ Adjust as needed!
 **Fix**: Manually specify ticket:
 
 ```bash
-/catalyst-dev:linear move PROJ-123 "In Progress"
+/awl-dev:linear move PROJ-123 "In Progress"
 ```
 
 ### "Wrong status updated"
@@ -521,7 +521,7 @@ Adjust as needed!
 **Fix**: Be explicit about which ticket
 
 ```bash
-/catalyst-dev:implement_plan thoughts/shared/plans/plan.md --ticket PROJ-123
+/awl-dev:implement_plan thoughts/shared/plans/plan.md --ticket PROJ-123
 ```
 
 ### "Status not found in Linear"

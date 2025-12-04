@@ -1,5 +1,5 @@
 #!/bin/bash
-# Load Catalyst config from ~/.config/catalyst/
+# Load Awl config from ~/.config/awl/
 
 load_config() {
   local config_file=".claude/config.json"
@@ -14,15 +14,15 @@ load_config() {
 
   if [[ -z "$project_key" ]]; then
     echo "ERROR: projectKey not set in .claude/config.json" >&2
-    echo "Run: ./scripts/setup-catalyst-config.sh" >&2
+    echo "Run: ./scripts/setup-awl-config.sh" >&2
     return 1
   fi
 
-  local external_config="$HOME/.config/catalyst/config-$project_key.json"
+  local external_config="$HOME/.config/awl/config-$project_key.json"
 
   if [[ ! -f "$external_config" ]]; then
     echo "ERROR: Config not found: $external_config" >&2
-    echo "Run: ./scripts/setup-catalyst-config.sh" >&2
+    echo "Run: ./scripts/setup-awl-config.sh" >&2
     return 1
   fi
 

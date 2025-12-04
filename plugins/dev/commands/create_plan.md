@@ -314,7 +314,7 @@ Create the plan document in Linear:
 
 ```bash
 # Get team key from config
-TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' .claude/config.json)
+TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' .claude/config.json)
 
 # Create Linear document with plan content
 linearis documents create \

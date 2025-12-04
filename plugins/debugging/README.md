@@ -1,4 +1,4 @@
-# Catalyst Debugging Plugin
+# Awl Debugging Plugin
 
 Production error monitoring and debugging powered by Sentry MCP integration.
 
@@ -14,7 +14,7 @@ Production error monitoring and debugging powered by Sentry MCP integration.
 
 ## When to Enable This Plugin
 
-Enable `catalyst-debugging` when you need to:
+Enable `awl-debugging` when you need to:
 
 - ✅ Debug production errors and exceptions
 - ✅ Investigate error spikes or incidents
@@ -29,13 +29,13 @@ Disable when you're doing regular development work to save ~20k tokens of contex
 
 ```bash
 # Install from marketplace
-/plugin install catalyst-debugging@catalyst
+/plugin install awl-debugging@awl
 
 # Enable for current session
-/plugin enable catalyst-debugging
+/plugin enable awl-debugging
 
 # Disable when done
-/plugin disable catalyst-debugging
+/plugin disable awl-debugging
 ```
 
 ## Prerequisites
@@ -69,10 +69,10 @@ To get these values:
 
 ```bash
 # Enable plugin
-/plugin enable catalyst-debugging
+/plugin enable awl-debugging
 
 # Investigate error
-/catalyst-dev:debug-production-error "MYAPP-456"
+/awl-dev:debug-production-error "MYAPP-456"
 
 # View stack trace and context
 > "Show me the full stack trace and user actions that led to this error"
@@ -81,27 +81,27 @@ To get these values:
 > "Use Seer to analyze root cause and suggest fixes"
 
 # Disable when done
-/plugin disable catalyst-debugging
+/plugin disable awl-debugging
 ```
 
 ### Assess Error Impact
 
 ```bash
-/plugin enable catalyst-debugging
+/plugin enable awl-debugging
 
 /error-impact-analysis "payment gateway errors last 7 days"
 
-/plugin disable catalyst-debugging
+/plugin disable awl-debugging
 ```
 
 ### Performance Investigation
 
 ```bash
-/plugin enable catalyst-debugging
+/plugin enable awl-debugging
 
 /trace-analysis "slow API requests in checkout service"
 
-/plugin disable catalyst-debugging
+/plugin disable awl-debugging
 ```
 
 ### Combined with Analytics
@@ -109,13 +109,13 @@ To get these values:
 Enable both plugins for comprehensive incident analysis:
 
 ```bash
-/plugin enable catalyst-debugging
-/plugin enable catalyst-analytics
+/plugin enable awl-debugging
+/plugin enable awl-analytics
 
 # Analyze error impact on user behavior
 > "How many users who hit error X today went on to complete checkout vs abandon?"
 
-/plugin disable catalyst-debugging catalyst-analytics
+/plugin disable awl-debugging awl-analytics
 ```
 
 ## Context Management
@@ -188,7 +188,7 @@ When enabled, this plugin provides access to:
 
 ### "Sentry MCP not available"
 
-- Plugin may not be enabled: `/plugin enable catalyst-debugging`
+- Plugin may not be enabled: `/plugin enable awl-debugging`
 - Check environment variables: `echo $SENTRY_AUTH_TOKEN`
 - Verify token permissions include `project:read` and `event:read`
 
@@ -207,14 +207,14 @@ When enabled, this plugin provides access to:
 ### High context usage warning
 
 - This is expected (~20k tokens)
-- Disable plugin when not debugging: `/plugin disable catalyst-debugging`
+- Disable plugin when not debugging: `/plugin disable awl-debugging`
 - Check `/context` to see breakdown
 
 ## Related Plugins
 
-- **catalyst-dev** - Core development workflow (always enabled)
-- **catalyst-analytics** - PostHog product analytics (enable for user impact analysis)
-- **catalyst-meta** - Workflow discovery and creation
+- **awl-dev** - Core development workflow (always enabled)
+- **awl-analytics** - PostHog product analytics (enable for user impact analysis)
+- **awl-meta** - Workflow discovery and creation
 
 ## Version
 
@@ -226,5 +226,5 @@ MIT
 
 ## Support
 
-Issues: https://github.com/coalesce-labs/catalyst/issues Docs:
-https://github.com/coalesce-labs/catalyst
+Issues: https://github.com/ralfschimmel/awl/issues Docs:
+https://github.com/ralfschimmel/awl
