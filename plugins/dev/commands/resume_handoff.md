@@ -1,107 +1,117 @@
 ---
 description: Resume work from a handoff document
 category: workflow
-tools: Read, Bash, TodoWrite
+tools: Read, Bash, TodoWrite, Task
 model: inherit
-version: 1.0.0
+version: 2.0.0
 ---
 
-# Resume work from a handoff document
+# Resume Work from a Handoff Document
+
+You are tasked with resuming work from a handoff document stored in Linear. These handoffs contain
+critical context, learnings, and next steps from previous work sessions that need to be understood
+and continued.
 
 ## Prerequisites
 
-Before executing, verify required tools are installed:
+Before executing, verify Linear integration is available:
 
 ```bash
+# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
 if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
   "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
 fi
 ```
 
-## Configuration Note
-
-This command uses ticket references like `PROJ-123`. Replace `PROJ` with your Linear team's ticket
-prefix:
-
-- Read from `.claude/config.json` if available
-- Otherwise use a generic format like `TICKET-XXX`
-- Examples: `ENG-123`, `FEAT-456`, `BUG-789`
-
-You are tasked with resuming work from a handoff document through an interactive process. These
-handoffs contain critical context, learnings, and next steps from previous work sessions that need
-to be understood and continued.
-
 ## Initial Response
 
-**STEP 1: Auto-discover recent handoff (REQUIRED)**
+### Step 1: Determine Ticket
 
-IMMEDIATELY run this bash script BEFORE any other response:
+**If user provided a ticket ID as parameter** (e.g., `/resume-handoff PROJ-123`):
+- Set the ticket in workflow context:
+  ```bash
+  "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
+  ```
+- Continue to Step 2
 
-```bash
-# Auto-discover most recent handoff from workflow context
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" ]]; then
-  RECENT_HANDOFF=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" recent handoffs)
-  if [[ -n "$RECENT_HANDOFF" ]]; then
-    echo "📋 Auto-discovered recent handoff: $RECENT_HANDOFF"
-    echo ""
-  fi
-fi
+**If no parameter provided**:
+- Check workflow context for current ticket:
+  ```bash
+  CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
+  ```
+
+**If no current ticket:**
+
+```
+I need a Linear ticket to find handoff documents.
+
+Please provide a ticket ID: `/resume-handoff PROJ-123`
 ```
 
-**STEP 2: Determine which handoff to use**
+### Step 2: Find Handoff Documents
 
-After running the auto-discovery script, follow this logic:
+Use the linear-document-locator to find handoff documents:
 
-1. **If user provided a file path as parameter**:
-   - Use the provided path (user override)
-   - Skip to Step 3
+```bash
+linearis attachments list --issue "$CURRENT_TICKET"
+```
 
-2. **If user provided a ticket number (like PROJ-123)**:
-   - Run `humanlayer thoughts sync` to ensure `thoughts/` is up to date
-   - Look in `thoughts/shared/handoffs/PROJ-123/` directory
-   - List all handoffs for that ticket
-   - If multiple exist, use the most recent (by timestamp in filename `YYYY-MM-DD_HH-MM-SS`)
-   - If none exist, tell user and wait for input
-   - Skip to Step 3
+Look for documents with title starting with "Handoff:".
 
-3. **If no parameters provided AND RECENT_HANDOFF was found**:
-   - Show user: "📋 Found recent handoff: $RECENT_HANDOFF"
-   - Ask: "**Proceed with this handoff?** [Y/n]"
-   - If yes: use RECENT_HANDOFF and skip to Step 3
-   - If no: proceed to option 4
+**If no handoff found:**
 
-4. **If no parameters AND no RECENT_HANDOFF found**:
-   - List available handoffs from `thoughts/shared/handoffs/`
-   - Show most recent 5 handoffs with dates
-   - Ask user which one to use
-   - Wait for user input with path or ticket number
+```
+No handoff documents found for {CURRENT_TICKET}.
 
-**STEP 3: Analyze the handoff**
+Would you like me to:
+1. Check for other document types (research, plans)?
+2. Start fresh implementation for this ticket?
+```
 
-Once you have a handoff path:
-- Read the handoff document FULLY (no limit/offset)
-- Immediately read any research or plan documents it references
-- Do NOT use sub-agents to read these critical files
-- Ingest all context from the handoff
-- Propose course of action to user
-- Get confirmation before proceeding
+**If multiple handoffs found:**
+
+```
+Found multiple handoff documents for {CURRENT_TICKET}:
+1. Handoff: {title1} (created {date1})
+2. Handoff: {title2} (created {date2})
+
+Which handoff should I resume from? (Usually the most recent)
+```
+
+**If single handoff found:**
+
+```
+Found handoff for {CURRENT_TICKET}:
+- Handoff: {title}
+
+Let me read and analyze it...
+```
+
+### Step 3: Read Handoff and Related Documents
+
+1. **Read handoff document completely** using `linearis documents read <document-id>`
+
+2. **Find and read related documents** using linear-document-locator:
+   - Research documents attached to the ticket
+   - Plan documents attached to the ticket
+
+3. **Read critical codebase files** mentioned in the handoff
 
 ## Process Steps
 
-### Step 1: Read and Analyze Handoff
+### Step 1: Analyze the Handoff
 
-1. **Read handoff document completely**:
-   - Use the Read tool WITHOUT limit/offset parameters
-   - Extract all sections:
-     - Task(s) and their statuses
-     - Recent changes
-     - Learnings
-     - Artifacts
-     - Action items and next steps
-     - Other notes
+After reading the handoff:
 
-2. **Spawn focused research tasks**: Based on the handoff content, spawn parallel research tasks to
-   verify current state:
+1. **Extract key sections**:
+   - Task(s) and their statuses
+   - Recent changes
+   - Learnings
+   - Artifacts
+   - Action items and next steps
+   - Other notes
+
+2. **Spawn focused research tasks** to verify current state:
 
    ```
    Task 1 - Verify recent changes:
@@ -110,7 +120,6 @@ Once you have a handoff path:
    2. Check if the described changes are still present
    3. Look for any subsequent modifications
    4. Identify any conflicts or regressions
-   Use tools: Read, Grep, Glob
    Return: Current state of recent changes with file:line references
    ```
 
@@ -121,65 +130,48 @@ Once you have a handoff path:
    2. Verify patterns and implementations still exist
    3. Look for any breaking changes since handoff
    4. Identify new related code added since handoff
-   Use tools: Read, Grep, Glob
    Return: Validation results and any discrepancies found
-   ```
-
-   ```
-   Task 3 - Gather artifact context:
-   Read all artifacts mentioned in the handoff.
-   1. Read feature documents listed in "Artifacts"
-   2. Read implementation plans referenced
-   3. Read any research documents mentioned
-   4. Extract key requirements and decisions
-   Use tools: Read
-   Return: Summary of artifact contents and key decisions
    ```
 
 3. **Wait for ALL sub-tasks to complete** before proceeding
 
-4. **Read critical files identified**:
-   - Read files from "Learnings" section completely
-   - Read files from "Recent changes" to understand modifications
-   - Read any new related files discovered during research
+4. **Read critical files identified** into main context
 
 ### Step 2: Synthesize and Present Analysis
 
-1. **Present comprehensive analysis**:
+Present comprehensive analysis:
 
-   ```
-   I've analyzed the handoff from [date] by [researcher]. Here's the current situation:
+```
+I've analyzed the handoff for {CURRENT_TICKET}. Here's the current situation:
 
-   **Original Tasks:**
-   - [Task 1]: [Status from handoff] → [Current verification]
-   - [Task 2]: [Status from handoff] → [Current verification]
+**Original Tasks:**
+- [Task 1]: [Status from handoff] → [Current verification]
+- [Task 2]: [Status from handoff] → [Current verification]
 
-   **Key Learnings Validated:**
-   - [Learning with file:line reference] - [Still valid/Changed]
-   - [Pattern discovered] - [Still applicable/Modified]
+**Key Learnings Validated:**
+- [Learning with file:line reference] - [Still valid/Changed]
+- [Pattern discovered] - [Still applicable/Modified]
 
-   **Recent Changes Status:**
-   - [Change 1] - [Verified present/Missing/Modified]
-   - [Change 2] - [Verified present/Missing/Modified]
+**Recent Changes Status:**
+- [Change 1] - [Verified present/Missing/Modified]
+- [Change 2] - [Verified present/Missing/Modified]
 
-   **Artifacts Reviewed:**
-   - [Document 1]: [Key takeaway]
-   - [Document 2]: [Key takeaway]
+**Related Documents:**
+- Research: {title} - [Key insight]
+- Plan: {title} - [Current phase status]
 
-   **Recommended Next Actions:**
-   Based on the handoff's action items and current state:
-   1. [Most logical next step based on handoff]
-   2. [Second priority action]
-   3. [Additional tasks discovered]
+**Recommended Next Actions:**
+Based on the handoff's action items and current state:
+1. [Most logical next step based on handoff]
+2. [Second priority action]
+3. [Additional tasks discovered]
 
-   **Potential Issues Identified:**
-   - [Any conflicts or regressions found]
-   - [Missing dependencies or broken code]
+**Potential Issues Identified:**
+- [Any conflicts or regressions found]
+- [Missing dependencies or broken code]
 
-   Shall I proceed with [recommended action 1], or would you like to adjust the approach?
-   ```
-
-2. **Get confirmation** before proceeding
+Shall I proceed with [recommended action 1], or would you like to adjust the approach?
+```
 
 ### Step 3: Create Action Plan
 
@@ -188,22 +180,23 @@ Once you have a handoff path:
    - Add any new tasks discovered during analysis
    - Prioritize based on dependencies and handoff guidance
 
-2. **Present the plan**:
-
-   ```
-   I've created a task list based on the handoff and current analysis:
-
-   [Show todo list]
-
-   Ready to begin with the first task: [task description]?
-   ```
+2. **Get confirmation** before proceeding
 
 ### Step 4: Begin Implementation
 
-1. **Start with the first approved task**
-2. **Reference learnings from handoff** throughout implementation
-3. **Apply patterns and approaches documented** in the handoff
-4. **Update progress** as tasks are completed
+1. **Update Linear ticket status**:
+   ```bash
+   linearis issues update "$CURRENT_TICKET" --state "In Progress"
+   linearis comments create "$CURRENT_TICKET" --body "Resuming work from handoff"
+   ```
+
+2. **Start with the first approved task**
+
+3. **Reference learnings from handoff** throughout implementation
+
+4. **Apply patterns and approaches documented** in the handoff
+
+5. **Update progress** as tasks are completed
 
 ## Guidelines
 
@@ -267,18 +260,64 @@ Once you have a handoff path:
 - Original approach may no longer apply
 - Need to re-evaluate strategy
 
+## Integration with Other Commands
+
+```
+/research-codebase PROJ-123 → research document
+                  ↓
+           /create-plan → implementation plan
+                  ↓
+          /implement-plan → code changes
+                  ↓
+          /create-handoff → handoff document
+                  ↓
+         /resume-handoff → continues work (this command)
+```
+
+**How it connects:**
+
+- **Previous**: Handoff created by `/create-handoff` as Linear document
+- **Next**: Continues implementation, may use `/implement-plan`, `/describe-pr`
+- **Workflow context**: Sets current ticket for subsequent commands
+
+## Error Handling
+
+**If handoff document not readable:**
+
+```
+⚠️ Could not read handoff document.
+
+Please verify:
+1. The document ID is correct
+2. You have access to this Linear workspace
+3. LINEAR_API_TOKEN is set correctly
+```
+
+**If ticket not found:**
+
+```
+⚠️ Ticket {TICKET_ID} not found in Linear.
+
+Please verify:
+1. The ticket ID is correct (e.g., PROJ-123)
+2. You have access to this Linear team
+3. LINEAR_API_TOKEN is set correctly
+```
+
 ## Example Interaction Flow
 
 ```
-User: /catalyst-dev:resume_handoff specification/feature/handoffs/handoff-0.md
-Assistant: Let me read and analyze that handoff document...
+User: /resume-handoff PROJ-123
+Assistant: Let me find and analyze handoff documents for PROJ-123...
 
+[Sets ticket in workflow context]
+[Queries Linear for documents]
 [Reads handoff completely]
 [Spawns research tasks]
 [Waits for completion]
 [Reads identified files]
 
-I've analyzed the handoff from [date]. Here's the current situation...
+I've analyzed the handoff for PROJ-123. Here's the current situation...
 
 [Presents analysis]
 

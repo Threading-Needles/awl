@@ -3,7 +3,7 @@ description: Create pull request with automatic Linear integration
 category: version-control-git
 tools: Bash(linearis *), Bash(git *), Bash(gh *), Read, Task
 model: inherit
-version: 1.0.0
+version: 2.0.0
 ---
 
 # Create Pull Request
@@ -13,9 +13,10 @@ ticket.
 
 ## Prerequisites
 
-Before executing, verify required tools are installed:
+Before executing, verify Linear integration is available:
 
 ```bash
+# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
 if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
   "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
 fi
@@ -32,7 +33,15 @@ TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' "$CONFIG_FILE")
 
 ## Process:
 
-### 1. Check for uncommitted changes
+### 1. Get Current Ticket
+
+Check workflow context for current ticket:
+
+```bash
+CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
+```
+
+### 2. Check for uncommitted changes
 
 ```bash
 git status --porcelain
@@ -44,7 +53,7 @@ If there are uncommitted changes:
 - If yes: internally call `/catalyst-dev:commit` workflow
 - If no: proceed (user may want to commit manually later)
 
-### 2. Verify not on main/master branch
+### 3. Verify not on main/master branch
 
 ```bash
 branch=$(git branch --show-current)
@@ -55,7 +64,7 @@ If on `main` or `master`:
 - Error: "Cannot create PR from main branch. Create a feature branch first."
 - Exit
 
-### 3. Detect base branch
+### 4. Detect base branch
 
 ```bash
 # Check which exists
@@ -68,7 +77,7 @@ else
 fi
 ```
 
-### 4. Check if branch is up-to-date with base
+### 5. Check if branch is up-to-date with base
 
 ```bash
 # Fetch latest
@@ -88,10 +97,28 @@ If behind:
   - Error: "Rebase conflicts detected. Resolve conflicts and run /catalyst-dev:create_pr again."
   - Exit
 
-### 5. Check for existing PR
+### 6. Check for existing PR
 
 ```bash
-gh pr view --json number,url,title,state 2>/dev/null
+# Check for existing PR (capture output and exit status)
+pr_output=$(gh pr view --json number,url,title,state 2>&1)
+pr_status=$?
+
+# Handle different scenarios
+if [[ $pr_status -eq 0 ]]; then
+    # PR exists - parse the JSON
+    echo "$pr_output"
+elif echo "$pr_output" | grep -q "no pull requests found"; then
+    # No PR yet - this is expected, continue
+    :
+elif echo "$pr_output" | grep -q "not logged in"; then
+    echo "Error: GitHub CLI not authenticated. Run: gh auth login" >&2
+    exit 1
+else
+    # Some other error
+    echo "Error checking for existing PR: $pr_output" >&2
+    exit 1
+fi
 ```
 
 If PR exists:
@@ -104,18 +131,26 @@ If PR exists:
 - If A: exit
 - **This is the ONLY interactive prompt in the happy path**
 
-### 6. Extract ticket from branch name
+### 7. Extract ticket from branch name or workflow context
 
 ```bash
 branch=$(git branch --show-current)
 
-# Extract pattern: PREFIX-NUMBER using configured team key
-if [[ "$branch" =~ ($TEAM_KEY-[0-9]+) ]]; then
+# First check workflow context
+ticket=$CURRENT_TICKET
+
+# If not in context, extract from branch pattern: PREFIX-NUMBER
+if [[ -z "$ticket" && "$branch" =~ ($TEAM_KEY-[0-9]+) ]]; then
     ticket="${BASH_REMATCH[1]}"  # e.g., RCW-13
+fi
+
+# Set ticket in workflow context for subsequent commands
+if [[ "$ticket" ]]; then
+    "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$ticket"
 fi
 ```
 
-### 7. Generate PR title from branch and ticket
+### 8. Generate PR title from branch and ticket
 
 ```bash
 # Branch format examples:
@@ -140,7 +175,7 @@ else
 fi
 ```
 
-### 8. Push branch
+### 9. Push branch
 
 ```bash
 # Check if branch has upstream
@@ -153,7 +188,7 @@ else
 fi
 ```
 
-### 9. Create PR
+### 10. Create PR
 
 ```bash
 # Minimal initial body
@@ -170,46 +205,30 @@ gh pr create --title "$title" --body "$body" --base "$base"
 
 Capture PR number and URL from output.
 
-### Track in Workflow Context
-
-After creating the PR, add it to workflow context:
-
-```bash
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" ]]; then
-  "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" add prs "$PR_URL" "${TICKET_ID:-null}"
-fi
-```
-
-### 10. Auto-call /catalyst-dev:describe_pr
+### 11. Auto-call /catalyst-dev:describe_pr
 
 Immediately call `/catalyst-dev:describe_pr` with the PR number to:
 
 - Generate comprehensive description
 - Run verification checks
 - Update PR title (refined from code analysis)
-- Save to thoughts/
-- Update Linear ticket
+- Save PR description as Linear document
+- Update Linear ticket status
 
-### 11. Update Linear ticket (if ticket found)
+### 12. Update Linear ticket (if ticket found)
 
-If ticket was extracted from branch:
+If ticket was extracted:
 
 ```bash
-# Verify linearis is available
-if ! command -v linearis &> /dev/null; then
-    echo "⚠️  Linearis CLI not found - skipping Linear ticket update"
-    echo "Install: npm install -g --install-links ryanrozich/linearis#feat/cycles-cli"
-else
-    # Update ticket state to "In Review"
-    linearis issues update "$ticket" --state "In Review" --assignee "@me"
+# Update ticket state to "In Review"
+linearis issues update "$ticket" --state "In Review" --assignee "@me"
 
-    # Add comment with PR link
-    linearis comments create "$ticket" \
-        --body "PR created and ready for review!\n\n**PR**: $prUrl\n\nDescription has been auto-generated with verification checks."
-fi
+# Add comment with PR link
+linearis comments create "$ticket" \
+    --body "PR created and ready for review!\n\n**PR**: $prUrl\n\nDescription has been auto-generated with verification checks."
 ```
 
-### 12. Report success
+### 13. Report success
 
 ```
 ✅ Pull request created successfully!
@@ -218,10 +237,35 @@ fi
 **URL**: {url}
 **Base**: {base_branch}
 **Ticket**: {ticket} (moved to "In Review")
+**Linear Document**: PR: #{number} - {title}
 
 Description has been generated and verification checks have been run.
 Review the PR on GitHub!
 ```
+
+## Integration with Other Commands
+
+```
+/research-codebase PROJ-123 → research document
+                  ↓
+           /create-plan → implementation plan
+                  ↓
+          /implement-plan → code changes
+                  ↓
+           /validate-plan → verification
+                  ↓
+              /describe-pr → PR description
+                  ↓
+              /create-pr → creates PR on GitHub (this command)
+                  ↓
+              /merge-pr → merges PR
+```
+
+**How it connects:**
+
+- **Previous**: Work is done via `/implement-plan`
+- **Next**: `/merge-pr` will merge the PR and update Linear
+- **Workflow context**: Ticket is used for Linear linking
 
 ## Error Handling
 
@@ -258,18 +302,15 @@ Run: gh auth login
 Then: gh repo set-default
 ```
 
-**Linearis CLI not found:**
+**Linear API token not set:**
 
 ```
-⚠️  Linearis CLI not found
+❌ LINEAR_API_TOKEN not set
 
-PR created successfully, but Linear ticket not updated.
-
-Install Linearis:
-  npm install -g --install-links ryanrozich/linearis#feat/cycles-cli
-
-Configure:
+Set your Linear API token:
   export LINEAR_API_TOKEN=your_token
+
+Get a token from: https://linear.app/settings/api
 ```
 
 **Linear ticket not found:**
@@ -309,6 +350,7 @@ Generated title: "RCW-13: Implement pr lifecycle"
 Creating PR...
 ✅ PR #2 created
 Calling /catalyst-dev:describe_pr to generate description...
+Saving PR description to Linear...
 Updating Linear ticket RCW-13 → In Review
 ✅ Complete!
 ```
@@ -325,17 +367,14 @@ Calling /catalyst-dev:describe_pr...
 ✅ Complete!
 ```
 
-## Integration with Other Commands
-
-- **Calls `/catalyst-dev:commit`** - if uncommitted changes (optional)
-- **Calls `/catalyst-dev:describe_pr`** - always, to generate comprehensive description
-- **Sets up for `/catalyst-dev:merge_pr`** - PR is now ready for review and eventual merge
-
 ## Remember:
 
 - **Minimize prompts** - only ask when PR already exists
 - **Auto-rebase** - keep branch up-to-date with base
-- **Auto-link Linear** - extract ticket from branch, update status with Linearis CLI
+- **Auto-link Linear** - extract ticket from branch, update status
 - **Auto-describe** - comprehensive description generated immediately
+- **Save to Linear** - PR description stored as Linear document
 - **Fail fast** - stop on conflicts or errors with clear messages
-- **Graceful degradation** - If Linearis not installed, warn but continue
+
+**Note**: This command is typically called automatically by `/implement-plan` after validation passes.
+You can also run it standalone to create a PR for existing changes.

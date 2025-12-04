@@ -1,9 +1,9 @@
 ---
 description: Interactive guide to supported workflows with context-aware assistance
 category: workflow
-tools: Read, Grep, Glob, Task
+tools: Read, Grep, Glob, Task, Bash
 model: inherit
-version: 1.0.0
+version: 2.0.0
 ---
 
 # Workflow Help
@@ -36,10 +36,10 @@ I can help you navigate the supported workflows in this workspace.
    - `/validate-frontmatter` → Ensure consistency
 
 **3. Utilities**
-   - `/catalyst-dev:commit` → Create structured commits
+   - `/commit` → Create structured commits
    - `/describe-pr` → Generate PR descriptions
-   - `/catalyst-dev:debug` → Investigate issues
-   - `/catalyst-dev:linear` → Linear ticket integration
+   - `/debug` → Investigate issues
+   - `/linear` → Linear ticket integration
 
 ---
 
@@ -66,24 +66,21 @@ Use codebase-locator agent:
 "Search for recent uncommitted changes, work-in-progress files, or partial implementations. Look for:
 - Git status (uncommitted files)
 - WIP branches
-- Partial plan files with unchecked boxes
-- Draft handoffs
+- Partial work (uncommitted code)
 Return: Evidence of active work with file paths"
 
 Tools: Bash (git status), Grep, Glob
 ```
 
-**Task 2 - Find Recent Documents**:
+**Task 2 - Check Current Ticket**:
 
 ```
-Use thoughts-locator agent (or Glob if no thoughts):
-"Find the most recent research, plan, or handoff documents. Look in:
-- thoughts/shared/research/ (or research/)
-- thoughts/shared/plans/ (or plans/)
-- thoughts/shared/handoffs/ (or handoffs/)
-Return: 3 most recent documents with dates and topics"
+"Get the current ticket from workflow context.
+Run: ${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh get-ticket
+If ticket exists, query Linear for documents attached to it.
+Return: Current ticket and any documents (research, plan, handoff) found"
 
-Tools: Bash (ls -t), Grep, Glob
+Tools: Bash
 ```
 
 **Task 3 - Detect Worktree**:
@@ -103,9 +100,9 @@ WAIT for all tasks to complete.
 Based on detection results, determine user's current state:
 
 - **In Worktree with Plan** → Likely in Implementation phase
-- **Recent Research Doc** → May be ready for Planning
-- **Recent Plan Doc** → May be ready for Implementation
-- **Recent Handoff** → May want to resume
+- **Current Ticket with Research Doc** → May be ready for Planning
+- **Current Ticket with Plan Doc** → May be ready for Implementation
+- **Current Ticket with Handoff** → May want to resume
 - **No Active Work** → Starting fresh
 
 ### Step 3: Provide Context-Aware Guidance
@@ -116,7 +113,7 @@ Based on detection results, determine user's current state:
 🎯 **I see you're currently working on {detected-context}**
 
 **Current State:**
-- {What I detected - be specific with file paths}
+- {What I detected - be specific with ticket and documents}
 - {Where you likely are in workflow}
 
 **Suggested Next Steps:**
@@ -175,14 +172,13 @@ Return: Concrete examples users can follow"
 Tools: Read, Grep
 ```
 
-**Task 3 - Check for User Files**:
+**Task 3 - Check for User's Current Ticket**:
 
 ```
-"Check if user has any existing research, plans, or handoffs.
-Look in thoughts/ or research/, plans/, handoffs/ directories.
-Return: What files exist, suggesting next steps based on what's there"
+"Get the current ticket from workflow context and query Linear for documents.
+Return: What documents exist for current ticket, suggesting next steps"
 
-Tools: Glob, Bash
+Tools: Bash
 ```
 
 WAIT for all tasks.
@@ -198,12 +194,12 @@ WAIT for all tasks.
 
 ### Phase 1: Research 🔍
 **When**: Need to understand existing codebase before planning
-**Command**: `/research-codebase`
+**Command**: `/research-codebase PROJ-123`
 
 {Include example from Task 2}
 {Note any existing research docs from Task 3}
 
-**Output**: `thoughts/shared/research/YYYY-MM-DD-PROJ-XXXX-description.md`
+**Output**: Linear document "Research: {description}" attached to ticket
 **After**: ✅ **CLEAR CONTEXT**
 
 ---
@@ -214,7 +210,7 @@ WAIT for all tasks.
 
 {Include example}
 
-**Output**: `thoughts/shared/plans/YYYY-MM-DD-PROJ-XXXX-description.md`
+**Output**: Linear document "Plan: {description}" attached to ticket
 **After**: ✅ **CLEAR CONTEXT**
 
 ---
@@ -234,7 +230,9 @@ cd ~/wt/{project}/PROJ-123-feature
 
 ### Phase 4: Implementation ⚙️
 **When**: In worktree with approved plan
-**Command**: `/implement-plan thoughts/shared/plans/YYYY-MM-DD-PROJ-XXXX-feature.md`
+**Command**: `/implement-plan`
+
+The plan is automatically discovered from Linear documents attached to the current ticket.
 
 {Include example}
 
@@ -254,12 +252,12 @@ cd ~/wt/{project}/PROJ-123-feature
 ### Phase 6: PR Creation 🚀
 **Commands**:
 \`\`\`bash
-/catalyst-dev:commit
+/commit
 gh pr create --fill
 /describe-pr
 \`\`\`
 
-**Output**: `thoughts/shared/prs/pr_{number}_{description}.md`
+**Output**: Linear document "PR: #{number} - {title}" attached to ticket
 **After**: ✅ **CLEAR CONTEXT** - workflow complete!
 
 ---
@@ -270,11 +268,11 @@ gh pr create --fill
 \`\`\`bash
 /create-handoff
 \`\`\`
-**Output**: `thoughts/shared/handoffs/PROJ-XXXX/YYYY-MM-DD_HH-MM-SS_description.md`
+**Output**: Linear document "Handoff: {description}" attached to ticket
 
 **Resume Handoff**:
 \`\`\`bash
-/resume-handoff {path-or-ticket}
+/resume-handoff PROJ-123
 \`\`\`
 
 ---
@@ -309,7 +307,7 @@ You can also check anytime with `/context` command.
 
 **Your Next Step:**
 {If existing files found:} You have {file} - ready to {next-action}?
-{If no files:} Start with: `/research-codebase` or `/create-plan`
+{If no files:} Start with: `/research-codebase PROJ-123` or `/create-plan`
 
 **Need more details on any phase?** Just ask!
 ```
@@ -338,7 +336,7 @@ Spawn focused research tasks to answer:
 ```
 Task 1: "Read docs/AGENTIC_WORKFLOW_GUIDE.md section on Handoff System"
 Task 2: "Find examples in commands/create_handoff.md and commands/resume_handoff.md"
-Task 3: "Check if user has existing handoffs"
+Task 3: "Check if user has existing handoffs in Linear"
 ```
 
 Present targeted answer with examples.
@@ -353,9 +351,9 @@ Present targeted answer with examples.
 ## Ready to Get Started?
 
 **Quick Actions:**
-1. 📝 Start research: `/research-codebase`
+1. 📝 Start research: `/research-codebase PROJ-123`
 2. 📋 Create plan: `/create-plan`
-3. 🔄 Resume work: `/resume-handoff {ticket}`
+3. 🔄 Resume work: `/resume-handoff PROJ-123`
 4. 🔍 Discover workflows: `/discover-workflows`
 5. ❓ Ask me anything else!
 
@@ -373,8 +371,8 @@ Type a command or ask another question!
 ### Context-Aware Assistance
 
 1. **Always detect current state first** using parallel agents
-2. **Don't assume** - verify with actual file checks
-3. **Be specific** with file paths and next actions
+2. **Don't assume** - verify with actual ticket checks
+3. **Be specific** with ticket IDs and documents found
 4. **Remind about context clearing** at appropriate points
 
 ### Compression & Conciseness
@@ -420,8 +418,9 @@ User: /workflow-help
 Agent: 🎯 **I see you're currently working on PROJ-123 OAuth implementation**
 
 **Current State:**
+- Ticket: PROJ-123
 - Worktree: `~/wt/my-project/PROJ-123-oauth`
-- Plan: `thoughts/shared/plans/2025-01-08-PROJ-123-oauth.md`
+- Plan: "Plan: OAuth Implementation" (Linear document)
 - Status: Phase 2/4 complete (checkboxes updated)
 
 **You're in Implementation Phase**
@@ -429,7 +428,7 @@ Agent: 🎯 **I see you're currently working on PROJ-123 OAuth implementation**
 **Suggested Next Steps:**
 1. ✅ Continue implementing Phase 3: `/implement-plan` (will resume from checkboxes)
 2. 🔄 Need to pause? `/create-handoff` before stopping
-3. 📖 Review plan: Check `thoughts/shared/plans/2025-01-08-PROJ-123-oauth.md`
+3. 📖 Review plan in Linear
 
 **Context Management:**
 ⚠️ If context feels full (>60%), clear and resume with plan file
@@ -457,12 +456,12 @@ I don't see any existing research or plans for this, so let's start from the beg
 First, understand how authentication currently works:
 
 \`\`\`
-/research-codebase
+/research-codebase PROJ-123
 \`\`\`
 
 When prompted, ask: "How does authentication currently work? What patterns exist?"
 
-**Output**: `thoughts/shared/research/YYYY-MM-DD-PROJ-XXX-auth-system.md`
+**Output**: Linear document "Research: {description}" attached to PROJ-123
 
 **After research**: ✅ **CLEAR CONTEXT** (close this conversation, start fresh)
 
@@ -475,9 +474,9 @@ Create implementation plan:
 /create-plan
 \`\`\`
 
-Reference your research doc when planning.
+The research document will be automatically found from Linear.
 
-**Output**: `thoughts/shared/plans/YYYY-MM-DD-PROJ-XXX-oauth-support.md`
+**Output**: Linear document "Plan: {description}" attached to PROJ-123
 
 **After plan approved**: ✅ **CLEAR CONTEXT**
 
@@ -485,7 +484,7 @@ Reference your research doc when planning.
 
 {Continue with remaining phases...}
 
-**Ready to start research?** Type `/research-codebase` or ask more questions!
+**Ready to start research?** Type `/research-codebase PROJ-123` or ask more questions!
 ```
 
 ### Example 3: Quick Question
@@ -504,7 +503,7 @@ Use the **Handoff System** to pause/resume:
 /create-handoff
 \`\`\`
 
-Creates: `thoughts/shared/handoffs/PROJ-XXXX/YYYY-MM-DD_HH-MM-SS_description.md`
+Creates Linear document "Handoff: {description}" attached to current ticket.
 
 The handoff captures:
 - Current progress
@@ -518,19 +517,17 @@ The handoff captures:
 
 ### To Resume:
 \`\`\`bash
-/resume-handoff thoughts/shared/handoffs/PROJ-123/2025-01-08_14-30-45_oauth.md
+/resume-handoff PROJ-123
 \`\`\`
 
-Or if command supports:
-\`\`\`bash
-/resume-handoff PROJ-123  # Finds latest handoff
-\`\`\`
+The handoff is automatically discovered from Linear documents attached to the ticket.
 
 **The resume process:**
-1. Reads handoff + linked docs
-2. Verifies current state
-3. Proposes next actions
-4. Continues where you left off
+1. Finds handoff from Linear
+2. Reads handoff + linked docs
+3. Verifies current state
+4. Proposes next actions
+5. Continues where you left off
 
 ---
 
@@ -553,8 +550,9 @@ The parallel agents can detect:
 
 - Current git branch
 - Worktree vs main repo
-- Recent files modified
-- Plan files with checkboxes
+- Current ticket from workflow context
+- Linear documents attached to ticket
+- Plan documents with checkboxes
 - Research documents
 - Handoff documents
 - PR status
@@ -563,7 +561,7 @@ The parallel agents can detect:
 
 Based on detected state, provide:
 
-- Specific file paths to reference
+- Specific ticket IDs and documents found
 - Exact commands to run next
 - Progress indicators (Phase X of Y)
 - Context clearing reminders at right moments

@@ -25,19 +25,7 @@ Generates a comprehensive **health report** (not just data) for the current Line
 First, verify all required tools and systems:
 
 ```bash
-# 1. Validate thoughts system (REQUIRED)
-if [[ -f "scripts/validate-thoughts-setup.sh" ]]; then
-  ./scripts/validate-thoughts-setup.sh || exit 1
-else
-  # Inline validation if script not found
-  if [[ ! -d "thoughts/shared" ]]; then
-    echo "❌ ERROR: Thoughts system not configured"
-    echo "Run: ./scripts/humanlayer/init-project.sh . {project-name}"
-    exit 1
-  fi
-fi
-
-# 2. Determine script directory with fallback
+# 1. Determine script directory with fallback
 if [[ -n "${CLAUDE_PLUGIN_ROOT}" ]]; then
   SCRIPT_DIR="${CLAUDE_PLUGIN_ROOT}/scripts"
 else
@@ -45,12 +33,15 @@ else
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts"
 fi
 
-# 3. Check PM plugin prerequisites
+# 2. Check PM plugin prerequisites (validates Linearis CLI and LINEAR_API_TOKEN)
 if [[ -f "${SCRIPT_DIR}/check-prerequisites.sh" ]]; then
   "${SCRIPT_DIR}/check-prerequisites.sh" || exit 1
 else
   echo "⚠️ Prerequisites check skipped (script not found at: ${SCRIPT_DIR})"
 fi
+
+# 3. Ensure reports directory exists
+mkdir -p "reports/cycles"
 ```
 
 ## Process
@@ -213,10 +204,10 @@ Format the agent's analysis into a user-facing health report:
 
 ### Step 5: Save Report
 
-Write report to `thoughts/shared/reports/cycles/YYYY-MM-DD-cycle-N-status.md`
+Write report to `reports/cycles/YYYY-MM-DD-cycle-N-status.md`
 
 ```bash
-REPORT_DIR="thoughts/shared/reports/cycles"
+REPORT_DIR="reports/cycles"
 mkdir -p "$REPORT_DIR"
 
 REPORT_FILE="$REPORT_DIR/$(date +%Y-%m-%d)-cycle-${cycle_number}-status.md"
@@ -232,11 +223,6 @@ cat > "$REPORT_FILE" << EOF
 EOF
 
 echo "✅ Report saved: $REPORT_FILE"
-
-# Update workflow context
-if [[ -f "${SCRIPT_DIR}/workflow-context.sh" ]]; then
-  "${SCRIPT_DIR}/workflow-context.sh" add reports "$REPORT_FILE" "${TICKET_ID:-null}"
-fi
 ```
 
 ### Step 6: Display Summary
@@ -262,7 +248,7 @@ Status:
   ✅ Done: 18  |  🔄 In Progress: 12  |  📋 Todo: 10
   🚨 Blocked: 2  |  ⚠️  At Risk: 3 (>5 days)
 
-Full health report: thoughts/shared/reports/cycles/2025-01-27-cycle-4-health.md
+Full health report: reports/cycles/2025-01-27-cycle-4-health.md
 ```
 
 ## Success Criteria

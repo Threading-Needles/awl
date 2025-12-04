@@ -3,7 +3,7 @@ description: Review cycle progress and identify blockers using Linearis and GitH
 category: project-task-management
 tools: Bash(linearis *), Bash(gh *), Read, Write, TodoWrite
 model: inherit
-version: 1.0.0
+version: 2.0.0
 status: placeholder
 ---
 
@@ -109,7 +109,7 @@ When fully implemented, this command will:
   - Flag stale PRs that need attention
 - **Work reconciliation** - Match PRs to Linear tickets, flag mismatches
 - **Team contribution report** - Show per-person breakdown of PRs and tickets
-- **Summary generation** - Create review document in thoughts/
+- **Summary generation** - Create review document in `reports/cycles/`
 - **Burndown visualization** - Show progress over time (text-based chart)
 
 Track progress at: https://github.com/coalesce-labs/catalyst/issues

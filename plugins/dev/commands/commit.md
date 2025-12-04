@@ -149,10 +149,10 @@ Refs: RCW-45
 **Fix:**
 
 ```
-fix(commands): handle missing PR template gracefully
+fix(commands): handle missing PR description gracefully
 
-Previously crashed when thoughts/shared/pr_description.md was
-missing. Now provides clear error with setup instructions.
+Previously crashed when PR document was not found in Linear.
+Now provides clear error with instructions to create one.
 
 Refs: RCW-78
 ```

@@ -17,19 +17,7 @@ Analyzes the relationship between GitHub pull requests and Linear issues to iden
 ## Prerequisites Check
 
 ```bash
-# 1. Validate thoughts system (REQUIRED)
-if [[ -f "scripts/validate-thoughts-setup.sh" ]]; then
-  ./scripts/validate-thoughts-setup.sh || exit 1
-else
-  # Inline validation if script not found
-  if [[ ! -d "thoughts/shared" ]]; then
-    echo "❌ ERROR: Thoughts system not configured"
-    echo "Run: ./scripts/humanlayer/init-project.sh . {project-name}"
-    exit 1
-  fi
-fi
-
-# 2. Determine script directory with fallback
+# 1. Determine script directory with fallback
 if [[ -n "${CLAUDE_PLUGIN_ROOT}" ]]; then
   SCRIPT_DIR="${CLAUDE_PLUGIN_ROOT}/scripts"
 else
@@ -37,12 +25,15 @@ else
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts"
 fi
 
-# 3. Check PM plugin prerequisites
+# 2. Check PM plugin prerequisites (validates Linearis CLI and LINEAR_API_TOKEN)
 if [[ -f "${SCRIPT_DIR}/check-prerequisites.sh" ]]; then
   "${SCRIPT_DIR}/check-prerequisites.sh" || exit 1
 else
   echo "⚠️ Prerequisites check skipped (script not found at: ${SCRIPT_DIR})"
 fi
+
+# 3. Ensure reports directory exists
+mkdir -p "reports/pr-sync"
 ```
 
 ## Process
@@ -169,7 +160,7 @@ linearis comments create TEAM-457 --body "PR #124 merged: https://github.com/use
 ### Step 4: Save Report
 
 ```bash
-REPORT_DIR="thoughts/shared/reports/pr-sync"
+REPORT_DIR="reports/pr-sync"
 mkdir -p "$REPORT_DIR"
 
 REPORT_FILE="$REPORT_DIR/$(date +%Y-%m-%d)-pr-sync.md"
@@ -182,11 +173,6 @@ cat > "$REPORT_FILE" << EOF
 EOF
 
 echo "✅ Report saved: $REPORT_FILE"
-
-# Update workflow context
-if [[ -f "${SCRIPT_DIR}/workflow-context.sh" ]]; then
-  "${SCRIPT_DIR}/workflow-context.sh" add reports "$REPORT_FILE" null
-fi
 ```
 
 ### Step 5: Display Summary
@@ -205,7 +191,7 @@ Actions available:
   2. Create Linear issues for orphaned PRs
   3. View full report
 
-Full report: thoughts/shared/reports/pr-sync/2025-01-27-pr-sync.md
+Full report: reports/pr-sync/2025-01-27-pr-sync.md
 ```
 
 ## Success Criteria

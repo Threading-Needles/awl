@@ -3,7 +3,7 @@ description: Conduct comprehensive codebase research using parallel sub-agents
 category: workflow
 tools: Read, Write, Grep, Glob, Task, TodoWrite, Bash
 model: inherit
-version: 1.0.0
+version: 2.0.0
 ---
 
 # Research Codebase
@@ -23,22 +23,10 @@ by spawning parallel sub-agents and synthesizing their findings.
 
 ## Prerequisites
 
-Before executing, verify all required tools and systems:
+Before executing, verify Linear integration is available:
 
 ```bash
-# 1. Validate thoughts system (REQUIRED)
-if [[ -f "scripts/validate-thoughts-setup.sh" ]]; then
-  ./scripts/validate-thoughts-setup.sh || exit 1
-else
-  # Inline validation if script not found
-  if [[ ! -d "thoughts/shared" ]]; then
-    echo "❌ ERROR: Thoughts system not configured"
-    echo "Run: ./scripts/humanlayer/init-project.sh . {project-name}"
-    exit 1
-  fi
-fi
-
-# 2. Validate plugin scripts
+# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
 if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
   "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
 fi
@@ -46,10 +34,35 @@ fi
 
 ## Initial Setup
 
-When this command is invoked, respond with:
+When this command is invoked:
+
+1. **Check for ticket ID argument**
+2. **If no ticket ID provided**, respond with:
 
 ```
-I'm ready to research the codebase. Please provide your research question or area of interest, and I'll analyze it thoroughly by exploring relevant components and connections.
+I need a Linear ticket to attach this research to.
+
+Please either:
+1. Provide a ticket ID: `/research-codebase PROJ-123`
+2. Let me create a new ticket for this research
+
+Which would you prefer?
+```
+
+3. **If ticket ID provided**, set it in workflow context and proceed:
+
+```bash
+# Set current ticket for subsequent commands
+"${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
+```
+
+4. **Then respond with**:
+
+```
+I'm ready to research the codebase for ticket {TICKET_ID}.
+
+Please provide your research question or area of interest, and I'll analyze it thoroughly
+by exploring relevant components and connections.
 ```
 
 Then wait for the user's research query.
@@ -63,7 +76,17 @@ Then wait for the user's research query.
 - **CRITICAL**: Read these files yourself in the main context before spawning any sub-tasks
 - This ensures you have full context before decomposing the research
 
-### Step 2: Analyze and Decompose the Research Question
+### Step 2: Update Linear Ticket Status
+
+```bash
+# Update ticket state to "Research in Progress"
+linearis issues update "$TICKET_ID" --state "Research in Progress"
+
+# Add comment about starting research
+linearis comments create "$TICKET_ID" --body "Starting research: ${RESEARCH_QUESTION}"
+```
+
+### Step 3: Analyze and Decompose the Research Question
 
 - Break down the user's query into composable research areas
 - Take time to think deeply about the underlying patterns, connections, and architectural
@@ -72,7 +95,7 @@ Then wait for the user's research query.
 - Create a research plan using TodoWrite to track all subtasks
 - Consider which directories, files, or architectural patterns are relevant
 
-### Step 3: Spawn Parallel Sub-Agent Tasks for Comprehensive Research
+### Step 4: Spawn Parallel Sub-Agent Tasks for Comprehensive Research
 
 Create multiple Task agents to research different aspects concurrently.
 
@@ -88,11 +111,10 @@ We have specialized agents that know how to do specific research tasks:
 **IMPORTANT**: All agents are documentarians, not critics. They will describe what exists without
 suggesting improvements or identifying issues.
 
-**For thoughts directory (if using thoughts system):**
+**For existing Linear documents on this ticket:**
 
-- Use the **thoughts-locator** agent to discover what documents exist about the topic
-- Use the **thoughts-analyzer** agent to extract key insights from specific documents (only the most
-  relevant ones)
+- Use the **linear-document-locator** agent to find any existing documents attached to the ticket
+- Use the **linear-document-analyzer** agent to extract insights from relevant documents
 
 **For external research (only if user explicitly asks):**
 
@@ -102,9 +124,8 @@ suggesting improvements or identifying issues.
 
 **For Linear tickets (if relevant):**
 
-- Use the **linear-ticket-reader** agent to get full details of a specific ticket (if Linear MCP
-  available)
-- Use the **linear-searcher** agent to find related tickets or historical context
+- Use the **linear-research** agent to get full details of a specific ticket
+- Use the **linear-research** agent to find related tickets or historical context
 
 The key is to use these agents intelligently:
 
@@ -130,78 +151,38 @@ Task 3 - Find existing patterns:
 "Use codebase-pattern-finder to find similar implementations of [pattern] in the codebase. Show concrete examples."
 ```
 
-### Step 4: Wait for All Sub-Agents to Complete and Synthesize Findings
+### Step 5: Wait for All Sub-Agents to Complete and Synthesize Findings
 
 - **IMPORTANT**: Wait for ALL sub-agent tasks to complete before proceeding
-- Compile all sub-agent results (both codebase and thoughts findings if applicable)
+- Compile all sub-agent results
 - Prioritize live codebase findings as primary source of truth
-- Use thoughts/ findings as supplementary historical context (if thoughts system is used)
 - Connect findings across different components
 - Document specific file paths and line numbers (format: `file.ext:line`)
 - Explain how components interact with each other
 - Include temporal context where relevant (e.g., "This was added in commit abc123")
 - Mark all research tasks as complete in TodoWrite
 
-### Step 5: Gather Metadata for the Research Document
+### Step 6: Gather Metadata for the Research Document
 
 Collect metadata for the research document:
-
-**If using thoughts system with metadata script:**
-
-- Run `hack/spec_metadata.sh` or equivalent to generate metadata
-- Metadata includes: date, researcher, git commit, branch, repository
-
-**If using simple approach:**
 
 - Get current date/time
 - Get git commit hash: `git rev-parse HEAD`
 - Get current branch: `git branch --show-current`
-- Get repository name from `.git/config` or working directory
+- Get repository name from working directory
 
-**Document Storage:**
-
-All research documents are stored in the **thoughts system** for persistence:
-
-**Required location:** `thoughts/shared/research/YYYY-MM-DD-{ticket}-{description}.md`
-
-**Why thoughts/shared/**:
-- ✅ Persisted across sessions (git-backed via HumanLayer)
-- ✅ Shared across worktrees
-- ✅ Synced via `humanlayer thoughts sync`
-- ✅ Team collaboration ready
-
-**Filename format:**
-- With ticket: `thoughts/shared/research/YYYY-MM-DD-PROJ-XXXX-description.md`
-- Without ticket: `thoughts/shared/research/YYYY-MM-DD-description.md`
-
-Replace `PROJ` with your ticket prefix from `.claude/config.json`.
-
-**Examples:**
-- `thoughts/shared/research/2025-01-08-PROJ-1478-parent-child-tracking.md`
-- `thoughts/shared/research/2025-01-08-authentication-flow.md` (no ticket)
-
-### Step 6: Generate Research Document
+### Step 7: Generate Research Document Content
 
 Create a structured research document with the following format:
 
 ```markdown
----
-date: YYYY-MM-DDTHH:MM:SS+TZ
-researcher: { your-name }
-git_commit: { commit-hash }
-branch: { branch-name }
-repository: { repo-name }
-topic: "{User's Research Question}"
-tags: [research, codebase, { component-names }]
-status: complete
-last_updated: YYYY-MM-DD
-last_updated_by: { your-name }
----
-
 # Research: {User's Research Question}
 
-**Date**: {date/time with timezone} **Researcher**: {your-name} **Git Commit**: {commit-hash}
-**Branch**: {branch-name} **Repository**: {repo-name}
+**Ticket**: {TICKET_ID}
+**Date**: {date/time with timezone}
+**Git Commit**: {commit-hash}
+**Branch**: {branch-name}
+**Repository**: {repo-name}
 
 ## Research Question
 
@@ -258,78 +239,53 @@ code. This is descriptive, not prescriptive.}
 ### Data Flow
 
 {Document how data moves through the system in this area}
-```
 
-Component A → Component B → Component C {Describe what happens at each step}
-
-```
+Component A → Component B → Component C
+{Describe what happens at each step}
 
 ### Key Integrations
 
 {Document how different parts of the system connect}
 
-## Historical Context (from thoughts/)
-
-{ONLY if using thoughts system}
-
-{Include insights from thoughts/ documents that provide context}
-
-- `thoughts/shared/research/previous-doc.md` - {Key decision or insight}
-- `thoughts/shared/plans/plan-123.md` - {Related implementation detail}
-
-## Related Research
-
-{Links to other research documents that touch on related topics}
-
-- `research/YYYY-MM-DD-related-topic.md` - {How it relates}
-
 ## Open Questions
 
-{Areas that would benefit from further investigation - NOT problems to fix, just areas where understanding could be deepened}
+{Areas that would benefit from further investigation - NOT problems to fix, just areas where
+understanding could be deepened}
 
 - {Question 1}
 - {Question 2}
 ```
 
-### Step 7: Add GitHub Permalinks (If Applicable)
+### Step 8: Save Research Document to Linear
 
-**If you're on the main/master branch OR if the commit is pushed:**
+Create the research document in Linear attached to the ticket:
 
-Generate GitHub permalinks and replace file references:
+```bash
+# Get team key from config
+TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' .claude/config.json)
 
+# Create Linear document with research content
+linearis documents create \
+  --title "Research: ${DESCRIPTION}" \
+  --team "${TEAM_KEY}" \
+  --content "${DOCUMENT_CONTENT}" \
+  --attach-to "${TICKET_ID}" \
+  --icon "Search" \
+  --color "#eb5757"
+
+# Add completion comment to ticket
+linearis comments create "$TICKET_ID" --body "Research complete! Document attached to this ticket."
 ```
-https://github.com/{owner}/{repo}/blob/{commit-hash}/{file-path}#L{line}
-```
 
-For line ranges:
-
-```
-https://github.com/{owner}/{repo}/blob/{commit-hash}/{file-path}#L{start}-L{end}
-```
-
-**If working on a feature branch that's not pushed yet:**
-
-- Keep local file references: `path/to/file.ext:line`
-- Add note: "GitHub permalinks will be added once this branch is pushed"
-
-### Step 8: Sync and Present Findings
-
-**If using thoughts system:**
-
-- Run `humanlayer thoughts sync` to sync the thoughts directory
-- This updates symlinks, creates searchable index, and commits to thoughts repo
-
-**If using simple approach:**
-
-- Just save the file to your research directory
-- Optionally commit to git
+### Step 9: Present Findings to User
 
 **Present to user:**
 
 ```markdown
 ✅ Research complete!
 
-**Research document**: {file-path}
+**Ticket**: {TICKET_ID}
+**Linear Document**: Research: {description}
 
 ## Summary
 
@@ -372,34 +328,30 @@ Would you like me to:
 3. Explore related topics?
 ```
 
-### Step 9: Handle Follow-Up Questions
+### Step 10: Handle Follow-Up Questions
 
 If the user has follow-up questions:
 
-1. **DO NOT create a new research document** - append to the same one
-2. **Update frontmatter fields:**
-   - `last_updated`: {new date}
-   - `last_updated_by`: {your name}
-   - Add `last_updated_note`: "{Brief note about what was added}"
+1. **Update the existing Linear document** with new findings
+2. Use `linearis documents update <document-id>` to append content
+3. **Spawn new sub-agents as needed** for the follow-up research
 
-3. **Add new section to existing document:**
+```bash
+# Update existing research document
+linearis documents update "$DOCUMENT_ID" \
+  --content "${UPDATED_CONTENT}"
 
-```markdown
----
-
-## Follow-up Research: {Follow-up Question}
-
-**Date**: {date} **Updated by**: {your-name}
-
-### Additional Findings
-
-{New research results using same structure as above}
+# Add comment about the update
+linearis comments create "$TICKET_ID" --body "Research updated with follow-up findings."
 ```
 
-4. **Spawn new sub-agents as needed** for the follow-up research
-5. **Re-sync** (if using thoughts system)
-
 ## Important Notes
+
+### Ticket Required
+
+- This command REQUIRES a ticket ID
+- If user doesn't provide one, offer to create a new ticket
+- All research documents are attached to the ticket in Linear
 
 ### Proactive Context Management
 
@@ -408,36 +360,6 @@ If the user has follow-up questions:
 - Check token usage after spawning parallel agents
 - After synthesis phase, check context again
 - **If context >60%**: Warn user and recommend handoff
-
-**Example Warning**:
-
-```
-⚠️ Context Usage Alert: Currently at 65% (130K/200K tokens)
-
-Research is complete, but context is getting full. Before continuing to
-planning phase, I recommend creating a handoff to preserve this work
-and start fresh.
-
-Would you like me to:
-1. Create a handoff now (recommended)
-2. Continue and clear context manually
-3. Proceed anyway (not recommended - may impact planning quality)
-
-**Why this matters**: The planning phase will load additional context.
-Starting fresh ensures optimal AI performance.
-```
-
-**When to Warn**:
-
-- After Step 7 (document generated) if context >60%
-- After Step 9 (follow-up complete) if context >70%
-- Anytime during research if context >80%
-
-**Educate the User**:
-
-- Explain WHY clearing context matters (performance, token efficiency)
-- Explain WHEN to clear (between phases)
-- Offer to create handoff yourself if `/create-handoff` command exists
 
 ### Parallel Execution
 
@@ -448,7 +370,7 @@ Starting fresh ensures optimal AI performance.
 ### Research Philosophy
 
 - Always perform fresh codebase research - never rely solely on existing docs
-- The `thoughts/` directory (if used) provides historical context, not primary source
+- Existing Linear documents provide historical context, not primary source
 - Focus on concrete file paths and line numbers - make it easy to navigate
 - Research documents should be self-contained and understandable months later
 
@@ -464,18 +386,6 @@ Starting fresh ensures optimal AI performance.
 - Document how components interact, not just what they do individually
 - Trace data flow across boundaries
 - Note integration points and dependencies
-
-### Temporal Context
-
-- Include when things were added/changed if relevant
-- Note deprecated patterns still in the codebase
-- Don't judge - just document the timeline
-
-### GitHub Links
-
-- Use permalinks for permanent references
-- Include line numbers for precision
-- Link to specific commits, not branches (branches move)
 
 ### Main Agent Role
 
@@ -503,144 +413,12 @@ Starting fresh ensures optimal AI performance.
 - Don't skip steps or reorder them
 - Each step builds on the previous ones
 
-### Thoughts Directory Handling
-
-**If using thoughts system:**
-
-- `thoughts/searchable/` is a special directory - paths found there should be documented as their
-  actual location
-- Example: `thoughts/searchable/allison/notes.md` → document as `thoughts/allison/notes.md`
-- Don't change directory names (keep `allison/`, don't change to `shared/`)
-
-**If NOT using thoughts system:**
-
-- Skip thoughts-related agents
-- Skip thoughts sync commands
-- Save research docs to `research/` directory in workspace root
-
-### Frontmatter Consistency
-
-- Always include complete frontmatter as shown in template
-- Use ISO 8601 dates with timezone
-- Keep tags consistent across research documents
-- Update `last_updated` fields when appending follow-ups
-
-## Linear Integration
-
-If a Linear ticket is associated with the research, the command can automatically update the ticket
-status.
-
-### How It Works
-
-**Ticket detection** (same as other commands):
-
-1. User provides ticket ID explicitly: `/research_codebase PROJ-123`
-2. Ticket mentioned in research query
-3. Auto-detected from current context
-
-**Status updates:**
-
-- When research starts → Move ticket to **"Research"**
-- When research document is saved → Add comment with link to research doc
-
-### Implementation Pattern
-
-**At research start** (Step 2 - after reading mentioned files):
-
-```bash
-# If ticket is detected or provided
-if [[ -n "$ticketId" ]]; then
-  # Check if Linearis CLI is available
-  if command -v linearis &> /dev/null; then
-    # Update ticket state to "Research" (use --state NOT --status!)
-    linearis issues update "$ticketId" --state "Research"
-
-    # Add comment (use 'comments create' NOT 'issues comment'!)
-    linearis comments create "$ticketId" --body "Starting research: [user's research question]"
-  else
-    echo "⚠️  Linearis CLI not found - skipping Linear ticket update"
-  fi
-fi
-```
-
-**After research document is saved** (Step 6 - after generating document):
-
-```bash
-# Attach research document to ticket
-if [[ -n "$ticketId" ]] && [[ -n "$githubPermalink" ]]; then
-  # Check if Linearis CLI is available
-  if command -v linearis &> /dev/null; then
-    # Add completion comment with research doc link
-    linearis comments create "$ticketId" \
-        --body "Research complete! See findings: $githubPermalink"
-  else
-    echo "⚠️  Linearis CLI not found - skipping Linear ticket update"
-  fi
-fi
-```
-
-### User Experience
-
-**With ticket:**
-
-```bash
-/catalyst-dev:research_codebase PROJ-123
-> "How does authentication work?"
-```
-
-**What happens:**
-
-1. Command detects ticket PROJ-123
-2. Moves ticket from Backlog → Research
-3. Adds comment: "Starting research: How does authentication work?"
-4. Conducts research with parallel agents
-5. Saves document to thoughts/shared/research/
-6. Attaches document to Linear ticket
-7. Adds comment: "Research complete! See findings: [link]"
-
-**Without ticket:**
-
-```bash
-/catalyst-dev:research_codebase
-> "How does authentication work?"
-```
-
-**What happens:**
-
-- Same research process, but no Linear updates
-- User can manually attach research to ticket later
-
-### Configuration
-
-Uses the same Linear configuration as other commands from `.claude/config.json`:
-
-- `linear.teamId`
-- `linear.thoughtsRepoUrl` (for GitHub permalinks)
-
-### Error Handling
-
-**If Linear MCP not available:**
-
-- Skip Linear integration silently
-- Continue with research as normal
-- Note in output: "Research complete (Linear not configured)"
-
-**If ticket not found:**
-
-- Show warning: "Ticket PROJ-123 not found in Linear"
-- Ask user: "Continue research without Linear integration? (Y/n)"
-
-**If status update fails:**
-
-- Log error but continue research
-- Include note in final output: "⚠️ Could not update Linear ticket status"
-
 ## Integration with Other Commands
 
 This command integrates with the complete development workflow:
 
 ```
-/research-codebase → research document (+ Linear: Research)
+/research-codebase PROJ-123 → research document (+ Linear: Research)
                   ↓
            /create-plan → implementation plan (+ Linear: Planning)
                   ↓
@@ -651,65 +429,58 @@ This command integrates with the complete development workflow:
 
 **How it connects:**
 
-- **research_codebase → Linear**: Moves ticket to "Research" status and attaches research document
-
-- **research_codebase → create_plan**: Research findings provide foundation for planning. The
-  create_plan command can reference research documents in its "References" section.
-
-- **Research before planning**: Always research the codebase first to understand what exists before
-  planning changes.
-
-- **Shared agents**: Both research_codebase and create_plan use the same specialized agents
-  (codebase-locator, codebase-analyzer, codebase-pattern-finder).
-
-- **Documentation persistence**: Research documents serve as permanent reference for future work.
+- **research_codebase → Linear**: Moves ticket to "Research" status and creates research document
+- **research_codebase → create_plan**: Subsequent commands find research via `linear-document-locator`
+- **Workflow context**: Current ticket is stored, subsequent commands use it automatically
 
 ## Example Workflow
 
 ```bash
-# User starts research
-/research-codebase
+# User starts research with ticket
+/research-codebase PROJ-123
 
-# You respond with initial prompt
+# You:
+# 1. Set current ticket in workflow context
+# 2. Update ticket status to "Research"
+# 3. Ask for research question
+
 # User asks: "How does authentication work in the API?"
 
 # You execute:
 # 1. Read any mentioned files fully
-# 2. Decompose into research areas (auth middleware, token validation, session management)
-# 3. Spawn parallel agents:
+# 2. Add comment to ticket about starting research
+# 3. Decompose into research areas (auth middleware, token validation, session management)
+# 4. Spawn parallel agents:
 #    - codebase-locator: Find auth-related files
 #    - codebase-analyzer: Understand auth middleware implementation
 #    - codebase-pattern-finder: Find auth usage patterns
-#    - thoughts-locator: Find previous auth discussions (if using thoughts)
-# 4. Wait for all agents
-# 5. Synthesize findings
-# 6. Generate research document at research/2025-01-08-authentication-system.md
-# 7. Present summary to user
+#    - linear-document-locator: Find existing research on PROJ-123
+# 5. Wait for all agents
+# 6. Synthesize findings
+# 7. Create Linear document "Research: Authentication Flow" attached to PROJ-123
+# 8. Present summary to user
 
 # User follows up: "How does it integrate with the database?"
-# You append to same document with new findings
+# You update the same Linear document with new findings
 ```
 
-### Track in Workflow Context
+## Error Handling
 
-After saving the research document, add it to workflow context:
+**If ticket not found:**
 
-```bash
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" ]]; then
-  "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" add research "$DOC_PATH" "${TICKET_ID:-null}"
-fi
+```
+⚠️ Ticket {TICKET_ID} not found in Linear.
+
+Please verify:
+1. The ticket ID is correct (e.g., PROJ-123)
+2. You have access to this Linear team
+3. LINEAR_API_TOKEN is set correctly
+
+Would you like me to create a new ticket for this research?
 ```
 
-## Adaptation Notes
+**If document creation fails:**
 
-This command is adapted from HumanLayer's research_codebase command. Key differences for
-portability:
-
-- **Thoughts system**: Made optional - can use simple `research/` directory
-- **Metadata script**: Made optional - can generate metadata inline
-- **Ticket prefixes**: Read from `.claude/config.json` or use PROJ- placeholder
-- **Linear integration**: Made optional - only used if Linear MCP available
-- **Web research**: Uses `external-research` agent instead of `web-search-researcher`
-
-The core workflow and philosophy remain the same: parallel sub-agents, documentarian mindset, and
-structured output.
+- Log error but continue with research
+- Present findings to user directly
+- Suggest manual document creation

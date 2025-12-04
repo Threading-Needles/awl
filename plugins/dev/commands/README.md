@@ -1,6 +1,6 @@
-# Thoughts Commands
+# Workflow Commands
 
-Context handoff and collaboration tools using the thoughts system.
+Context management and workflow tools using Linear documents.
 
 ## Commands
 
@@ -12,12 +12,12 @@ Create handoff document for passing work to another developer or session.
 
 ```
 /create-handoff
-> What work are you handing off?
 ```
 
 **Creates:**
 
-- Handoff document in `thoughts/shared/handoffs/YYYY-MM-DD-description.md`
+- Handoff document in Linear attached to the current ticket
+- Title format: `Handoff: {description}`
 - Includes: Current state, work completed, next steps, blockers, context
 
 **Content:**
@@ -36,12 +36,13 @@ Resume work from handoff document.
 **Usage:**
 
 ```
-/resume-handoff thoughts/shared/handoffs/YYYY-MM-DD-file.md
+/resume-handoff PROJ-123
 ```
 
 **Process:**
 
-- Reads full handoff document
+- Finds handoff documents attached to the ticket in Linear
+- Reads full handoff document content
 - Loads context (ticket, files, blockers)
 - Presents next steps
 - Asks how to proceed
@@ -66,12 +67,23 @@ Resume work from handoff document.
 - Code review preparation
 - Onboarding new team members
 
-## Thoughts System
+## Linear Document System
 
-Commands use the HumanLayer thoughts system:
+Commands use Linear documents attached to tickets:
 
-- `thoughts/personal/` - Your private notes
-- `thoughts/shared/` - Team-shared documents
-- `thoughts/global/` - Cross-project knowledge
+| Type | Title Pattern | Icon | Color |
+|------|---------------|------|-------|
+| Research | `Research: ...` | document | blue |
+| Plan | `Plan: ...` | list | green |
+| Handoff | `Handoff: ...` | handshake | orange |
+| PR Description | `PR: ...` | git-pull-request | purple |
 
-Initialize with: `humanlayer thoughts init`
+**Discovery:** Documents are discovered by querying Linear for attachments on the current ticket.
+
+**Workflow Context:** The current ticket is tracked in `.claude/.workflow-context.json` to enable
+command chaining (e.g., `/research-codebase` → `/create-plan` → `/implement-plan`).
+
+## Prerequisites
+
+- `LINEAR_API_TOKEN` environment variable set
+- `linearis` CLI installed (`npm install -g linearis`)

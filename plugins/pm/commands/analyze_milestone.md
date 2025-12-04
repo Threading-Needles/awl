@@ -22,19 +22,7 @@ Generates a comprehensive **health report** for a project milestone.
 ## Prerequisites Check
 
 ```bash
-# 1. Validate thoughts system (REQUIRED)
-if [[ -f "scripts/validate-thoughts-setup.sh" ]]; then
-  ./scripts/validate-thoughts-setup.sh || exit 1
-else
-  # Inline validation if script not found
-  if [[ ! -d "thoughts/shared" ]]; then
-    echo "❌ ERROR: Thoughts system not configured"
-    echo "Run: ./scripts/humanlayer/init-project.sh . {project-name}"
-    exit 1
-  fi
-fi
-
-# 2. Determine script directory with fallback
+# 1. Determine script directory with fallback
 if [[ -n "${CLAUDE_PLUGIN_ROOT}" ]]; then
   SCRIPT_DIR="${CLAUDE_PLUGIN_ROOT}/scripts"
 else
@@ -42,12 +30,15 @@ else
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts"
 fi
 
-# 3. Check PM plugin prerequisites
+# 2. Check PM plugin prerequisites (validates Linearis CLI and LINEAR_API_TOKEN)
 if [[ -f "${SCRIPT_DIR}/check-prerequisites.sh" ]]; then
   "${SCRIPT_DIR}/check-prerequisites.sh" || exit 1
 else
   echo "⚠️ Prerequisites check skipped (script not found at: ${SCRIPT_DIR})"
 fi
+
+# 3. Ensure reports directory exists
+mkdir -p "reports/milestones"
 ```
 
 ## Process
@@ -144,7 +135,7 @@ Format the analyzer output into final report:
 ### Step 5: Save Report
 
 ```bash
-REPORT_DIR="thoughts/shared/reports/milestones"
+REPORT_DIR="reports/milestones"
 mkdir -p "$REPORT_DIR"
 
 # Sanitize milestone name for filename
@@ -155,11 +146,6 @@ REPORT_FILE="$REPORT_DIR/$(date +%Y-%m-%d)-${MILESTONE_SLUG}.md"
 # ...
 
 echo "✅ Report saved: $REPORT_FILE"
-
-# Update workflow context
-if [[ -f "${SCRIPT_DIR}/workflow-context.sh" ]]; then
-  "${SCRIPT_DIR}/workflow-context.sh" add reports "$REPORT_FILE" "${TICKET_ID:-null}"
-fi
 ```
 
 ### Step 6: Display Summary
@@ -176,7 +162,7 @@ Priority Actions:
   2. [Action 2]
   3. [Action 3]
 
-Full report: thoughts/shared/reports/milestones/YYYY-MM-DD-milestone.md
+Full report: reports/milestones/YYYY-MM-DD-milestone.md
 ```
 
 ## Success Criteria

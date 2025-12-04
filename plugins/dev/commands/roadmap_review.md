@@ -3,7 +3,7 @@ description: Review project roadmap and milestone progress
 category: project-task-management
 tools: Bash(linearis *), Read, Write, TodoWrite
 model: inherit
-version: 1.0.0
+version: 2.0.0
 status: placeholder
 ---
 
@@ -80,7 +80,7 @@ When fully implemented, this command will:
 - **Risk analysis** - Identify at-risk projects (delayed, under-resourced)
 - **Timeline view** - Show project timelines and conflicts
 - **Resource allocation** - Show team members assigned to projects
-- **Summary generation** - Create roadmap document in thoughts/
+- **Summary generation** - Create roadmap document in `reports/milestones/`
 - **Trend analysis** - Compare progress month-over-month
 
 Track progress at: https://github.com/coalesce-labs/catalyst/issues

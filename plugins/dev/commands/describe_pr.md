@@ -3,32 +3,20 @@ description: Generate or update PR description with incremental changes
 category: version-control-git
 tools: Bash, Read, Write
 model: inherit
-version: 2.0.0
+version: 3.0.0
 ---
 
 # Generate/Update PR Description
 
 Generates or updates PR description with incremental information, auto-updates title, and links
-Linear tickets.
+Linear tickets. The PR description is also saved as a Linear document for persistence.
 
 ## Prerequisites
 
-Before executing, verify all required tools and systems:
+Before executing, verify Linear integration is available:
 
 ```bash
-# 1. Validate thoughts system (REQUIRED)
-if [[ -f "scripts/validate-thoughts-setup.sh" ]]; then
-  ./scripts/validate-thoughts-setup.sh || exit 1
-else
-  # Inline validation if script not found
-  if [[ ! -d "thoughts/shared" ]]; then
-    echo "❌ ERROR: Thoughts system not configured"
-    echo "Run: ./scripts/humanlayer/init-project.sh . {project-name}"
-    exit 1
-  fi
-fi
-
-# 2. Validate plugin scripts
+# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
 if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
   "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
 fi
@@ -36,27 +24,13 @@ fi
 
 ## Process:
 
-### 1. Read PR description template
+### 1. Get Current Ticket
+
+Check workflow context for current ticket:
 
 ```bash
-# Check if template exists
-if [ ! -f "thoughts/shared/pr_description.md" ]; then
-    echo "❌ PR description template not found"
-fi
+CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
 ```
-
-If missing:
-
-```
-❌ PR description template missing
-
-Your humanlayer thoughts setup is incomplete. Create a template at:
-  thoughts/shared/pr_description.md
-
-See the PR description template you created earlier for reference.
-```
-
-Read template fully to understand all sections.
 
 ### 2. Identify target PR
 
@@ -85,51 +59,41 @@ Ask user: "Which PR would you like to describe? (enter number)"
 **From multiple sources:**
 
 ```bash
-# 1. From branch name
+# 1. From workflow context (most reliable)
+ticket=$CURRENT_TICKET
+
+# 2. From branch name
 branch=$(gh pr view $pr_number --json headRefName -q .headRefName)
-if [[ "$branch" =~ ([A-Z]+)-([0-9]+) ]]; then
+if [[ -z "$ticket" && "$branch" =~ ([A-Z]+)-([0-9]+) ]]; then
     ticket="${BASH_REMATCH[0]}"
 fi
 
-# 2. From PR title
+# 3. From PR title
 title=$(gh pr view $pr_number --json title -q .title)
-if [[ "$title" =~ ([A-Z]+)-([0-9]+) ]]; then
+if [[ -z "$ticket" && "$title" =~ ([A-Z]+)-([0-9]+) ]]; then
     ticket="${BASH_REMATCH[0]}"
 fi
 
-# 3. From existing PR body
+# 4. From existing PR body
 body=$(gh pr view $pr_number --json body -q .body)
-if [[ "$body" =~ Refs:\ ([A-Z]+-[0-9]+) ]]; then
+if [[ -z "$ticket" && "$body" =~ Refs:\ ([A-Z]+-[0-9]+) ]]; then
     ticket="${BASH_REMATCH[1]}"
 fi
 ```
 
-### 4. Read existing descriptions
+**If ticket found, set in workflow context:**
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$ticket"
+```
 
-**Read current PR body from GitHub:**
+### 4. Check for existing PR description in Linear
 
 ```bash
-current_body=$(gh pr view $pr_number --json body -q .body)
+# Find existing PR documents attached to ticket
+linearis attachments list --issue "$ticket"
 ```
 
-**Read saved description (if exists):**
-
-```bash
-saved_desc="thoughts/shared/prs/${pr_number}_description.md"
-if [ -f "$saved_desc" ]; then
-    # Read fully
-    # Note what sections exist vs what's new
-fi
-```
-
-**Check for metadata header:**
-
-```markdown
-<!-- Auto-generated: 2025-10-06T10:30:00Z -->
-<!-- Last updated: 2025-10-06T14:45:00Z -->
-<!-- PR: #123 -->
-<!-- Previous commits: abc123,def456 -->
-```
+Look for documents with title starting with "PR:".
 
 ### 5. Gather comprehensive PR information
 
@@ -150,20 +114,23 @@ gh pr view $pr_number --json url,title,number,state,baseRefName,headRefName,auth
 gh pr checks $pr_number
 ```
 
-### 6. Analyze changes incrementally
-
-**If this is an UPDATE (saved description exists):**
+### 6. Get Linear ticket context
 
 ```bash
-# Extract previous commit list from metadata
-prev_commits=$(grep "Previous commits:" $saved_desc | sed 's/.*: //')
-
-# Get current commits
-current_commits=$(gh pr view $pr_number --json commits -q '.commits[].oid' | tr '\n' ',' | sed 's/,$//')
-
-# Compare
-new_commits=$(comm -13 <(echo "$prev_commits" | tr ',' '\n' | sort) <(echo "$current_commits" | tr ',' '\n' | sort))
+# Get ticket details from Linear
+linearis issues read "$ticket"
 ```
+
+Use ticket title and description for context when generating the PR description.
+
+### 7. Analyze changes incrementally
+
+**If this is an UPDATE (existing PR document found):**
+
+- Read the existing PR document from Linear
+- Extract previous commit list from metadata
+- Compare with current commits
+- Identify what's NEW since last description
 
 **Analysis:**
 
@@ -175,105 +142,72 @@ new_commits=$(comm -13 <(echo "$prev_commits" | tr ',' '\n' | sort) <(echo "$cur
   - Migration requirements
   - Security implications
 
-### 7. Merge descriptions intelligently
+### 8. Generate PR description
+
+Use the standard PR description format:
+
+```markdown
+<!-- Auto-generated: {timestamp} -->
+<!-- Last updated: {timestamp} -->
+<!-- PR: #{pr_number} -->
+<!-- Previous commits: {commit_list} -->
+
+## Summary
+
+{Brief overview of changes}
+
+## Changes Made
+
+### Backend Changes
+{List of backend changes}
+
+### Frontend Changes
+{List of frontend changes}
+
+## How to Verify It
+
+### Automated Checks
+- [ ] Build passes: `make build`
+- [ ] Tests pass: `make test`
+- [ ] Lint passes: `make lint`
+
+### Manual Verification
+- [ ] Feature works as expected
+- [ ] No regressions in related features
+
+## Related Issues/PRs
+
+- Fixes https://linear.app/{workspace}/issue/{ticket}
+
+## Changelog Entry
+
+{One-line changelog entry}
+
+## Reviewer Notes
+
+{Notes for reviewers}
+
+## Post-Merge Tasks
+
+- [ ] Update documentation if needed
+- [ ] Announce in relevant channels
+```
+
+**Merge descriptions intelligently:**
 
 **Auto-generated sections (always update):**
-
 - **Summary** - regenerate based on ALL changes
 - **Changes Made** - append new changes, preserve old
 - **How to Verify It** - update checklist, rerun checks
 - **Changelog Entry** - update to reflect all changes
 
 **Preserve manual edits in:**
-
 - **Reviewer Notes** - keep existing unless explicitly empty
 - **Screenshots/Videos** - never overwrite
 - **Manually checked boxes** - preserve [x] marks for manual steps
 - **Post-Merge Tasks** - append new, keep existing
 
-**Merging strategy:**
-
-```markdown
-## Changes Made
-
-### Backend Changes
-
-[Existing changes from previous description]
-
-**New changes** (since last update):
-
-- [New change 1]
-- [New change 2]
-
-### Frontend Changes
-
-[Existing + new merged together]
-```
-
-**Add change summary at top:**
-
-```markdown
-<!-- Auto-generated: 2025-10-06T15:00:00Z -->
-<!-- Last updated: 2025-10-06T15:00:00Z -->
-<!-- PR: #123 -->
-<!-- Previous commits: abc123,def456,ghi789 -->
-
----
-
-**Update History:**
-
-- 2025-10-06 15:00: Added validation logic, updated tests (3 new commits)
-- 2025-10-06 10:30: Initial implementation (5 commits)
-
----
-```
-
-### 8. Add Linear reference
-
-If ticket found:
-
-```markdown
-## Related Issues/PRs
-
-- Fixes https://linear.app/{workspace}/issue/{ticket}
-- Related to [any other linked issues]
-```
-
-Get Linear ticket details:
-
-```bash
-# Use Linearis CLI to get ticket details
-linearis issues read "$ticket"
-
-# Extract title and description with jq
-ticket_title=$(linearis issues read "$ticket" | jq -r '.title')
-ticket_description=$(linearis issues read "$ticket" | jq -r '.description')
-```
-
-Use ticket title and description for context.
-
-### 9. Generate updated title
-
-**Title generation rules:**
-
-```bash
-# If ticket exists
-if [[ "$ticket" ]]; then
-    # Get ticket title from Linear
-    ticket_title=$(linear API or fallback to branch)
-
-    # Format: TICKET: Descriptive title (max 72 chars)
-    title="$ticket: ${ticket_title:0:60}"
-else
-    # Generate from primary change
-    # Analyze commits and code changes
-    title="Brief summary of main change"
-fi
-```
-
-**Auto-update without prompt** - title is auto-generated section.
-
-### 10. Run verification checks
+### 9. Run verification checks
 
 **For each checklist item in "How to Verify It":**
 
@@ -297,73 +231,71 @@ fi
 ```
 
 **Common checks to attempt:**
-
 - `make test` / `npm test` / `pytest`
 - `make lint` / `npm run lint`
 - `npm run typecheck` / `tsc --noEmit`
 - `make build` / `npm run build`
 
-**Document results:**
+### 10. Save PR description to Linear
 
-- ✅ if passed
-- ❌ if failed (with error)
-- Manual required if can't automate
-
-### 11. Save and sync
-
-**Save description:**
+**Create or update Linear document:**
 
 ```bash
-# Add metadata header
-cat > "thoughts/shared/prs/${pr_number}_description.md" <<EOF
-<!-- Auto-generated: $(date -u +%Y-%m-%dT%H:%M:%SZ) -->
-<!-- Last updated: $(date -u +%Y-%m-%dT%H:%M:%SZ) -->
-<!-- PR: #$pr_number -->
-<!-- Previous commits: $commit_list -->
+# Get team key from config
+TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' .claude/config.json)
 
-[Full description content]
-EOF
+# If creating new document
+linearis documents create \
+  --title "PR: #${pr_number} - ${pr_title}" \
+  --team "${TEAM_KEY}" \
+  --content "${PR_DESCRIPTION}" \
+  --attach-to "${ticket}" \
+  --icon "CodeBlock" \
+  --color "#2f80ed"
+
+# If updating existing document
+linearis documents update "${document_id}" \
+  --content "${PR_DESCRIPTION}"
 ```
 
-**Sync thoughts:**
-
-```bash
-humanlayer thoughts sync
-```
-
-### 12. Update PR on GitHub
+### 11. Update PR on GitHub
 
 **Update title:**
 
 ```bash
+# If ticket exists, format: TICKET: Descriptive title
+if [[ "$ticket" ]]; then
+    # Get ticket title from Linear
+    ticket_title=$(linearis issues read "$ticket" | jq -r '.title')
+    new_title="$ticket: ${ticket_title:0:60}"
+else
+    # Generate from primary change
+    new_title="Brief summary of main change"
+fi
+
 gh pr edit $pr_number --title "$new_title"
 ```
 
 **Update body:**
 
 ```bash
-gh pr edit $pr_number --body-file "thoughts/shared/prs/${pr_number}_description.md"
+# Create temp file with description
+echo "$PR_DESCRIPTION" > /tmp/pr_body.md
+gh pr edit $pr_number --body-file /tmp/pr_body.md
 ```
 
-### 13. Update Linear ticket
-
-If ticket found:
+### 12. Update Linear ticket
 
 ```bash
-# Verify linearis is available
-if ! command -v linearis &> /dev/null; then
-    echo "⚠️  Linearis CLI not found - skipping Linear ticket update"
-else
-    # If not already in "In Review", move it and assign to self
-    linearis issues update "$ticket" --state "In Review" --assignee "@me"
+# Move to "In Review" state
+linearis issues update "$ticket" --state "In Review"
 
-    # Add comment about update with PR link
-    linearis comments create "$ticket" \
-        --body "PR description updated!\n\n**Changes**: ${updateSummary}\n**Verification**: ${checksPassedCount}/${totalChecks} automated checks passed\n\nView PR: ${prUrl}"
-fi
+# Add comment about PR description
+linearis comments create "$ticket" \
+    --body "PR description generated!\n\n**PR**: #${pr_number}\n**Verification**: ${checksPassedCount}/${totalChecks} automated checks passed\n\nView PR: ${prUrl}"
 ```
 
-### 14. Report results
+### 13. Report results
 
 **If first-time generation:**
 
@@ -372,8 +304,9 @@ fi
 
 **PR**: #123 - {title}
 **URL**: {url}
+**Ticket**: {ticket}
 **Verification**: {X}/{Y} automated checks passed
-**Linear**: {ticket} updated
+**Linear Document**: PR: #{pr_number} - {title}
 
 Manual verification steps remaining:
 - [ ] Test feature in staging
@@ -396,76 +329,30 @@ Review PR on GitHub!
 **Sections updated**: Summary, Changes Made, How to Verify It
 **Sections preserved**: Reviewer Notes, Screenshots
 
-**What changed**:
-  Updated: Summary, Backend Changes, Automated Checks
-  Preserved: Manual verification steps, Reviewer notes
-  Added: New validation section
-
 Review updated PR: {url}
 ```
 
-## Metadata Management
-
-**First generation:**
-
-```markdown
-<!-- Auto-generated: 2025-10-06T10:00:00Z -->
-<!-- Last updated: 2025-10-06T10:00:00Z -->
-<!-- PR: #123 -->
-<!-- Previous commits: abc123,def456 -->
-```
-
-**Subsequent updates:**
-
-```markdown
-<!-- Auto-generated: 2025-10-06T10:00:00Z -->
-<!-- Last updated: 2025-10-06T15:30:00Z -->
-<!-- PR: #123 -->
-<!-- Previous commits: abc123,def456,ghi789,jkl012 -->
-
----
-
-**Update History:**
-
-- 2025-10-06 15:30: Added error handling, fixed tests (2 commits)
-- 2025-10-06 10:00: Initial implementation (2 commits)
-
----
-```
-
-## Incremental Update Examples
-
-**Example 1: Code review changes**
+## Integration with Other Commands
 
 ```
-User pushes 2 commits after code review feedback
-
-/catalyst-dev:describe_pr detects:
-- 2 new commits
-- Changes in validation logic
-- New tests added
-
-Updates:
-- Appends to "Backend Changes"
-- Updates "How to Verify It" (reruns test check)
-- Updates Summary to mention review changes
-- Preserves reviewer notes and screenshots
-- Adds to update history
+/research-codebase PROJ-123 → research document
+                  ↓
+           /create-plan → implementation plan
+                  ↓
+          /implement-plan → code changes
+                  ↓
+           /validate-plan → verification
+                  ↓
+              /describe-pr → PR description (this command)
+                  ↓
+              /create-pr → creates PR on GitHub
 ```
 
-**Example 2: Multiple updates**
+**How it connects:**
 
-```
-Update 1 (initial): 5 commits
-Update 2 (review): 3 commits
-Update 3 (fixes): 2 commits
-
-Description shows:
-- Complete history in update log
-- All changes accumulated
-- Latest verification status
-- All manual notes preserved
-```
+- **Previous**: Gets context from research/plan documents in Linear
+- **Next**: `/create-pr` uses the description, also links to ticket
+- **Workflow context**: Ticket is used throughout
 
 ## Error Handling
 
@@ -481,13 +368,14 @@ Open PRs:
 Which PR? (enter number)
 ```
 
-**Template missing:**
+**No ticket found:**
 
 ```
-❌ PR description template required
+⚠️ No ticket ID found. PR description will be created without Linear linking.
 
-Create: thoughts/shared/pr_description.md
-See earlier in conversation for template structure.
+Would you like to:
+1. Provide a ticket ID to link
+2. Continue without ticket linking
 ```
 
 **Verification command fails:**
@@ -536,6 +424,5 @@ Uses `.claude/config.json`:
 - **Auto-update title** - based on analysis
 - **Run verification** - attempt all automated checks
 - **Link Linear** - extract ticket, update status
+- **Save to Linear** - PR description as document
 - **Show what changed** - clear summary of updates
-- **Full context** - read entire existing description
-- **Metadata tracking** - commit history, timestamps

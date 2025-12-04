@@ -1,6 +1,9 @@
 ---
 description: Validate that implementation plans were correctly executed
 category: workflow
+tools: Read, Grep, Glob, Task, TodoWrite, Bash
+model: inherit
+version: 2.0.0
 ---
 
 # Validate Plan
@@ -8,28 +11,175 @@ category: workflow
 You are tasked with validating that an implementation plan was correctly executed, verifying all
 success criteria and identifying any deviations or issues.
 
+## Prerequisites
+
+Before executing, verify Linear integration is available:
+
+```bash
+# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
+if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
+  "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
+fi
+```
+
 ## Initial Setup
 
-When invoked:
+### Step 1: Get Current Ticket
 
-1. **Determine context** - Are you in an existing conversation or starting fresh?
-   - If existing: Review what was implemented in this session
-   - If fresh: Need to discover what was done through git and codebase analysis
+Check workflow context for current ticket:
 
-2. **Locate the plan**:
-   - If plan path provided, use it
-   - Otherwise, search recent commits for plan references or ask user
+```bash
+CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
+```
 
-3. **Gather implementation evidence**:
+### Step 2: Handle Ticket State
 
-   ```bash
-   # Check recent commits
-   git log --oneline -n 20
-   git diff HEAD~N..HEAD  # Where N covers implementation commits
+**If no current ticket:**
 
-   # Run comprehensive checks
-   cd $(git rev-parse --show-toplevel) && make check test
+```
+I need a Linear ticket to find the implementation plan.
+
+Please either:
+1. Provide a ticket ID: `/validate-plan PROJ-123`
+2. Or tell me which ticket to validate
+
+Which would you prefer?
+```
+
+If user provides ticket, set it:
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
+```
+
+**If current ticket exists:**
+
+```
+I'll validate the implementation for ticket {CURRENT_TICKET}.
+
+Let me find the plan and gather implementation evidence...
+```
+
+### Step 3: Find and Read the Plan
+
+Use the linear-document-locator to find plan documents:
+
+```bash
+linearis attachments list --issue "$CURRENT_TICKET"
+```
+
+Look for documents with title starting with "Plan:".
+
+**If plan found:**
+- Read the full plan content using `linearis documents read <document-id>`
+
+**If no plan found:**
+
+```
+No implementation plan found for {CURRENT_TICKET}.
+
+Cannot validate without a plan. Would you like me to:
+1. Check a different ticket?
+2. Validate against a different source?
+```
+
+### Step 4: Gather Implementation Evidence
+
+```bash
+# Check recent commits
+git log --oneline -n 20
+git diff HEAD~N..HEAD  # Where N covers implementation commits
+
+# Run comprehensive checks
+cd $(git rev-parse --show-toplevel) && make check test
+```
+
+## Self-Healing Validation
+
+After running initial checks, if any failures are detected, attempt to fix them automatically:
+
+### Step 5: Analyze and Fix Issues
+
+For each failing check:
+
+1. **Analyze the failure**:
+   - Parse error output to identify specific issues
+   - Categorize: build error, lint error, type error, test failure
+
+2. **Attempt automatic fix** (max 3 attempts per issue type):
    ```
+   Attempt {N}/3 to fix {issue_type}:
+   - Issue: {description}
+   - Analyzing root cause...
+   - Implementing fix...
+   - Re-running check...
+   ```
+
+3. **Track results**:
+   - Record what was attempted
+   - Record success/failure
+   - If failed after 3 attempts, document why
+
+4. **Critical vs Non-Critical**:
+   - **Critical** (build, test): Must pass to continue
+   - **Non-critical** (lint warnings): Note and continue
+
+### Step 6: Create Validation Document
+
+Create a Linear document with validation results:
+
+```bash
+# Get team key from config
+TEAM_KEY=$(jq -r '.catalyst.linear.teamKey // "PROJ"' .claude/config.json)
+
+linearis documents create \
+  --title "Validation: ${FEATURE_NAME}" \
+  --team "${TEAM_KEY}" \
+  --content "${VALIDATION_CONTENT}" \
+  --attach-to "${CURRENT_TICKET}" \
+  --icon "CheckCircle" \
+  --color "#27ae60"
+```
+
+**Validation Document Content**:
+
+```markdown
+# Validation: {Feature Name}
+
+**Ticket**: {CURRENT_TICKET}
+**Date**: {timestamp}
+**Status**: {PASS|FAIL|PARTIAL}
+
+## Checks Run
+
+| Check | Initial | Final | Attempts |
+|-------|---------|-------|----------|
+| Build | ❌ | ✅ | 2 |
+| Lint | ⚠️ | ✅ | 1 |
+| Type Check | ✅ | ✅ | 0 |
+| Tests | ✅ | ✅ | 0 |
+
+## Issues Fixed
+
+### Build Error
+- **Issue**: Missing import in component.ts
+- **Fix**: Added import statement
+- **Attempts**: 2
+
+## Issues Not Fixed
+
+{If any:}
+### {Issue Type}
+- **Issue**: {description}
+- **Attempted**: {what was tried}
+- **Why it failed**: {explanation}
+- **Suggested action**: {manual steps}
+
+## Final Status
+
+{PASS: All critical checks pass}
+{FAIL: Critical checks still failing - manual intervention required}
+{PARTIAL: Critical pass, non-critical issues remain}
+```
 
 ## Validation Process
 
@@ -37,7 +187,7 @@ When invoked:
 
 If starting fresh or need more context:
 
-1. **Read the implementation plan** completely
+1. **Read the implementation plan** completely from Linear
 2. **Identify what should have changed**:
    - List all files that should be modified
    - Note all success criteria (automated and manual)
@@ -93,7 +243,8 @@ Create comprehensive validation summary:
 ```
 # Validation Report: {Feature Name}
 
-**Plan**: `thoughts/shared/plans/YYYY-MM-DD-PROJ-XXXX-feature.md`
+**Ticket**: {CURRENT_TICKET}
+**Plan**: (Linear document attached to ticket)
 **Validated**: {date}
 **Validation Status**: {PASS/FAIL/PARTIAL}
 
@@ -114,7 +265,7 @@ Current usage: {X}% ({Y}K/{Z}K tokens)
 1. Review this validation report
 2. Address any failures
 3. Close this session (clear context)
-4. Start fresh for: `/catalyst-dev:commit` and `/describe-pr`
+4. Start fresh for: `/commit` and `/describe-pr`
 
 {If <60%}:
 ✅ Context healthy. Ready for PR creation.
@@ -129,12 +280,15 @@ Current usage: {X}% ({Y}K/{Z}K tokens)
 
 ### Implementation Status
 
-✓ Phase 1: [Name] - Fully implemented ✓ Phase 2: [Name] - Fully implemented ⚠️ Phase 3: [Name] -
-Partially implemented (see issues)
+✓ Phase 1: [Name] - Fully implemented
+✓ Phase 2: [Name] - Fully implemented
+⚠️ Phase 3: [Name] - Partially implemented (see issues)
 
 ### Automated Verification Results
 
-✓ Build passes: `make build` ✓ Tests pass: `make test` ✗ Linting issues: `make lint` (3 warnings)
+✓ Build passes: `make build`
+✓ Tests pass: `make test`
+✗ Linting issues: `make lint` (3 warnings)
 
 ### Code Review Findings
 
@@ -171,6 +325,20 @@ Partially implemented (see issues)
 - Document new API endpoints
 ```
 
+### Step 4: Update Linear
+
+Add validation results to the ticket:
+
+```bash
+# Add validation comment to ticket
+linearis comments create "$CURRENT_TICKET" --body "Validation complete: ${STATUS}
+
+${SUMMARY_OF_FINDINGS}"
+
+# If all phases complete, update ticket state to In Review
+linearis issues update "$CURRENT_TICKET" --state "In Review"
+```
+
 ## Working with Existing Context
 
 If you were part of the implementation:
@@ -200,17 +368,83 @@ Always verify:
 - [ ] Documentation updated if needed
 - [ ] Manual test steps are clear
 
-## Relationship to Other Commands
+## Integration with Other Commands
 
-Recommended workflow:
+```
+/research-codebase PROJ-123 → research document
+                  ↓
+           /create-plan → implementation plan
+                  ↓
+          /implement-plan → code changes
+                  ↓
+           /validate-plan → verification (this command)
+                  ↓
+              /describe-pr → PR created
+```
 
-1. `/catalyst-dev:implement_plan` - Execute the implementation
-2. `/catalyst-dev:commit` - Create atomic commits for changes
-3. `/catalyst-dev:validate_plan` - Verify implementation correctness
-4. `/catalyst-dev:describe_pr` - Generate PR description
+**How it connects:**
+
+- **Previous**: Finds plan from Linear documents attached to ticket
+- **Next**: `/describe-pr` creates PR description, also as Linear document
+- **Workflow context**: Current ticket is tracked throughout
 
 The validation works best after commits are made, as it can analyze the git history to understand
 what was implemented.
 
+## Error Handling
+
+**If plan not found:**
+
+```
+⚠️ No plan document found for {CURRENT_TICKET}.
+
+Options:
+1. Provide a different ticket ID
+2. Run validation without a formal plan (ad-hoc verification)
+```
+
+**If ticket not found:**
+
+```
+⚠️ Ticket {TICKET_ID} not found in Linear.
+
+Please verify:
+1. The ticket ID is correct (e.g., PROJ-123)
+2. You have access to this Linear team
+3. LINEAR_API_TOKEN is set correctly
+```
+
 Remember: Good validation catches issues before they reach production. Be constructive but thorough
 in identifying gaps or improvements.
+
+## Return Status for Chaining
+
+When called programmatically (from implement_plan), return clear status:
+
+**If PASS**:
+```
+VALIDATION_STATUS=PASS
+All checks pass. Ready for PR creation.
+```
+
+**If FAIL** (critical issues remain):
+```
+VALIDATION_STATUS=FAIL
+Critical issues could not be resolved:
+- {issue 1}
+- {issue 2}
+
+Manual intervention required before PR creation.
+```
+
+**If PARTIAL** (non-critical issues remain):
+```
+VALIDATION_STATUS=PARTIAL
+Critical checks pass. Non-critical issues noted:
+- {issue 1}
+
+Proceeding to PR creation with warnings.
+```
+
+**Note**: This command is typically called automatically by `/implement-plan` as part of the
+post-implementation workflow. You can also run it standalone to validate an implementation.
