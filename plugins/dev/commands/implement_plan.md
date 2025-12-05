@@ -22,6 +22,25 @@ if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
 fi
 ```
 
+## Plugin Prerequisites
+
+The `/implement-plan` command requires the `pr-review-toolkit` plugin for automated PR review in Phase C.
+
+**Before starting implementation**, check if the plugin is available. If the plugin is not installed, output:
+
+```
+❌ Required plugin missing: pr-review-toolkit
+
+The /implement-plan command requires pr-review-toolkit for automated PR review.
+
+Install with:
+  /plugin install pr-review-toolkit
+
+Then run /implement-plan again.
+```
+
+**Hard fail** - do not proceed with implementation until the plugin is confirmed available.
+
 ## Initial Response
 
 ### Step 1: Get Current Ticket
@@ -344,6 +363,19 @@ After all plan phases complete successfully, automatically execute the following
    ```
 
    Use SlashCommand tool to invoke `/pr-review-toolkit:review-pr all`
+
+   **If the SlashCommand fails with "command not found"**, output:
+   ```
+   ❌ pr-review-toolkit plugin not installed
+
+   The auto-review phase requires pr-review-toolkit.
+
+   Install with: /plugin install pr-review-toolkit
+
+   Then run /implement-plan again to continue from Phase C.
+   ```
+
+   Exit with error status - do not continue to Phase D.
 
 2. **Parse review output**:
    - Extract Critical Issues

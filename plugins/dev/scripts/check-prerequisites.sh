@@ -34,6 +34,16 @@ OPTIONAL_MCPS=(
 	"posthog:Analytics:/plugin marketplace add posthog-mcp"
 )
 
+# Recommended plugins (name:purpose:install-command)
+RECOMMENDED_PLUGINS=(
+	"pr-review-toolkit:PR review automation:/plugin install pr-review-toolkit"
+	"frontend-design:High-quality UI:/plugin install frontend-design"
+	"feature-dev:Guided development:/plugin install feature-dev"
+	"commit-commands:Commit shortcuts:/plugin install commit-commands"
+	"code-review:Code review:/plugin install code-review"
+	"hookify:Behavior prevention:/plugin install hookify"
+)
+
 echo "🔍 Checking Awl prerequisites..."
 echo ""
 
@@ -98,6 +108,14 @@ echo ""
 echo "ℹ️  Optional MCP servers:"
 for mcp_spec in "${OPTIONAL_MCPS[@]}"; do
 	IFS=: read -r name purpose install <<<"$mcp_spec"
+	echo -e "   • ${YELLOW}$name${NC} ($purpose): $install"
+done
+echo ""
+
+# Recommended plugins
+echo "ℹ️  Recommended plugins (run /awl-dev:doctor for full check):"
+for plugin_spec in "${RECOMMENDED_PLUGINS[@]}"; do
+	IFS=: read -r name purpose install <<<"$plugin_spec"
 	echo -e "   • ${YELLOW}$name${NC} ($purpose): $install"
 done
 

@@ -88,6 +88,26 @@ Awl is distributed as a 5-plugin system. Install what you need:
 /plugin install awl-meta
 ```
 
+### Check Your Setup
+
+Run `/awl-dev:doctor` to check what's installed and get guidance on missing dependencies.
+
+### Install Recommended Plugins (Optional)
+
+For the best experience, install these complementary plugins from the Claude Code marketplace:
+
+```bash
+# Required for full /implement-plan automation
+/plugin install pr-review-toolkit
+
+# Recommended for enhanced development
+/plugin install frontend-design
+/plugin install feature-dev
+/plugin install commit-commands
+/plugin install code-review
+/plugin install hookify
+```
+
 ### What You Get
 
 **awl-dev** (Always enabled):
