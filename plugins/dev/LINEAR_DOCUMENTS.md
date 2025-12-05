@@ -149,6 +149,88 @@ The workflow context file (`.claude/.workflow-context.json`) stores only the cur
 3. **Include timestamps in handoffs** - Helps identify most recent handoff
 4. **Keep descriptions concise** - Title should summarize the document purpose
 
+## Embedded Questions
+
+When running in headless mode (`claude -p`), workflow commands cannot use the interactive
+`AskUserQuestion` tool. Instead, questions are embedded directly in Research and Plan documents
+for async answering via the Linear UI.
+
+### Question Format
+
+Questions are embedded in a dedicated section within the document:
+
+```markdown
+## Questions for User
+
+@{Assignee Name} - Please answer before proceeding to {next command}:
+
+> **Q1 (blocking)**: What authentication method should we use?
+> **Context**: This affects security model and token storage approach.
+> **Options**: A) JWT with refresh tokens B) Session-based C) OAuth2
+> **Answer**: _[please fill in]_
+
+> **Q2 (non-blocking)**: Should we add rate limiting to this endpoint?
+> **Context**: Current traffic is low but may grow.
+> **Answer**: _[please fill in]_
+```
+
+### Question Types
+
+| Type | Format | Behavior |
+|------|--------|----------|
+| Blocking | `**Q1 (blocking)**:` | Workflow hard-fails if unanswered |
+| Non-blocking | `**Q2 (non-blocking)**:` | Workflow proceeds with defaults noted |
+
+### Answer Detection
+
+The workflow checks for the placeholder pattern to detect unanswered questions:
+
+```
+**Answer**: _[please fill in]_
+```
+
+When a user answers, they replace the placeholder:
+
+```
+**Answer**: B) Session-based - better fits our existing infrastructure
+```
+
+### Workflow Integration
+
+1. **Research Phase** (`/research-codebase` in headless mode):
+   - Embeds questions in "Questions for User" section
+   - Sets ticket status to "Spec Needed"
+   - Mentions assignee for notification
+
+2. **Plan Phase** (`/create-plan`):
+   - Validates Research document for unanswered questions
+   - Hard-fails with list if blocking questions remain unanswered
+   - Embeds its own questions with same pattern
+
+3. **Implementation Phase** (`/implement-plan`):
+   - Validates Plan document for unanswered questions
+   - Hard-fails with list and document link if found
+
+### Status Convention
+
+When a document contains unanswered questions:
+- Set ticket status to **"Spec Needed"**
+- This signals the ticket is blocked pending human input
+
+### Assignee Mention
+
+If the ticket has an assignee, mention them in the questions section:
+
+```markdown
+@John Smith - Please answer before proceeding to /create-plan:
+```
+
+If no assignee, omit the mention:
+
+```markdown
+Please answer before proceeding to /create-plan:
+```
+
 ## Icon Reference
 
 Valid Linear document icons (case-sensitive, PascalCase):

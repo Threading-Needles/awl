@@ -32,6 +32,19 @@ if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
 fi
 ```
 
+## Execution Mode Detection
+
+Detect whether running interactively or headless (e.g., `claude -p`):
+
+```bash
+MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
+# MODE will be "interactive" or "headless"
+```
+
+**Mode behavior:**
+- **Interactive**: Ask user for research focus using AskUserQuestion, discuss findings
+- **Headless**: Use ticket title/description as research focus, embed questions in document
+
 ## Initial Setup
 
 When this command is invoked:
@@ -56,7 +69,15 @@ Which would you prefer?
 "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
 ```
 
-4. **Then respond with**:
+4. **Get assignee for headless mode** (used for document mentions):
+
+```bash
+ASSIGNEE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-assignee "$TICKET_ID")
+```
+
+5. **Branch based on mode**:
+
+**If MODE is "interactive":**
 
 ```
 I'm ready to research the codebase for ticket {TICKET_ID}.
@@ -66,6 +87,13 @@ by exploring relevant components and connections.
 ```
 
 Then wait for the user's research query.
+
+**If MODE is "headless":**
+
+- Read the ticket details: `linearis issues read "$TICKET_ID"`
+- Use the ticket title and description as the research focus
+- Proceed directly to research steps (no user prompt needed)
+- Track questions that arise during research for embedding in document
 
 ## Steps to Follow After Receiving the Research Query
 
@@ -218,6 +246,27 @@ system in this area. Focus on WHAT EXISTS, not what should exist.}
 
 {Continue for all major findings}
 
+## Questions for User
+
+{ONLY include this section in headless mode when questions arise during research}
+
+{If ASSIGNEE is set:}
+@{ASSIGNEE} - Please answer before proceeding to /create-plan:
+
+{If no ASSIGNEE:}
+Please answer before proceeding to /create-plan:
+
+> **Q1 (blocking)**: {Question that must be answered before planning}
+> **Context**: {Why this matters for the plan}
+> **Options**: A) {option} B) {option} C) {option}
+> **Answer**: _[please fill in]_
+
+> **Q2 (non-blocking)**: {Question that helps but has a reasonable default}
+> **Context**: {Background information}
+> **Answer**: _[please fill in]_
+
+{Note: Only include questions that genuinely arose during research and affect planning}
+
 ## Code References
 
 Quick reference of key files and their roles:
@@ -275,6 +324,30 @@ linearis documents create \
 
 # Add completion comment to ticket
 linearis comments create "$TICKET_ID" --body "Research complete! Document attached to this ticket."
+```
+
+**In headless mode with embedded questions:**
+
+If the document contains a "Questions for User" section with unanswered questions:
+
+```bash
+# Set ticket status to "Spec Needed" to signal human input required
+linearis issues update "$TICKET_ID" --state "Spec Needed"
+```
+
+Then output a clear message:
+
+```
+✅ Research complete with questions pending.
+
+**Ticket**: {TICKET_ID}
+**Status**: Spec Needed
+
+The research document has been attached to the ticket with {N} questions
+that need answers before proceeding to /create-plan.
+
+Please answer the questions in the Linear document, then run:
+  claude -p "/create-plan"
 ```
 
 ### Step 9: Present Findings to User
