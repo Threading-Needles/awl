@@ -23,6 +23,19 @@ if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
 fi
 ```
 
+## Execution Mode Detection
+
+Detect whether running interactively or headless (e.g., `claude -p`):
+
+```bash
+MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
+# MODE will be "interactive" or "headless"
+```
+
+**Mode behavior:**
+- **Interactive**: Discuss options with user, ask clarifying questions
+- **Headless**: Use research context to make decisions, embed questions in plan document
+
 ## Initial Response
 
 ### Step 1: Get Current Ticket
@@ -81,6 +94,37 @@ I'll use this as context for the plan. Let me read it...
 
 Read the research document content using linear-document-analyzer.
 
+### Step 3a: Validate Research Answers (Required)
+
+After reading the research document, check for unanswered **blocking** questions:
+
+Look for questions marked `(blocking)` that still have the pattern: `**Answer**: _[please fill in]_`
+
+Note: Non-blocking questions can remain unanswered - proceed with noted defaults if present.
+
+**If unanswered blocking questions found:**
+
+```
+❌ Cannot proceed: Research document has unanswered questions
+
+The following questions need answers before planning can begin:
+
+**Q1 (blocking)**: {question text}
+  → Location: Research document attached to {CURRENT_TICKET}
+
+**Q2 (blocking)**: {question text}
+  → Location: Research document attached to {CURRENT_TICKET}
+
+Please answer these questions in the Linear document, then run:
+  /create-plan
+```
+
+**Hard fail** - do not proceed until all blocking questions have answers.
+
+**If all questions answered (or no questions section):**
+
+Continue to Step 4.
+
 **If no research found:**
 
 ```
@@ -92,6 +136,14 @@ Would you like me to:
 ```
 
 ### Step 4: Gather Planning Input
+
+**Get assignee for headless mode** (used for document mentions):
+
+```bash
+ASSIGNEE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-assignee "$CURRENT_TICKET")
+```
+
+**If MODE is "interactive":**
 
 ```
 I'll help you create a detailed implementation plan for {CURRENT_TICKET}.
@@ -105,6 +157,14 @@ I'll analyze this along with the research and work with you to create a comprehe
 ```
 
 Then wait for the user's input.
+
+**If MODE is "headless":**
+
+- Use the ticket title, description, and research document as context
+- Read the ticket details: `linearis issues read "$CURRENT_TICKET"`
+- Make reasonable decisions based on research findings
+- Track questions that arise during planning for embedding in document
+- Do NOT wait for user input - proceed directly to planning steps
 
 ## Process Steps
 
@@ -289,6 +349,29 @@ After structure approval, create the plan document content:
 
 ---
 
+## Questions for User
+
+{ONLY include this section in headless mode when questions arise during planning}
+
+{If ASSIGNEE is set:}
+@{ASSIGNEE} - Please answer before proceeding to /implement-plan:
+
+{If no ASSIGNEE:}
+Please answer before proceeding to /implement-plan:
+
+> **Q1 (blocking)**: {Question that must be answered before implementation}
+> **Context**: {Why this matters for implementation}
+> **Options**: A) {option} B) {option} C) {option}
+> **Answer**: _[please fill in]_
+
+> **Q2 (non-blocking)**: {Question that helps but has a reasonable default}
+> **Context**: {Background information}
+> **Answer**: _[please fill in]_
+
+{Note: Only include questions that genuinely arose during planning and affect implementation}
+
+---
+
 ## Testing Strategy
 
 ### Unit Tests:
@@ -327,6 +410,30 @@ linearis documents create \
 
 # Add completion comment to ticket
 linearis comments create "$CURRENT_TICKET" --body "Implementation plan created and attached to this ticket."
+```
+
+**In headless mode with embedded questions:**
+
+If the document contains a "Questions for User" section with unanswered questions:
+
+```bash
+# Set ticket status to "Spec Needed" to signal human input required
+linearis issues update "$CURRENT_TICKET" --state "Spec Needed"
+```
+
+Then output a clear message:
+
+```
+✅ Implementation plan created with questions pending.
+
+**Ticket**: {CURRENT_TICKET}
+**Status**: Spec Needed
+
+The plan document has been attached to the ticket with {N} questions
+that need answers before proceeding to /implement-plan.
+
+Please answer the questions in the Linear document, then run:
+  claude -p "/implement-plan"
 ```
 
 ### Step 6: Present Plan and Check Context

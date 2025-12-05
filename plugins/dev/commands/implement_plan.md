@@ -80,6 +80,37 @@ Let me read the full plan...
 
 Read the plan document content using linear-document-analyzer.
 
+### Step 3a: Validate Plan Answers (Required)
+
+After reading the plan document, check for unanswered **blocking** questions:
+
+Look for questions marked `(blocking)` that still have the pattern: `**Answer**: _[please fill in]_`
+
+Note: Non-blocking questions can remain unanswered - proceed with noted defaults if present.
+
+**If unanswered blocking questions found:**
+
+```
+❌ Cannot proceed: Plan document has unanswered questions
+
+The following questions need answers before implementation can begin:
+
+**Q1 (blocking)**: {question text}
+  → Location: Plan document attached to {CURRENT_TICKET}
+
+**Q2 (blocking)**: {question text}
+  → Location: Plan document attached to {CURRENT_TICKET}
+
+Please answer these questions in the Linear document, then run:
+  /implement-plan
+```
+
+**Hard fail** - do not proceed until all blocking questions have answers.
+
+**If all questions answered (or no questions section):**
+
+Continue to Step 4.
+
 **If no plan found:**
 
 ```

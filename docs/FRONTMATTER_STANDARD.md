@@ -471,6 +471,48 @@ When adding new categories, tools, or patterns:
 4. **Document changes**: Include clear commit message explaining the update
 5. **Notify team**: If working in a team, communicate the change
 
+## Mode-Aware Commands
+
+Commands that support both interactive and headless execution should include mode detection.
+
+### Mode Detection Pattern
+
+Add this after Prerequisites in your command:
+
+```markdown
+## Execution Mode Detection
+
+Detect whether running interactively or headless (e.g., `claude -p`):
+
+\`\`\`bash
+MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
+# MODE will be "interactive" or "headless"
+\`\`\`
+
+**Mode behavior:**
+- **Interactive**: Ask user questions via AskUserQuestion, discuss options
+- **Headless**: Use context to make decisions, embed questions in documents
+```
+
+### Mode Branching
+
+When behavior differs by mode, document both paths:
+
+```markdown
+**If MODE is "interactive":**
+
+{Interactive behavior - typically uses AskUserQuestion}
+
+**If MODE is "headless":**
+
+{Headless behavior - typically uses ticket/research context}
+```
+
+### Embedded Questions
+
+In headless mode, embed questions in Linear documents instead of asking interactively.
+See `plugins/dev/LINEAR_DOCUMENTS.md` for the embedded questions format.
+
 ## Best Practices
 
 ### Descriptions

@@ -840,6 +840,133 @@ Each Claude Code session is isolated with its own context.
 
 ---
 
+## Headless Workflow (Agentic Mode)
+
+### Overview
+
+When running Claude Code with `claude -p` (headless/print mode), interactive questioning via
+`AskUserQuestion` is not available. The mode-aware workflow commands adapt by embedding questions
+directly in Linear documents.
+
+### How It Works
+
+```
+Headless: claude -p "/research-codebase TN-123"
+                     ↓
+         Research executes autonomously
+                     ↓
+         Questions embedded in Research doc
+                     ↓
+         Ticket status → "Spec Needed"
+                     ↓
+         User answers in Linear UI
+                     ↓
+Headless: claude -p "/create-plan"
+                     ↓
+         Validates Research answers
+                     ↓
+         If unanswered → Hard fail with list
+         If answered → Proceeds to planning
+```
+
+### Mode Detection
+
+Commands detect their execution mode automatically:
+
+```bash
+MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
+# Returns "interactive" or "headless"
+```
+
+**Interactive mode** (TTY detected):
+- Uses `AskUserQuestion` tool for clarifications
+- Waits for user responses
+- Presents options and discusses trade-offs
+
+**Headless mode** (no TTY):
+- Uses ticket title/description as context
+- Makes reasonable decisions based on research
+- Embeds questions in Linear documents
+
+### Embedded Questions Format
+
+When questions arise in headless mode, they're embedded in the document:
+
+```markdown
+## Questions for User
+
+@Assignee Name - Please answer before proceeding to /create-plan:
+
+> **Q1 (blocking)**: What authentication method should we use?
+> **Context**: This affects security model and token storage.
+> **Options**: A) JWT B) Session-based C) OAuth2
+> **Answer**: _[please fill in]_
+```
+
+### Answer Validation
+
+Downstream commands check for unanswered questions:
+
+- `/create-plan` validates Research document answers
+- `/implement-plan` validates Plan document answers
+
+**If unanswered questions found:**
+
+```
+❌ Cannot proceed: Research document has unanswered questions
+
+**Q1 (blocking)**: What authentication method should we use?
+  → Location: Research document attached to TN-123
+
+Please answer in Linear, then run: /create-plan
+```
+
+### Status Convention
+
+When a document contains unanswered questions:
+- Ticket status is set to **"Spec Needed"**
+- This signals the ticket is blocked pending human input
+- User can filter by this status to find tickets needing attention
+
+### Agentic Workflow Example
+
+```bash
+# 1. Start research in headless mode
+claude -p "/research-codebase TN-123"
+# → Creates Research doc with embedded questions
+# → Sets ticket to "Spec Needed"
+
+# 2. User answers questions in Linear UI
+# → Opens Research doc, fills in answers
+
+# 3. Continue with planning
+claude -p "/create-plan"
+# → Validates Research answers
+# → Creates Plan doc (may have its own questions)
+
+# 4. If Plan has questions, answer them in Linear
+
+# 5. Continue with implementation
+claude -p "/implement-plan"
+# → Validates Plan answers
+# → Implements phases
+# → Auto-validates, creates PR, runs review
+```
+
+### Best Practices
+
+1. **Keep questions minimal** - Only ask what truly needs human input
+2. **Provide options** - When possible, offer A/B/C choices
+3. **Include context** - Explain why the question matters
+4. **Mark blocking vs non-blocking** - Help prioritize
+5. **Use "Spec Needed" status** - Makes tracking easy
+
+### Reference
+
+See `plugins/dev/LINEAR_DOCUMENTS.md` for the complete embedded questions specification.
+
+---
+
 ## Additional Resources
 
 ### Official Documentation
