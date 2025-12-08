@@ -448,3 +448,13 @@ Proceeding to PR creation with warnings.
 
 **Note**: This command is typically called automatically by `/implement-plan` as part of the
 post-implementation workflow. You can also run it standalone to validate an implementation.
+
+## Status Update Convention
+
+This command is a downstream command (typically called by `/implement-plan`) and does NOT update status on start. However, on failure, it should roll back to the appropriate previous state:
+
+```bash
+# Roll back to previous state on failure
+linearis issues update "$CURRENT_TICKET" --state "In Dev"
+linearis comments create "$CURRENT_TICKET" --body "Validation failed: ${ERROR_REASON}. Returning to development state."
+```

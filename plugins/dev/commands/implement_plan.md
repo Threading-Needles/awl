@@ -78,6 +78,16 @@ I'll implement the plan for ticket {CURRENT_TICKET}.
 Let me find the implementation plan...
 ```
 
+### Step 2a: Update Linear Ticket Status (FIRST)
+
+**This MUST be the first action after confirming ticket**:
+
+```bash
+# Update ticket state immediately - this is THE FIRST thing we do
+linearis issues update "$CURRENT_TICKET" --state "In Dev"
+linearis comments create "$CURRENT_TICKET" --body "Starting implementation of plan"
+```
+
 ### Step 3: Find the Plan Document
 
 Use the linear-document-locator agent to find plan documents:
@@ -160,11 +170,6 @@ Once you have the plan document:
 4. **Read all files mentioned in the plan** FULLY into context
 5. **Think deeply** about how the pieces fit together
 6. **Create a todo list** to track your progress
-7. **Update Linear ticket status**:
-   ```bash
-   linearis issues update "$CURRENT_TICKET" --state "In Dev"
-   linearis comments create "$CURRENT_TICKET" --body "Starting implementation of plan"
-   ```
 
 ## Implementation Philosophy
 
@@ -550,4 +555,18 @@ Please verify:
 1. The ticket ID is correct (e.g., PROJ-123)
 2. You have access to this Linear team
 3. LINEAR_API_TOKEN is set correctly
+```
+
+## Status Update Convention
+
+**EVERY workflow step MUST update status as the FIRST action**:
+
+- Step 2a updates status to "In Dev" BEFORE any plan lookups
+- Status transitions to "In Review" via create_pr (which is already correct)
+- On failure, roll back to previous state:
+
+```bash
+# Roll back to previous state on failure
+linearis issues update "$CURRENT_TICKET" --state "Plan in Progress"
+linearis comments create "$CURRENT_TICKET" --body "Implementation failed: ${ERROR_REASON}. Returning to planning state."
 ```

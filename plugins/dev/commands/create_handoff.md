@@ -229,3 +229,9 @@ Would you like me to:
 1. Create a new ticket for this work and attach the handoff?
 2. Display the handoff content for manual saving?
 ```
+
+## Status Update Convention
+
+This command does NOT update ticket status - it simply saves context for session transfer. The ticket status remains in its current state ("In Dev", "In Progress", etc.) until the next session decides what to do.
+
+On failure, there is no rollback needed since no status was changed. Simply report the error and allow the user to retry or save the content manually.

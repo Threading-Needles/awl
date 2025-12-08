@@ -681,3 +681,13 @@ Continue anyway? y
 - **Update Linear** - move ticket to Done automatically
 - **Clear summary** - show what happened
 - **Only prompt for exceptions** - approvals missing, CI failing
+
+## Status Update Convention
+
+This command updates ticket status to "Done" on successful merge. On failure, it should roll back to the appropriate previous state:
+
+```bash
+# Roll back to previous state on failure
+linearis issues update "$CURRENT_TICKET" --state "In Review"
+linearis comments create "$CURRENT_TICKET" --body "Merge failed: ${ERROR_REASON}. Returning to review state."
+```

@@ -97,6 +97,16 @@ Then wait for the user's research query.
 
 ## Steps to Follow After Receiving the Research Query
 
+### Step 0: Update Linear Ticket Status (FIRST)
+
+**This MUST be the first action after receiving the research query**:
+
+```bash
+# Update ticket state immediately - this is THE FIRST thing we do
+linearis issues update "$TICKET_ID" --state "Research in Progress"
+linearis comments create "$TICKET_ID" --body "Starting research: ${RESEARCH_QUESTION:-Analyzing ticket}"
+```
+
 ### Step 1: Read Any Directly Mentioned Files First
 
 - If the user mentions specific files (tickets, docs, JSON), read them FULLY first
@@ -104,17 +114,7 @@ Then wait for the user's research query.
 - **CRITICAL**: Read these files yourself in the main context before spawning any sub-tasks
 - This ensures you have full context before decomposing the research
 
-### Step 2: Update Linear Ticket Status
-
-```bash
-# Update ticket state to "Research in Progress"
-linearis issues update "$TICKET_ID" --state "Research in Progress"
-
-# Add comment about starting research
-linearis comments create "$TICKET_ID" --body "Starting research: ${RESEARCH_QUESTION}"
-```
-
-### Step 3: Analyze and Decompose the Research Question
+### Step 2: Analyze and Decompose the Research Question
 
 - Break down the user's query into composable research areas
 - Take time to think deeply about the underlying patterns, connections, and architectural
@@ -123,7 +123,7 @@ linearis comments create "$TICKET_ID" --body "Starting research: ${RESEARCH_QUES
 - Create a research plan using TodoWrite to track all subtasks
 - Consider which directories, files, or architectural patterns are relevant
 
-### Step 4: Spawn Parallel Sub-Agent Tasks for Comprehensive Research
+### Step 3: Spawn Parallel Sub-Agent Tasks for Comprehensive Research
 
 Create multiple Task agents to research different aspects concurrently.
 
@@ -179,7 +179,7 @@ Task 3 - Find existing patterns:
 "Use codebase-pattern-finder to find similar implementations of [pattern] in the codebase. Show concrete examples."
 ```
 
-### Step 5: Wait for All Sub-Agents to Complete and Synthesize Findings
+### Step 4: Wait for All Sub-Agents to Complete and Synthesize Findings
 
 - **IMPORTANT**: Wait for ALL sub-agent tasks to complete before proceeding
 - Compile all sub-agent results
@@ -190,7 +190,7 @@ Task 3 - Find existing patterns:
 - Include temporal context where relevant (e.g., "This was added in commit abc123")
 - Mark all research tasks as complete in TodoWrite
 
-### Step 6: Gather Metadata for the Research Document
+### Step 5: Gather Metadata for the Research Document
 
 Collect metadata for the research document:
 
@@ -199,7 +199,7 @@ Collect metadata for the research document:
 - Get current branch: `git branch --show-current`
 - Get repository name from working directory
 
-### Step 7: Generate Research Document Content
+### Step 6: Generate Research Document Content
 
 Create a structured research document with the following format:
 
@@ -305,7 +305,7 @@ understanding could be deepened}
 - {Question 2}
 ```
 
-### Step 8: Save Research Document to Linear
+### Step 7: Save Research Document to Linear
 
 Create the research document in Linear attached to the ticket:
 
@@ -350,7 +350,7 @@ Please answer the questions in the Linear document, then run:
   claude -p "/create-plan"
 ```
 
-### Step 9: Present Findings to User
+### Step 8: Present Findings to User
 
 **Present to user:**
 
@@ -401,7 +401,7 @@ Would you like me to:
 3. Explore related topics?
 ```
 
-### Step 10: Handle Follow-Up Questions
+### Step 9: Handle Follow-Up Questions
 
 If the user has follow-up questions:
 
@@ -557,3 +557,17 @@ Would you like me to create a new ticket for this research?
 - Log error but continue with research
 - Present findings to user directly
 - Suggest manual document creation
+
+## Status Update Convention
+
+**EVERY workflow step MUST update status as the FIRST action**:
+
+- Step 0 updates status to "Research in Progress" BEFORE any file reads
+- Status stays "Research in Progress" after completion (next command advances it)
+- On failure, roll back to previous state:
+
+```bash
+# Roll back to previous state on failure
+linearis issues update "$TICKET_ID" --state "Backlog"
+linearis comments create "$TICKET_ID" --body "Research failed: ${ERROR_REASON}"
+```

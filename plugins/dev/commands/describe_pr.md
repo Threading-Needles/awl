@@ -426,3 +426,13 @@ Uses `.claude/config.json`:
 - **Link Linear** - extract ticket, update status
 - **Save to Linear** - PR description as document
 - **Show what changed** - clear summary of updates
+
+## Status Update Convention
+
+This command is a downstream command (typically called by `/create-pr`) and does NOT update status on start - it updates to "In Review" on success. However, on failure, it should roll back to the appropriate previous state:
+
+```bash
+# Roll back to previous state on failure
+linearis issues update "$CURRENT_TICKET" --state "In Dev"
+linearis comments create "$CURRENT_TICKET" --body "PR description generation failed: ${ERROR_REASON}. Returning to development state."
+```

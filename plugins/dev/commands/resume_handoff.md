@@ -48,6 +48,16 @@ I need a Linear ticket to find handoff documents.
 Please provide a ticket ID: `/resume-handoff PROJ-123`
 ```
 
+### Step 1a: Update Linear Ticket Status (FIRST)
+
+**This MUST be the first action after confirming ticket**:
+
+```bash
+# Update ticket state immediately - this is THE FIRST thing we do
+linearis issues update "$CURRENT_TICKET" --state "In Progress"
+linearis comments create "$CURRENT_TICKET" --body "Resuming work from handoff"
+```
+
 ### Step 2: Find Handoff Documents
 
 Use the linear-document-locator to find handoff documents:
@@ -184,19 +194,13 @@ Shall I proceed with [recommended action 1], or would you like to adjust the app
 
 ### Step 4: Begin Implementation
 
-1. **Update Linear ticket status**:
-   ```bash
-   linearis issues update "$CURRENT_TICKET" --state "In Progress"
-   linearis comments create "$CURRENT_TICKET" --body "Resuming work from handoff"
-   ```
+1. **Start with the first approved task**
 
-2. **Start with the first approved task**
+2. **Reference learnings from handoff** throughout implementation
 
-3. **Reference learnings from handoff** throughout implementation
+3. **Apply patterns and approaches documented** in the handoff
 
-4. **Apply patterns and approaches documented** in the handoff
-
-5. **Update progress** as tasks are completed
+4. **Update progress** as tasks are completed
 
 ## Guidelines
 
@@ -325,4 +329,17 @@ Shall I proceed with implementing the webhook validation fix, or would you like 
 
 User: Yes, proceed with the webhook validation
 Assistant: [Creates todo list and begins implementation]
+```
+
+## Status Update Convention
+
+**EVERY workflow step MUST update status as the FIRST action**:
+
+- Step 1a updates status to "In Progress" BEFORE any document lookups
+- On failure, roll back to previous state:
+
+```bash
+# Roll back to previous state on failure
+linearis issues update "$CURRENT_TICKET" --state "Backlog"
+linearis comments create "$CURRENT_TICKET" --body "Handoff resume failed: ${ERROR_REASON}"
 ```
