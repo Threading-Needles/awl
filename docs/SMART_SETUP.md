@@ -16,10 +16,6 @@ The setup script automatically checks standard locations for existing API tokens
 1. **Environment variable**: `SENTRY_AUTH_TOKEN`
 2. **File**: `~/.sentryclirc` (looks for `token=` line)
 
-#### Railway
-1. **Environment variable**: `RAILWAY_TOKEN`
-2. **File**: `~/.railway/config.json`
-
 ### Token Validation
 
 When a token is discovered, the setup script:
@@ -88,7 +84,6 @@ Enter team number [1-3]: 1
 If you already have:
 - Linear CLI configured → Zero manual input
 - Sentry CLI configured → Zero manual input
-- Railway CLI configured → Zero manual input
 
 ## Setting Up for Auto-Discovery
 
@@ -125,12 +120,6 @@ chmod 600 ~/.sentryclirc
 ```
 
 Then `sentry-cli` and Awl both auto-discover it.
-
-### Railway
-
-**Railway CLI auto-creates**: `~/.railway/config.json`
-
-Just run `railway login` once, and Awl will discover it.
 
 ## API Validation Details
 

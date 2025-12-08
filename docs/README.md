@@ -40,7 +40,7 @@ See [CLAUDE.md](../CLAUDE.md) for complete architecture details.
 
 #### [Installation & Configuration Guide](../QUICKSTART.md)
 
-Complete guide covering installation, configuration, thoughts system setup, service integration (Linear, Sentry, Railway, PostHog), and worktree configuration.
+Complete guide covering installation, configuration, thoughts system setup, service integration (Linear, Sentry, PostHog), and worktree configuration.
 
 **Read this when**: Setting up a new project or configuring integrations.
 

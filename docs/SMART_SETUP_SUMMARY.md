@@ -19,10 +19,6 @@ Intelligent token discovery and validation for Awl setup.
 - `format_sentry_orgs()` - Formats orgs for display
 - `format_sentry_projects()` - Formats projects for display
 
-**Functions for Railway:**
-- `discover_railway_token()` - Checks env var and `~/.railway/config.json`
-- `validate_railway_token()` - Calls Railway API to validate
-
 ### 2. Smart Configuration Prompts
 
 **`scripts/smart-linear-config.sh`:**
@@ -63,14 +59,6 @@ Checked in order:
 2. `~/.sentryclirc` file (looks for `token=` line)
 
 **Compatible with `sentry-cli`** - uses same standard locations!
-
-### Railway
-
-Checked in order:
-1. `$RAILWAY_TOKEN` environment variable
-2. `~/.railway/config.json` file
-
-**Compatible with `railway` CLI** - uses same standard locations!
 
 ---
 
@@ -201,9 +189,6 @@ export LINEAR_API_TOKEN="lin_api_..."
 
 # Sentry
 export SENTRY_AUTH_TOKEN="sntrys_..."
-
-# Railway
-export RAILWAY_TOKEN="..."
 ```
 
 Good for: Testing, temporary setups
@@ -223,12 +208,6 @@ cat > ~/.sentryclirc << 'EOF'
 token=sntrys_...
 EOF
 chmod 600 ~/.sentryclirc
-```
-
-#### Railway
-```bash
-railway login
-# Automatically creates ~/.railway/config.json
 ```
 
 Good for: Permanent setups, shared with other CLIs
@@ -282,8 +261,6 @@ echo "lin_api_your_token" > ~/.linear_api_token
 - [x] Sentry token discovery (env + file)
 - [x] Sentry API validation (REST)
 - [x] Sentry org/project extraction
-- [x] Railway token discovery
-- [x] Railway API validation
 - [x] Smart config prompt functions
 - [x] Documentation
 

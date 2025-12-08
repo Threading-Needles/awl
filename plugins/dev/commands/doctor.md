@@ -23,8 +23,6 @@ Run all checks and output a structured status report:
 ✅ linearis (Linear CLI)
 ✅ jq (JSON processor)
 ✅ gh (GitHub CLI)
-❌ railway (Railway CLI)
-   → Install: npm install -g @railway/cli
 
 ## Environment Variables
 
@@ -101,7 +99,7 @@ for tool_spec in "${REQUIRED_TOOLS[@]}"; do
 done
 
 # Optional tools
-OPTIONAL_TOOLS=("railway:Railway CLI:npm install -g @railway/cli" "sentry-cli:Sentry CLI:curl -sL https://sentry.io/get-cli/ | sh")
+OPTIONAL_TOOLS=("sentry-cli:Sentry CLI:curl -sL https://sentry.io/get-cli/ | sh")
 
 for tool_spec in "${OPTIONAL_TOOLS[@]}"; do
     IFS=: read -r cmd name install <<< "$tool_spec"

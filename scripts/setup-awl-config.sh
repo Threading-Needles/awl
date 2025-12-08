@@ -22,7 +22,6 @@ if [[ -f ".claude/config.json" ]]; then
   jq '{
     linear: .linear,
     sentry: .sentry,
-    railway: .railway,
     posthog: .posthog,
     exa: .exa
   }' .claude/config.json > "$CONFIG_DIR/config-$PROJECT_KEY.json"
@@ -56,10 +55,6 @@ else
     "org": "[NEEDS_SETUP]",
     "project": "[NEEDS_SETUP]",
     "authToken": "[NEEDS_SETUP]"
-  },
-  "railway": {
-    "token": "[NEEDS_SETUP]",
-    "projectId": "[NEEDS_SETUP]"
   },
   "posthog": {
     "apiKey": "[NEEDS_SETUP]",
