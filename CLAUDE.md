@@ -777,6 +777,61 @@ plugin independently and sets their own `LINEAR_API_TOKEN`.
 7. **Preserve context** - Save to Linear documents, not just memory
 8. **Smart updates** - Merge workspace changes, keep local config
 
+## User CLAUDE.md Snippet
+
+When users install Awl in their projects, they should add a workflow snippet to their project's
+CLAUDE.md. This section provides the reference snippet that users copy-paste into their own projects.
+
+**For projects using Awl (not this repository)**, add this to your CLAUDE.md:
+
+```markdown
+## Awl Workflow Integration
+
+This project uses [Awl](https://github.com/ralfschimmel/awl) for Linear-driven development
+workflows.
+
+### Ticket-Driven Development
+
+Always work with a Linear ticket. The standard workflow is:
+
+/awl-dev:research_codebase PROJ-123 → /awl-dev:create_plan → /awl-dev:implement_plan
+
+Where `PROJ-123` is your Linear ticket ID (replace `PROJ` with your project's ticket prefix).
+
+### Key Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/awl-dev:research_codebase` | Research codebase and save findings to Linear |
+| `/awl-dev:create_plan` | Create implementation plan from research |
+| `/awl-dev:implement_plan` | Execute plan with auto-validation and PR creation |
+| `/awl-dev:create_handoff` | Save context for later sessions |
+| `/awl-dev:resume_handoff` | Resume from saved context |
+| `/awl-dev:doctor` | Check Awl setup and dependencies |
+
+### Context Persistence
+
+- All workflow documents (research, plans, handoffs) are stored as Linear documents attached to
+  tickets
+- Use `/awl-dev:create_handoff` before ending a session to save context
+- Use `/awl-dev:resume_handoff PROJ-123` to resume work on a ticket
+
+### Configuration
+
+Project configuration is in `.claude/config.json`. See
+[Awl Configuration Guide](https://github.com/ralfschimmel/awl/blob/main/docs/CONFIGURATION.md).
+```
+
+**Why this exists here**: This demonstrates the "dogfooding" principle - the Awl repository itself
+uses Awl workflows, but this snippet section serves as the reference for users who install Awl in
+their projects.
+
+**Progressive Disclosure**: This snippet follows Anthropic's CLAUDE.md best practices - it's minimal
+(~30 lines of actual content) and references detailed documentation for users who want more.
+
+See `plugins/dev/docs/CLAUDE_MD_SNIPPET.md` for the full user documentation with customization
+instructions.
+
 ## Getting Help
 
 - Check `docs/` for comprehensive guides
