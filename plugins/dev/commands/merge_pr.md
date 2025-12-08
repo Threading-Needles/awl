@@ -21,6 +21,20 @@ if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
 fi
 ```
 
+## Execution Mode Detection
+
+Detect whether running interactively or headless (e.g., `claude -p`):
+
+```bash
+MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
+# MODE will be "interactive" or "headless"
+```
+
+**Mode behavior:**
+
+- **Interactive**: Prompt for confirmation at key decision points (CI failures, missing approvals, final merge). Allow user overrides to proceed despite warnings.
+- **Headless**: Proceed automatically when all checks pass. Exit with error on any issues (CI failures, missing approvals, conflicts) with no override option.
+
 ## Configuration
 
 Read team configuration from `.claude/config.json`:
@@ -207,11 +221,30 @@ Failed checks:
 Passed checks:
   - test ✅
   - security ✅
+```
 
+**If MODE is "interactive":**
+
+```
 Continue merge anyway? [y/N]:
 ```
 
 If user says no: exit. If user says yes: continue (user override).
+
+**If MODE is "headless":**
+
+```
+❌ Cannot merge: Required CI checks are failing
+
+Failed checks:
+  - {list of failed checks}
+
+Fix the failing checks and try again.
+```
+
+Exit with error code.
+
+**Skip CI checks entirely if** `requireCI: false` in config (applies to both interactive and headless modes - no prompt shown, no error raised).
 
 ### 7. Check approval status
 
@@ -232,13 +265,29 @@ review_decision=$(gh pr view $pr_number --json reviewDecision -q .reviewDecision
 ⚠️  PR has not been approved
 
 Review status: $review_decision
+```
 
+**If MODE is "interactive":**
+
+```
 Continue merge anyway? [y/N]:
 ```
 
 If user says no: exit. If user says yes: continue (user override).
 
-**Skip these prompts if** `requireApproval: false` in config.
+**If MODE is "headless":**
+
+```
+❌ Cannot merge: PR has not been approved
+
+Review status: $review_decision
+
+Approve the PR first and try again.
+```
+
+Exit with error code.
+
+**Skip approval checks entirely if** `requireApproval: false` in config (applies to both interactive and headless modes - no prompt shown, no error raised).
 
 ### 8. Extract ticket reference
 
@@ -275,9 +324,21 @@ About to merge:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Merge strategy: Squash and merge
+```
 
+**If MODE is "interactive":**
+
+```
 Proceed? [Y/n]:
 ```
+
+**If MODE is "headless":**
+
+```
+Proceeding with merge (all checks passed)...
+```
+
+Proceed automatically to merge execution.
 
 ### 10. Execute squash merge
 
@@ -480,13 +541,21 @@ Fix tests or skip (not recommended):
 Failed:
   - build: Compilation error in src/types.ts
   - security: Dependency vulnerability found
+```
 
+**If MODE is "interactive":**
+
+```
 You can:
   1. Fix issues and try again
   2. Override and merge anyway (not recommended)
 
 Override? [y/N]:
 ```
+
+**If MODE is "headless":**
+
+(No override option - exit with error)
 
 **Linear API error:**
 
