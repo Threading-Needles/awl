@@ -73,6 +73,16 @@ I'll create an implementation plan for ticket {CURRENT_TICKET}.
 Let me check for existing research on this ticket...
 ```
 
+### Step 2a: Update Linear Ticket Status (FIRST)
+
+**This MUST be the first action after confirming ticket**:
+
+```bash
+# Update ticket state immediately - this is THE FIRST thing we do
+linearis issues update "$CURRENT_TICKET" --state "Plan in Progress"
+linearis comments create "$CURRENT_TICKET" --body "Starting implementation planning"
+```
+
 ### Step 3: Find Existing Research
 
 Use the linear-document-locator agent to find research documents:
@@ -386,13 +396,7 @@ After getting initial clarifications:
 
 Once aligned on approach:
 
-1. **Update Linear ticket status**:
-   ```bash
-   linearis issues update "$CURRENT_TICKET" --state "Plan in Progress"
-   linearis comments create "$CURRENT_TICKET" --body "Starting implementation planning"
-   ```
-
-2. **Create initial plan outline**:
+1. **Create initial plan outline**:
 
    ```
    Here's my proposed plan structure:
@@ -408,7 +412,7 @@ Once aligned on approach:
    Does this phasing make sense? Should I adjust the order or granularity?
    ```
 
-3. **Get feedback on structure** before writing details
+2. **Get feedback on structure** before writing details
 
 ### Step 4: Detailed Plan Writing
 
@@ -774,13 +778,28 @@ Please review the updated plan and let me know:
 /create-plan
 # You:
 # 1. Get current ticket from workflow context (PROJ-123)
-# 2. Find research document in Linear
-# 3. Read research content
-# 4. Ask for planning input
-# 5. Research codebase further
-# 6. Create plan outline
-# 7. Get user approval
-# 8. Write detailed plan
-# 9. Save to Linear as "Plan: {description}"
-# 10. Present summary
+# 2. Update ticket status to "Plan in Progress" (THE FIRST thing)
+# 3. Find research document in Linear
+# 4. Read research content
+# 5. Ask for planning input
+# 6. Research codebase further
+# 7. Create plan outline
+# 8. Get user approval
+# 9. Write detailed plan
+# 10. Save to Linear as "Plan: {description}"
+# 11. Present summary
+```
+
+## Status Update Convention
+
+**EVERY workflow step MUST update status as the FIRST action**:
+
+- Step 2a updates status to "Plan in Progress" BEFORE any document lookups
+- Status stays "Plan in Progress" after completion (next command advances it)
+- On failure, roll back to previous state:
+
+```bash
+# Roll back to previous state on failure
+linearis issues update "$CURRENT_TICKET" --state "Research in Progress"
+linearis comments create "$CURRENT_TICKET" --body "Planning failed: ${ERROR_REASON}"
 ```
