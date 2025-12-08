@@ -132,6 +132,9 @@ This script will guide you through:
 
 You're ready! Try `/research-codebase` in your next session.
 
+**Recommended**: Add the Awl workflow snippet to your project's CLAUDE.md. See
+[CLAUDE.md Setup](QUICKSTART.md#claudemd-setup) for the copy-paste snippet.
+
 See [QUICKSTART.md](QUICKSTART.md) for detailed setup instructions.
 
 ## Installation
