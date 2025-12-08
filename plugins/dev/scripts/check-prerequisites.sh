@@ -19,7 +19,6 @@ REQUIRED_TOOLS=(
 
 # Optional tools (command:name:install-instruction)
 OPTIONAL_TOOLS=(
-	"railway:Railway CLI:npm install -g @railway/cli"
 	"sentry-cli:Sentry CLI:curl -sL https://sentry.io/get-cli/ | sh"
 )
 

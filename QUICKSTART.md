@@ -217,10 +217,6 @@ This file contains **API tokens and secrets** and is **never committed** to git.
       "project": "acme-web",
       "authToken": "sntrys_..."
     },
-    "railway": {
-      "token": "...",
-      "projectId": "..."
-    },
     "posthog": {
       "apiKey": "...",
       "projectId": "..."
@@ -416,28 +412,6 @@ Secrets config (`~/.config/awl/config-{projectKey}.json`):
 ```
 
 **Authentication**: Set `LINEAR_API_TOKEN` environment variable or store in `~/.linear_api_token`
-
-### Railway (Deployment)
-
-**Installation**:
-```bash
-npm install -g @railway/cli
-railway login
-```
-
-**Configuration**:
-
-Secrets config:
-```json
-{
-  "awl": {
-    "railway": {
-      "projectId": "your-project-id",
-      "defaultService": "web"
-    }
-  }
-}
-```
 
 ### Sentry (Error Monitoring)
 
