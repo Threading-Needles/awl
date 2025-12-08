@@ -123,7 +123,7 @@ Please answer these questions in the Linear document, then run:
 
 **If all questions answered (or no questions section):**
 
-Continue to Step 4.
+Continue to Step 3b.
 
 **If no research found:**
 
@@ -134,6 +134,73 @@ Would you like me to:
 1. Create a plan without research (you'll provide context)
 2. Run /research-codebase first (recommended)
 ```
+
+### Step 3b: Check for Existing Plan
+
+After finding research (or deciding to proceed without it), check for existing plan documents:
+
+```bash
+linearis attachments list --issue "$CURRENT_TICKET"
+```
+
+Look for documents with title starting with "Plan:".
+
+**If existing plan found:**
+
+Store the document ID and title for later use:
+```
+EXISTING_PLAN_ID={document_id}
+EXISTING_PLAN_TITLE={title}
+```
+
+Continue to Step 3c for iteration decision.
+
+**If multiple plans found:**
+
+```
+Found multiple plans for {CURRENT_TICKET}:
+1. Plan: {title1} (created {date1})
+2. Plan: {title2} (created {date2})
+
+Which plan should I iterate on? (enter number, or 'new' for fresh plan)
+```
+
+**If no existing plan found:**
+
+Continue to Step 4 (create new plan flow).
+
+### Step 3c: Decide Iteration vs New Plan (if existing plan found)
+
+**If MODE is "interactive":**
+
+```
+I found an existing plan for {CURRENT_TICKET}:
+- {EXISTING_PLAN_TITLE}
+
+Options:
+1. **Iterate existing plan** - incorporate feedback and research updates
+2. **Create new plan** - start fresh (existing plan preserved)
+
+Which would you prefer? (1 or 2)
+```
+
+Wait for user response.
+
+**If MODE is "headless":**
+
+Automatically choose to iterate the existing plan:
+```
+Found existing plan: {EXISTING_PLAN_TITLE}
+Proceeding with iteration (headless mode).
+```
+
+**If user chooses "Create new plan" or no existing plan:**
+
+Continue to Step 4 (existing flow).
+
+**If iterating existing plan:**
+
+Continue to Step 4b (iteration flow).
 
 ### Step 4: Gather Planning Input
 
@@ -165,6 +232,78 @@ Then wait for the user's input.
 - Make reasonable decisions based on research findings
 - Track questions that arise during planning for embedding in document
 - Do NOT wait for user input - proceed directly to planning steps
+
+### Step 4b: Iterate Existing Plan
+
+When iterating an existing plan (instead of creating new):
+
+#### 1. Read Existing Plan
+
+```bash
+EXISTING_PLAN=$(linearis documents read "$EXISTING_PLAN_ID")
+```
+
+Parse the existing plan to identify:
+- Current phases and their completion status (look for [x] checkboxes)
+- Existing success criteria
+- Any "Questions for User" section with answers
+- Implementation approach and file references
+
+#### 2. Identify Changes Needed
+
+Compare existing plan against:
+- Updated research document (if research was updated since plan creation)
+- Ticket description changes
+- Feedback in ticket comments
+- New requirements or constraints
+
+In headless mode, look for ticket comments containing feedback:
+```bash
+# Get recent comments
+linearis issues read "$CURRENT_TICKET" | jq .comments
+```
+
+#### 3. Generate Updated Plan
+
+**Preserve these sections** (do not regenerate):
+- Phases already marked complete [x]
+- Manual verification items already checked
+- User-provided answers in "Questions for User" section
+- Custom notes or additions
+
+**Update these sections:**
+- Overview (if scope changed)
+- Incomplete phases (incorporate feedback)
+- Success criteria (add new ones if needed)
+- Testing strategy (if new test requirements)
+
+#### 4. Present Changes for Review (interactive mode only)
+
+**If MODE is "interactive":**
+
+```
+Here are the proposed changes to the existing plan:
+
+**Added:**
+- Phase 4: New validation requirements
+- Success criterion: API response time < 200ms
+
+**Modified:**
+- Phase 2: Updated approach based on research findings
+- Overview: Clarified scope
+
+**Preserved:**
+- Phase 1 (already complete)
+- Manual verification checklist
+
+Does this look correct? (yes/no/edit)
+```
+
+**If MODE is "headless":**
+
+Proceed directly to Step 5 with the updated plan content.
+
+After Step 4b, continue to Step 5 (Save Plan to Linear) with the iteration path.
 
 ## Process Steps
 
@@ -393,7 +532,7 @@ Please answer before proceeding to /implement-plan:
 
 ### Step 5: Save Plan to Linear
 
-Create the plan document in Linear:
+**If creating new plan (no existing plan or user chose "new"):**
 
 ```bash
 # Get team key from config
@@ -410,6 +549,25 @@ linearis documents create \
 
 # Add completion comment to ticket
 linearis comments create "$CURRENT_TICKET" --body "Implementation plan created and attached to this ticket."
+```
+
+**If updating existing plan (iteration):**
+
+```bash
+# Update existing document
+linearis documents update "$EXISTING_PLAN_ID" \
+  --content "${PLAN_CONTENT}"
+
+# Add iteration comment to ticket
+linearis comments create "$CURRENT_TICKET" --body "Implementation plan updated with latest feedback and research."
+```
+
+Add metadata comment at top of plan to track iterations:
+
+```markdown
+<!-- Plan iteration: {N} -->
+<!-- Last updated: {timestamp} -->
+<!-- Previous update: {previous_timestamp} -->
 ```
 
 **In headless mode with embedded questions:**
@@ -437,6 +595,8 @@ Please answer the questions in the Linear document, then run:
 ```
 
 ### Step 6: Present Plan and Check Context
+
+**If new plan created:**
 
 ```
 ✅ Implementation plan created!
@@ -468,6 +628,44 @@ Please review the plan and let me know:
 - Are the phases properly scoped?
 - Are the success criteria specific enough?
 - Any technical details that need adjustment?
+```
+
+**If existing plan updated (iteration):**
+
+```
+✅ Implementation plan updated!
+
+**Ticket**: {CURRENT_TICKET}
+**Linear Document**: {EXISTING_PLAN_TITLE} (iteration #{N})
+
+**Changes made:**
+- {summary of what was updated}
+- {sections preserved}
+
+## 📊 Context Status
+
+Current usage: {X}% ({Y}K/{Z}K tokens)
+
+{If >60%}:
+⚠️ **Context Alert**: We're at {X}% context usage.
+
+**Recommendation**: Clear context before implementation phase.
+
+**What to do**:
+1. ✅ Review the updated plan in Linear
+2. ✅ Close this session (clear context)
+3. ✅ Start fresh session
+4. ✅ Run `/implement-plan`
+
+{If <60%}:
+✅ Context healthy ({X}%).
+
+---
+
+Please review the updated plan and let me know:
+- Do the changes address the feedback?
+- Are the preserved sections still accurate?
+- Any additional modifications needed?
 ```
 
 ### Step 7: Iterate Based on Feedback
