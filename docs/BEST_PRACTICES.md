@@ -9,9 +9,6 @@ workflows.
 - [Agent Usage Patterns](#agent-usage-patterns)
 - [Planning Best Practices](#planning-best-practices)
 - [Implementation Strategies](#implementation-strategies)
-- [Thoughts Organization](#thoughts-organization)
-- [Team Collaboration](#team-collaboration)
-- [Worktree Workflow](#worktree-workflow)
 - [Anti-Patterns to Avoid](#anti-patterns-to-avoid)
 
 ---
@@ -111,7 +108,6 @@ Read src/cache/redis-client.js
 ```
 # Spawn multiple focused agents
 @awl-dev:codebase-locator find payment files
-@awl-dev:thoughts-locator search payment research
 @awl-dev:codebase-pattern-finder show payment patterns
 ```
 
@@ -141,7 +137,7 @@ Read src/cache/redis-client.js
 
 **Implementation:**
 
-- **Thoughts Directory**: Persistent, searchable, version-controlled
+- **Linear Documents**: Persistent, searchable, attached to tickets
 - **Plans**: Detailed specifications that survive conversation resets
 - **Research Documents**: Reusable findings
 - **Ticket Analysis**: Deep context that persists
@@ -151,13 +147,13 @@ Read src/cache/redis-client.js
 ```
 # Research phase (expensive)
 @awl-dev:codebase-analyzer deeply analyze authentication system
-@awl-dev:thoughts-locator find past auth decisions
 
 # Save findings (persistence)
-Write comprehensive analysis to thoughts/shared/research/auth_system.md
+/research-codebase PROJ-123
+# Saves research as Linear document attached to ticket
 
 # Later conversation (cheap)
-Read thoughts/shared/research/auth_system.md
+/resume-handoff PROJ-123
 # Instant context recovery without re-research
 ```
 
@@ -184,9 +180,6 @@ Read thoughts/shared/research/auth_system.md
 # Level 3: Deep dive
 # Follow specific code path discovered
 Read src/utils/crypto.js  # Discovered during analysis
-
-# Level 4: Related context
-@awl-dev:thoughts-locator find any webhook issues
 ```
 
 ---
@@ -216,20 +209,6 @@ Read src/utils/crypto.js  # Discovered during analysis
 - Locating test patterns
 - Understanding common approaches
 
-**thoughts-locator** - "What do we know about X?"
-
-- Finding past research
-- Locating related tickets
-- Discovering existing plans
-- Searching historical context
-
-**thoughts-analyzer** - "What were the key decisions about X?"
-
-- Extracting decisions from research
-- Understanding trade-offs
-- Finding technical specifications
-- Validating current relevance
-
 ### Parallel vs Sequential Agent Usage
 
 **Use Parallel When:**
@@ -244,7 +223,6 @@ Read src/utils/crypto.js  # Discovered during analysis
 ```
 # All independent, spawn together
 @awl-dev:codebase-locator find database migration files
-@awl-dev:thoughts-locator search for database decisions
 @awl-dev:codebase-pattern-finder show migration patterns
 ```
 
@@ -578,433 +556,6 @@ Phase 3: Tests
 
 ---
 
-## Thoughts Organization
-
-### Naming Conventions
-
-**Plans:**
-
-```
-Format: YYYY-MM-DD-ENG-XXXX-description.md
-Examples:
-  thoughts/shared/plans/2025-01-08-ENG-1234-rate-limiting.md
-  thoughts/shared/plans/2025-01-09-improve-error-handling.md (no ticket)
-```
-
-**Research Documents:**
-
-```
-Format: YYYY-MM-DD_topic.md or topic.md
-Examples:
-  thoughts/shared/research/2025-01-08_authentication_approaches.md
-  thoughts/shared/research/database_patterns.md
-  thoughts/shared/research/performance_optimization.md
-```
-
-**Tickets:**
-
-```
-Format: eng_XXXX.md or ticket_description.md
-Examples:
-  thoughts/shared/tickets/eng_1234.md
-  thoughts/ryan/tickets/eng_1234_my_research.md
-```
-
-**PR Descriptions:**
-
-```
-Format: pr_XXXX_description.md
-Examples:
-  thoughts/shared/prs/pr_456_rate_limiting.md
-  thoughts/shared/prs/pr_457_fix_auth_bug.md
-```
-
-### Personal vs Shared Guidelines
-
-**Use Personal (`thoughts/{your_name}/`) For:**
-
-- Rough exploration and learning
-- Private TODOs
-- Incomplete research
-- Personal notes on tickets
-- Experimental ideas
-- Learning notes
-
-**Use Shared (`thoughts/shared/`) For:**
-
-- Finalized implementation plans
-- Completed research
-- Architectural decisions
-- Team-relevant ticket analysis
-- PR descriptions
-- Patterns and conventions
-
-**Example Workflow:**
-
-```bash
-# Start in personal
-echo "Exploring auth options..." > thoughts/ryan/notes/auth_exploration.md
-
-# Research and refine in personal
-[investigate, experiment, learn]
-
-# Move polished insights to shared
-cat > thoughts/shared/research/2025-01-08_auth_decision.md << 'EOF'
-# Authentication Approach Decision
-
-## Options Evaluated
-[Clean, actionable summary]
-
-## Decision: JWT with RS256
-[Rationale, trade-offs, implementation notes]
-EOF
-```
-
-### When to Create New Documents
-
-**Create a New Plan When:**
-
-- Starting a new feature
-- Major refactoring effort
-- Complex bug fix requiring multiple phases
-- Migration or upgrade task
-
-**Create a New Research Doc When:**
-
-- Evaluating multiple options
-- Investigating architectural patterns
-- Analyzing performance issues
-- Documenting critical decisions
-
-**Add to Existing Doc When:**
-
-- Updating based on new findings
-- Adding implementation notes to existing plan
-- Documenting progress on ongoing research
-- Appending related decisions
-
-### Thoughts Syncing Cadence
-
-**Sync After:**
-
-- Creating or updating plans
-- Completing research
-- Finishing implementation (before PR)
-- Making architectural decisions
-
-**Command:**
-
-```bash
-humanlayer thoughts sync
-
-# Or manually
-cd ~/thoughts
-git add .
-git commit -m "Update research and plans for ENG-1234"
-git push
-```
-
-**Automate with Git Hooks:**
-
-```bash
-# .git/hooks/post-commit
-#!/bin/bash
-cd ~/thoughts && git add . && git commit -m "Auto-sync $(date)" || true
-```
-
----
-
-## Team Collaboration
-
-### Shared Thoughts Repository
-
-**Setup:**
-
-```bash
-# Initialize central thoughts repo
-cd ~/thoughts
-git remote add origin <team-thoughts-repo-url>
-git push -u origin main
-
-# Team members clone
-git clone <team-thoughts-repo-url> ~/thoughts
-```
-
-**Benefits:**
-
-- Shared context across team
-- No duplicated research
-- Consistent patterns
-- Historical knowledge preserved
-
-### Pull Before Planning
-
-**Pattern:**
-
-```bash
-# Before starting new work
-cd ~/thoughts
-git pull
-
-# Now your planning includes latest team knowledge
-/awl-dev:create_plan thoughts/shared/tickets/eng_1234.md
-```
-
-### Collaborative Research
-
-**Developer A:**
-
-```bash
-# Research authentication options
-cat > thoughts/shared/research/2025-01-08_auth_options.md << 'EOF'
-# Authentication Options
-
-## JWT vs Sessions
-
-[Detailed analysis]
-
-## Recommendation: JWT
-[Rationale]
-
-## Open Questions
-- Token rotation strategy?
-- Refresh token storage?
-EOF
-
-humanlayer thoughts sync
-```
-
-**Developer B:**
-
-```bash
-# Pull latest
-humanlayer thoughts sync
-
-# Add findings to same doc
-cat >> thoughts/shared/research/2025-01-08_auth_options.md << 'EOF'
-
-## Token Rotation Strategy
-
-[Research on rotation approaches]
-
-## Recommendation: Sliding expiration
-[Details]
-EOF
-
-humanlayer thoughts sync
-```
-
-**Result**: Collaborative, incremental knowledge building.
-
-### Ticket Ownership Patterns
-
-**Personal Tickets:**
-
-```
-thoughts/ryan/tickets/eng_1234.md
-- Personal research and notes
-- Not shared with team
-- Your workspace for exploration
-```
-
-**Shared Tickets:**
-
-```
-thoughts/shared/tickets/eng_1234.md
-- Team-visible analysis
-- Detailed requirements breakdown
-- Shared context for implementation
-```
-
-**Pattern:**
-
-```bash
-# Start in personal
-echo "Initial research..." > thoughts/ryan/tickets/eng_1234.md
-
-# Refine and understand deeply
-[research, explore]
-
-# Create shared version with polished analysis
-cat > thoughts/shared/tickets/eng_1234.md << 'EOF'
-# ENG-1234: Rate Limiting
-
-## Requirements Analysis
-[Clean, comprehensive breakdown]
-
-## Implementation Considerations
-[Key findings from research]
-
-## Technical Approach
-[Recommended approach]
-EOF
-```
-
-### PR Description Sharing
-
-**Pattern:**
-
-```bash
-# After implementation
-cat > thoughts/shared/prs/pr_456_rate_limiting.md << 'EOF'
-# PR #456: Implement Rate Limiting
-
-## Summary
-- Adds Redis-based rate limiting
-- 100 req/min anonymous, 1000 req/min authenticated
-- Returns 429 with retry-after header
-
-## Implementation
-- Phase 1: Database schema (migration 012)
-- Phase 2: Middleware (src/middleware/rate-limit.js)
-- Phase 3: Tests (tests/middleware/rate-limit.test.js)
-
-## Testing
-- Unit tests: 15 new tests
-- Integration tests: E2E rate limit scenarios
-- Manual testing: Verified with curl scripts
-
-## References
-- Plan: thoughts/shared/plans/2025-01-08-ENG-1234-rate-limiting.md
-- Ticket: thoughts/shared/tickets/eng_1234.md
-EOF
-
-humanlayer thoughts sync
-```
-
-Team members can reference this in future work.
-
----
-
-## Worktree Workflow
-
-### When to Use Worktrees
-
-**Use Worktrees When:**
-
-- Working on large, long-running features
-- Need to switch context frequently
-- Want to keep main branch clean
-- Developing multiple features in parallel
-- Want isolated testing environments
-
-**Don't Use Worktrees When:**
-
-- Small, quick fixes
-- Single feature at a time
-- Short-lived branches
-- Frequent merging to main
-
-### Worktree Organization
-
-**Recommended Structure:**
-
-```
-~/wt/{repo-name}/{feature-name}/
-
-Examples:
-~/wt/my-api/rate-limiting/
-~/wt/my-api/authentication/
-~/wt/my-api/user-settings/
-```
-
-**Benefits:**
-
-- Clear organization
-- Easy to find worktrees
-- Matches feature naming
-- Consistent paths
-
-### Sharing Context Across Worktrees
-
-**Thoughts Directory:** All worktrees share the same thoughts directory via symlink.
-
-**Automatic Sharing:**
-
-```
-Main Repo: ~/projects/my-api/thoughts/
-Worktree 1: ~/wt/my-api/rate-limiting/thoughts/
-Worktree 2: ~/wt/my-api/auth/thoughts/
-
-# All three point to:
-~/thoughts/repos/my-api/
-```
-
-**Result:**
-
-- Plans created in one worktree visible in all others
-- Research shared automatically
-- No duplicate context
-- Seamless collaboration
-
-### Agents in Worktrees
-
-**.claude/ Directory:**
-
-Option 1: Copy (default behavior of create-worktree.sh)
-
-```
-Main Repo: ~/projects/my-api/.claude/
-Worktree:   ~/wt/my-api/feature/.claude/ (copied)
-```
-
-Option 2: Symlink (for shared agent updates)
-
-```bash
-# In worktree
-rm -rf .claude
-ln -s ~/projects/my-api/.claude .claude
-```
-
-**Trade-offs:**
-
-- Copy: Worktree independence, no accidental changes
-- Symlink: Agent updates apply everywhere, shared customization
-
-### Worktree Cleanup
-
-**After Feature Merges:**
-
-```bash
-cd ~/projects/my-api
-
-# Remove worktree
-git worktree remove ~/wt/my-api/rate-limiting
-
-# Or if directory already deleted
-git worktree prune
-
-# Delete branch (if desired)
-git branch -d ENG-1234-rate-limiting
-```
-
-**Automated Cleanup Script:**
-
-```bash
-#!/bin/bash
-# cleanup-merged-worktrees.sh
-
-cd ~/projects/my-api
-
-# List merged branches
-merged=$(git branch --merged main | grep -v "main")
-
-for branch in $merged; do
-  # Find worktree for branch
-  wt=$(git worktree list | grep "$branch" | awk '{print $1}')
-
-  if [ -n "$wt" ]; then
-    echo "Removing worktree: $wt"
-    git worktree remove "$wt"
-  fi
-
-  echo "Deleting branch: $branch"
-  git branch -d "$branch"
-done
-```
-
----
-
 ## Anti-Patterns to Avoid
 
 ### 1. Context Over-Loading
@@ -1054,7 +605,6 @@ Read src/auth/handler.js
 ```
 # Parallel, focused research
 @awl-dev:codebase-locator find payment files
-@awl-dev:thoughts-locator search payment research
 @awl-dev:codebase-pattern-finder show payment patterns
 ```
 
@@ -1130,9 +680,10 @@ Let's add rate limiting. I'll start coding...
 
 ```
 # Research, plan, then implement
-/awl-dev:create_plan thoughts/shared/tickets/eng_1234.md
+/awl-dev:research_codebase ENG-1234
 [collaborative planning with research]
-/awl-dev:implement_plan thoughts/shared/plans/2025-01-08-ENG-1234-rate-limiting.md
+/awl-dev:create_plan
+/awl-dev:implement_plan
 ```
 
 ### 5. No Context Persistence
@@ -1159,15 +710,13 @@ Let's add rate limiting. I'll start coding...
 ```
 # Persist everything important
 [research]
-Write findings to thoughts/shared/research/rate_limiting.md
+/research-codebase ENG-1234  # Saves to Linear
 
 [planning]
-Plan saved to thoughts/shared/plans/2025-01-08-ENG-1234-rate-limiting.md
+/create-plan  # Saves to Linear
 
-[implementation notes]
-Add to plan as "Implementation Notes" section
-
-humanlayer thoughts sync
+[handoff if pausing]
+/create-handoff  # Saves to Linear
 ```
 
 ### 6. Mixed Automated and Manual Criteria
@@ -1285,13 +834,12 @@ I'll create a new pagination approach...
 1. **Context is precious** - Load only what's needed, when needed
 2. **Just-in-time loading** - Discover dynamically, don't preload
 3. **Use specialized agents** - Parallel, focused research beats monolithic
-4. **Persist important context** - Use thoughts/ for reusable knowledge
+4. **Persist important context** - Use Linear documents for reusable knowledge
 5. **Separate automated vs manual** - Clear success criteria enable better validation
 6. **Follow existing patterns** - Check codebase before creating new approaches
 7. **Control scope** - Explicitly state what's NOT being done
 8. **Progressive discovery** - Start broad, narrow progressively
-9. **Sync thoughts regularly** - Share context with team
-10. **Verify incrementally** - Don't wait until end to test
+9. **Verify incrementally** - Don't wait until end to test
 
 ---
 

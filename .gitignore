@@ -19,9 +19,6 @@ Thumbs.db
 # Backup directories created by update-project.sh
 .claude-backup-*/
 
-# HumanLayer thoughts directory (symlink to external system)
-thoughts/
-
 # Personal developer configuration (not shared with team)
 .claude/config.local.json
 .claude/.personal/*

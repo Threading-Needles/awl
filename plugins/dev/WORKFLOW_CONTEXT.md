@@ -4,97 +4,68 @@ Complete guide to automatic document tracking and discovery in Awl.
 
 ## The Problem We Solved
 
-**Before**: Users had to remember and paste file paths between commands
-```bash
-# User writes a research document
-/research-codebase
+**Before**: Users had to remember ticket IDs and find documents manually between commands.
 
-# Later, user wants to create a plan...
-/create-plan thoughts/shared/research/2025-10-28-long-filename-they-dont-remember.md
-# ❌ User has to remember or find the exact path
-```
-
-**After**: System automatically tracks and suggests recent documents
+**After**: System automatically tracks the current ticket and discovers documents from Linear:
 ```bash
-# User writes a research document
-/research-codebase
-# ✅ Hook automatically tracks in .workflow-context.json
+# User researches the codebase
+/research-codebase PROJ-123
+# ✅ Sets current ticket, saves research to Linear
 
 # Later, user wants to create a plan...
 /create-plan
-# ✅ System shows: "💡 Found recent research: [path]"
-#     "Would you like me to use this as context?"
+# ✅ Queries Linear for research attached to PROJ-123
 ```
 
 ---
 
 ## How It Works: Complete Flow
 
-### 1. Writing Documents (Automatic Tracking)
+### 1. Setting the Current Ticket
 
-When Claude writes or edits a thoughts file:
+When a workflow command is invoked with a ticket ID:
 
 ```
-You → /research-codebase → Creates: thoughts/shared/research/2025-10-28-PROJ-123-auth.md
+You → /research-codebase PROJ-123
       ↓
-Claude Code Hook triggers PostToolUse event
-      ↓
-hooks/update-workflow-context.sh runs
+workflow-context.sh set-ticket PROJ-123
       ↓
 .workflow-context.json updated:
 {
   "lastUpdated": "2025-10-28T22:30:00Z",
-  "currentTicket": "PROJ-123",
-  "mostRecentDocument": {
-    "type": "research",
-    "path": "thoughts/shared/research/2025-10-28-PROJ-123-auth.md",
-    "ticket": "PROJ-123"
-  },
-  "workflow": {
-    "research": [
-      {
-        "path": "thoughts/shared/research/2025-10-28-PROJ-123-auth.md",
-        "ticket": "PROJ-123",
-        "created": "2025-10-28T22:30:00Z"
-      }
-    ]
-  }
+  "currentTicket": "PROJ-123"
 }
 ```
 
+Research is saved as a Linear document "Research: ..." attached to PROJ-123.
+
 **Key Components:**
 
-1. **Hooks** (`hooks.toml`) - Watch for Write/Edit on thoughts files
-2. **Hook Script** (`hooks/update-workflow-context.sh`) - Extract metadata and update context
-3. **Workflow Context** (`.claude/.workflow-context.json`) - Stores recent documents
+1. **Workflow Context** (`.claude/.workflow-context.json`) - Tracks current ticket
+2. **Workflow Script** (`scripts/workflow-context.sh`) - Set/get ticket
+3. **Linear Documents** - All workflow artifacts stored in Linear
 
-### 2. Reading Documents (Auto-Discovery)
+### 2. Discovering Documents (Auto-Discovery)
 
-When user invokes a workflow command:
+When user invokes a downstream workflow command:
 
 ```
 You → /create-plan
       ↓
-Command IMMEDIATELY runs:
-```bash
-RECENT_RESEARCH=$(workflow-context.sh recent research)
-# Returns: thoughts/shared/research/2025-10-28-PROJ-123-auth.md
-```
+Command reads current ticket from workflow-context.json
       ↓
-Claude shows:
-"💡 Found recent research: thoughts/shared/research/2025-10-28-PROJ-123-auth.md"
-"Would you like me to use this as context for the plan?"
+Queries Linear: linearis attachments list --issue PROJ-123
       ↓
-You → "yes"
+Finds "Research: OAuth Implementation" document
       ↓
-Claude reads the research and creates plan
+Claude reads research and creates plan
 ```
 
 **Key Components:**
 
-1. **Command Instructions** - Explicit STEP 1: Run auto-discovery
-2. **Workflow Script** (`scripts/workflow-context.sh`) - Query recent documents
-3. **User Confirmation** - Ask before proceeding with auto-discovered doc
+1. **Workflow Context** - Provides current ticket ID
+2. **Linear API** (via linearis CLI) - Query documents attached to ticket
+3. **Command Instructions** - Auto-discover documents from Linear
 
 ---
 
@@ -104,26 +75,22 @@ Claude reads the research and creates plan
 
 ```bash
 # 1. Research the codebase
-/research-codebase "How does authentication work?"
-# → Creates: thoughts/shared/research/2025-10-28-PROJ-123-auth-research.md
-# → Hook tracks it automatically ✅
+/research-codebase PROJ-123
+# → Sets current ticket to PROJ-123
+# → Creates Linear document "Research: Auth System" attached to PROJ-123 ✅
 
 # 2. Create implementation plan
 /create-plan
-# → STEP 1: Auto-discovers recent research
-# → Shows: "💡 Found recent research: .../auth-research.md"
-# → You confirm: "yes"
+# → Reads current ticket (PROJ-123) from workflow context
+# → Queries Linear for research document
 # → Claude reads research and creates plan
-# → Creates: thoughts/shared/plans/2025-10-28-PROJ-123-oauth-support.md
-# → Hook tracks it automatically ✅
+# → Creates Linear document "Plan: OAuth Support" attached to PROJ-123 ✅
 
 # 3. Implement the plan
 /implement-plan
-# → STEP 1: Auto-discovers recent plan
-# → Shows: "📋 Found recent plan: .../oauth-support.md"
-# → You confirm: "yes"
-# → Claude reads plan and implements
-# → No file path needed! ✅
+# → Reads current ticket (PROJ-123) from workflow context
+# → Queries Linear for plan document
+# → Claude reads plan and implements ✅
 ```
 
 **Zero file paths needed after initial research!**
@@ -156,170 +123,74 @@ All commands gracefully fall back to asking for input:
 
 ## Configuration Files
 
-### 1. Workflow Context (`.claude/.workflow-context.json`)
+### Workflow Context (`.claude/.workflow-context.json`)
 
-**Purpose**: Track recent documents
+**Purpose**: Track current ticket for command chaining
 **Location**: `.claude/.workflow-context.json` (per-worktree)
-**Managed by**: Hooks + commands
+**Managed by**: Commands via `workflow-context.sh`
 
 **Structure**:
 ```json
 {
   "lastUpdated": "ISO timestamp",
-  "currentTicket": "PROJ-123",
-  "mostRecentDocument": {
-    "type": "plans|research|handoffs|prs",
-    "path": "thoughts/shared/.../file.md",
-    "created": "ISO timestamp",
-    "ticket": "PROJ-123"
-  },
-  "workflow": {
-    "research": [...recent docs...],
-    "plans": [...recent docs...],
-    "handoffs": [...recent docs...],
-    "prs": [...recent docs...]
-  }
+  "currentTicket": "PROJ-123"
 }
-```
-
-### 2. Hooks Configuration (`hooks.toml`)
-
-**Purpose**: Define which file operations trigger tracking
-**Location**: `plugins/dev/hooks.toml`
-**Loaded by**: Claude Code on plugin install
-
-**Pattern**:
-```toml
-[[hooks]]
-name = "Track Research Documents"
-event = "PostToolUse"
-
-[hooks.matcher]
-tool_name = "Write"
-file_paths = ["*thoughts/shared/research/*"]
-
-[hooks.command]
-command = "bash"
-args = ["${CLAUDE_PLUGIN_ROOT}/hooks/update-workflow-context.sh"]
 ```
 
 ---
 
 ## Scripts
 
-### 1. `workflow-context.sh` (Query Script)
+### `workflow-context.sh`
 
-**Purpose**: Read from workflow context
+**Purpose**: Manage current ticket in workflow context
 **Location**: `plugins/dev/scripts/workflow-context.sh`
 **Used by**: Commands
 
 **API**:
 ```bash
-# Get most recent document of type
-workflow-context.sh recent <type>
-# → Returns: path/to/recent/doc.md
+# Set current ticket
+workflow-context.sh set-ticket PROJ-123
 
-# Get all documents for ticket
-workflow-context.sh ticket PROJ-123
-# → Returns: all docs with ticket PROJ-123
+# Get current ticket
+workflow-context.sh get-ticket
+# → Returns: PROJ-123
 
 # Initialize context file
 workflow-context.sh init
-```
-
-### 2. `update-workflow-context.sh` (Hook Handler)
-
-**Purpose**: Update workflow context when files are written
-**Location**: `plugins/dev/hooks/update-workflow-context.sh`
-**Triggered by**: Claude Code hooks
-
-**How it works**:
-1. Gets file path from `$CLAUDE_FILE_PATHS` (or JSON fallback)
-2. Determines document type from path
-3. Extracts ticket from filename (`PROJ-123`)
-4. Calls `workflow-context.sh add` to update context
-
----
-
-## Ticket Extraction
-
-The system automatically extracts ticket numbers from filenames:
-
-### Patterns Recognized
-- `2025-10-28-PROJ-123-description.md` → `PROJ-123`
-- `ABC-456_feature.md` → `ABC-456`
-- `thoughts/shared/handoffs/PROJ-123/handoff.md` → `PROJ-123` (from directory)
-- Any `[A-Z]+-[0-9]+` pattern
-
-### Regex
-```bash
-if [[ "$FILENAME" =~ ([A-Z]+-[0-9]+) ]]; then
-  TICKET="${BASH_REMATCH[1]}"
-fi
 ```
 
 ---
 
 ## Command Pattern: Auto-Discovery
 
-All workflow commands follow this explicit pattern:
+All workflow commands follow this pattern:
+
+1. **Get current ticket** from `.claude/.workflow-context.json`
+2. **Query Linear** for documents attached to that ticket
+3. **Present findings** and proceed with the workflow
 
 ```markdown
 ## Initial Response
 
-**STEP 1: Auto-discover recent document (REQUIRED)**
+**STEP 1: Get current ticket (REQUIRED)**
 
-IMMEDIATELY run this bash script BEFORE any other response:
-
+Read the current ticket from workflow context:
 ```bash
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" ]]; then
-  RECENT_DOC=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" recent <type>)
-  if [[ -n "$RECENT_DOC" ]]; then
-    echo "📋 Auto-discovered recent <type>: $RECENT_DOC"
-  fi
-fi
+TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
 ```
 
-**STEP 2: Determine which document to use**
+**STEP 2: Query Linear for documents**
 
-1. If user provided path → use it (override)
-2. If RECENT_DOC found → ask to proceed
-3. If nothing found → ask for path
+```bash
+linearis attachments list --issue "$TICKET"
 ```
 
-**Why this works:**
-- **IMMEDIATELY** and **REQUIRED** are explicit
-- **STEP 1** makes it clear this happens first
-- Bash script is shown inline (not just referenced)
-- Logic flow is numbered and clear
+**STEP 3: Determine which document to use**
 
----
-
-## Activation
-
-### Automatic (On Install)
-
-When you install `awl-dev`:
-1. Claude Code discovers `hooks.toml`
-2. Registers all 8 hooks (Write + Edit × 4 types)
-3. Hooks activate immediately
-
-### Manual (After Updates)
-
-If you update hook scripts:
-1. Restart Claude Code
-2. Hooks reload with new behavior
-
-### Verification
-
-Check if hooks are working:
-```bash
-# Write a test thoughts file
-echo "test" > thoughts/shared/research/test.md
-
-# Check workflow context
-cat .claude/.workflow-context.json | jq '.workflow.research[0]'
-# Should show: {..., "path": "thoughts/shared/research/test.md", ...}
+1. If user provided ticket/path → use it (override)
+2. If documents found in Linear → proceed
+3. If nothing found → ask for ticket ID
 ```
 
 ---
@@ -327,81 +198,57 @@ cat .claude/.workflow-context.json | jq '.workflow.research[0]'
 ## Benefits
 
 ### 1. Zero Memory Required
-Users don't need to remember file paths between commands
+Users don't need to remember ticket IDs between commands
 
 ### 2. Natural Workflow
 Commands chain together seamlessly:
 ```bash
-/research-codebase → /create-plan → /implement-plan
+/research-codebase PROJ-123 → /create-plan → /implement-plan
 ```
 
 ### 3. Context Awareness
-System knows what you're working on (ticket, recent docs)
+System knows what you're working on (ticket, documents in Linear)
 
 ### 4. Graceful Degradation
-Falls back to asking if auto-discovery doesn't find anything
+Falls back to asking for ticket ID if auto-discovery doesn't find anything
 
 ### 5. User Override
-Can always provide explicit path to override auto-discovery
+Can always provide explicit ticket ID to override auto-discovery
 
 ---
 
 ## Troubleshooting
 
-### Hooks Not Firing
-
-**Symptom**: Workflow context not updating when writing files
-
-**Solutions**:
-1. Restart Claude Code (hooks load on startup)
-2. Check plugin installed: `/plugin list`
-3. Manually test: `CLAUDE_FILE_PATHS="thoughts/shared/plans/test.md" bash plugins/dev/hooks/update-workflow-context.sh`
-
 ### Auto-Discovery Not Working
 
-**Symptom**: Commands don't show "📋 Auto-discovered..."
+**Symptom**: Commands can't find documents for the current ticket
 
-**Cause**: Claude not executing the bash script
-
-**Solution**: Commands now have explicit STEP 1 with IMMEDIATELY and REQUIRED keywords
+**Solutions**:
+1. Check current ticket is set: `workflow-context.sh get-ticket`
+2. Verify Linear documents exist: `linearis attachments list --issue PROJ-123`
+3. Ensure `LINEAR_API_TOKEN` is set
 
 ### Workflow Context Empty
 
-**Symptom**: `.workflow-context.json` exists but has no documents
+**Symptom**: `.workflow-context.json` exists but has no ticket
 
 **Solutions**:
-1. Write a thoughts file to trigger hooks
-2. Manually add: `workflow-context.sh add research "path/to/doc.md" "PROJ-123"`
-3. Check hooks are registered in Claude Code settings
+1. Set ticket manually: `workflow-context.sh set-ticket PROJ-123`
+2. Re-run the initial command with a ticket ID: `/research-codebase PROJ-123`
 
-### Wrong Document Suggested
+### Wrong Ticket in Context
 
-**Symptom**: Auto-discovery finds wrong document
+**Symptom**: Commands are querying the wrong ticket
 
-**Cause**: Most recent document isn't what you want
-
-**Solution**: Provide explicit path to override:
+**Solution**: Override by providing the ticket ID explicitly:
 ```bash
-/implement-plan thoughts/shared/plans/specific-plan.md
+/research-codebase PROJ-456
 ```
-
----
-
-## Future Enhancements
-
-Potential improvements:
-
-1. **Ticket-Based Discovery**: Auto-find all docs for current ticket
-2. **Relationship Tracking**: Track which plan came from which research
-3. **Smart Suggestions**: Suggest related documents beyond just "most recent"
-4. **Metadata Extraction**: Read YAML frontmatter for richer context
-5. **Cross-Reference Validation**: Warn if implementing plan without reading research
 
 ---
 
 ## See Also
 
-- [Hooks Documentation](./HOOKS.md) - Claude Code hooks system
-- [Auto-Discovery Pattern](./.auto-discover-pattern.md) - Standard pattern for commands
+- [Linear Documents](./LINEAR_DOCUMENTS.md) - Linear documents conventions
 - [Commands](./commands/) - Individual command documentation
 - [Scripts](./scripts/) - Utility scripts

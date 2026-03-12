@@ -64,14 +64,12 @@ Linearis now supports full project milestone management:
 
 **Pattern 1: Locator Agents** (Find WHERE)
 - `codebase-locator` - Finds relevant files/directories
-- `thoughts-locator` - Finds relevant thought documents
 - **Tools:** Grep, Glob, Bash(ls)
 - **Model:** `inherit`
 - **Purpose:** Location discovery only
 
 **Pattern 2: Analyzer Agents** (Explain HOW/WHY)
 - `codebase-analyzer` - Deep code analysis and explanation
-- `thoughts-analyzer` - Analyzes thought content
 - **Tools:** Read, Grep, Glob, + MCP tools
 - **Model:** `inherit`
 - **Purpose:** Deep analysis and insights
@@ -137,7 +135,7 @@ Linearis now supports full project milestone management:
 - Purpose: Finding files/locations, simple pattern matching
 - Benefits: Faster search operations
 - Examples:
-  - `codebase-locator`, `thoughts-locator` (in dev plugin)
+  - `codebase-locator` (in dev plugin)
 
 **Analyzer Agents → Sonnet 4.5**
 - Purpose: Deep analysis, insight generation, recommendations
@@ -179,7 +177,6 @@ model: haiku  # ✅ New - data gathering only
 **Verb-Noun Pattern (Preferred):**
 - `create_plan` - Create a plan
 - `create_pr` - Create pull request
-- `create_worktree` - Create git worktree
 - `create_handoff` - Create handoff document
 - `research_codebase` - Research the codebase
 - `implement_plan` - Implement a plan
@@ -244,7 +241,7 @@ model: haiku  # ✅ New - data gathering only
 **Commands:**
 - Orchestrate workflows (spawn agents, format output)
 - Handle user interaction (prompts, confirmations)
-- Manage file I/O (save reports to thoughts/)
+- Manage file I/O (save reports)
 - Update workflow context
 - **Do NOT** contain complex analysis logic
 

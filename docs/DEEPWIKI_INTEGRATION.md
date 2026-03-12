@@ -126,11 +126,6 @@ mcp__deepwiki__ask_question({
 
 **Tools to add**: Maybe `mcp__deepwiki__ask_question` (optional)
 
-### ❌ Low Value / Not Recommended
-
-- **thoughts-locator**: Only searches local thoughts/
-- **thoughts-analyzer**: Only analyzes local docs
-
 ---
 
 ## Which Commands Should Use DeepWiki?
@@ -406,8 +401,8 @@ Find this section and add DeepWiki guidance:
    - Ask: "What's the standard approach for [pattern] in [library]?"
 
    **For historical context:**
-   - **thoughts-locator** - Find previous research or decisions
-   - **thoughts-analyzer** - Extract insights from past work
+   - **linear-document-locator** - Find previous research or decisions
+   - **linear-document-analyzer** - Extract insights from past work
 ````
 
 ### Add Example to Planning Template

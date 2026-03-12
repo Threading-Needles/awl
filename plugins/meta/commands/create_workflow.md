@@ -67,12 +67,12 @@ Return: List of similar local workflows with their frontmatter and key patterns
 **Task 2 - Catalog Examples**:
 
 ```
-Use thoughts-analyzer agent:
-"Search the workflow catalog at thoughts/shared/workflows/ for workflows similar to {user-description}. Find examples from external repositories that match the {category} category."
+Use codebase-analyzer agent:
+"Search for workflow examples in the plugin directories (plugins/dev/, plugins/meta/) similar to {user-description}. Find examples that match the {category} category."
 
 Tools: Grep, Read
-Path: thoughts/shared/workflows/
-Return: External workflow examples with their implementations
+Path: plugins/
+Return: Workflow examples with their implementations
 ```
 
 **Task 3 - Frontmatter Standards**:
@@ -398,27 +398,7 @@ Determine save location:
 **If Command**:
 - Save to: `commands/{workflow-name}.md`
 
-### Step 10: Create Creation Record
-
-Save creation details to `thoughts/shared/workflows/created.md`:
-
-```markdown
-## {workflow-name}
-
-- **Created**: {date}
-- **Type**: {agent/command}
-- **Location**: {file-path}
-- **Modeled After**:
-  - {local-example if any}
-  - {catalog-example if any}
-- **Purpose**: {brief-description}
-- **Tools**: {tool-list}
-- **Category**: {category}
-
-**Creation Notes**: {any special notes about decisions made}
-````
-
-### Step 11: Confirmation
+### Step 10: Confirmation
 
 Present success summary:
 
@@ -440,8 +420,6 @@ Present success summary:
 2. Test: Try using the workflow
 3. Customize: Adjust for your specific needs
 4. Commit: `git add {file-path} && git commit -m "Add {workflow-name} {type}"`
-
-Creation recorded in: thoughts/shared/workflows/created.md
 ```
 
 ## Advanced Usage

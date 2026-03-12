@@ -32,7 +32,7 @@ Organize by **use case** rather than **feature type**:
 **Includes**:
 
 - Core workflow commands: `/research-codebase`, `/create-plan`, `/implement-plan`
-- Development commands: `/awl-dev:commit`, `/describe-pr`, `/create-worktree`
+- Development commands: `/awl-dev:commit`, `/describe-pr`
 - Handoff system: `/create-handoff`, `/resume-handoff`
 - All research agents (codebase-locator, analyzer, pattern-finder, etc.)
 - Lightweight MCPs: DeepWiki (~1.9k), Context7 (~1.7k)

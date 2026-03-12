@@ -29,8 +29,7 @@ Please provide:
 2. Workflow name (e.g., code-review)
 
 Or, if you've already run /discover-workflows:
-- Check the catalog: thoughts/shared/workflows/catalog.md
-- Pick from discovered workflows
+- Pick from previously discovered workflows
 ```
 
 ## Process
@@ -66,26 +65,14 @@ Path: /Users/ryan/code-repos/ryan-claude-workspace
 Return: Similar local workflows for comparison
 ```
 
-**Task 3 - Historical Context**:
-
-```
-Use thoughts-locator agent:
-"Search for any previous research, notes, or attempts related to this type of workflow. Search for keywords: {workflow-name}, {workflow-purpose}."
-
-Tools: Grep, Glob
-Path: thoughts/
-Return: Any historical context or previous attempts
-```
-
-**WAIT for all 3 tasks to complete.**
+**WAIT for both tasks to complete.**
 
 ### Step 3: Aggregate and Analyze
 
-Combine results from parallel tasks:
+Combine results from the parallel tasks:
 
 - External workflow details (Task 1)
 - Similar local patterns (Task 2)
-- Historical context (Task 3)
 
 Mark all tasks complete in TodoWrite.
 
@@ -125,10 +112,6 @@ Show comprehensive analysis:
 ### Differences
 
 - [Key differences from our patterns]
-
-### Historical Context
-
-[From Task 3 - any previous attempts or notes]
 
 ## Required Adaptations
 
@@ -236,26 +219,7 @@ Determine type and save location:
 
 - Save to: `commands/{workflow-name}.md`
 
-### Step 8: Create Import Record
-
-Save import details to `thoughts/shared/workflows/imports.md`:
-
-```markdown
-## {workflow-name}
-
-- **Imported**: {date}
-- **Source**: {repo}/{workflow}
-- **Type**: {agent/command}
-- **Location**: {file-path}
-- **Adaptations**:
-  - {adaptation 1}
-  - {adaptation 2}
-- **Status**: Active
-
-**Why imported**: {reason}
-```
-
-### Step 9: Confirmation
+### Step 8: Confirmation
 
 Present success summary:
 
@@ -277,8 +241,6 @@ Present success summary:
 2. Test: Try using the workflow
 3. Customize: Adjust for your specific needs
 4. Commit: `git add {file-path} && git commit -m "Import {workflow-name} from {repo}"`
-
-Import recorded in: thoughts/shared/workflows/imports.md
 ```
 
 ## Advanced Usage
@@ -311,7 +273,7 @@ Shows what would be imported without actually saving files.
 - **Track provenance**: Always attribute source
 - **Respect licenses**: Check repo license before importing
 - **Test imported workflows**: Verify they work in your environment
-- **Keep imports.md updated**: Track what you've imported
+- **Track imports**: Keep a record of what you've imported
 
 ## Integration with Other Commands
 

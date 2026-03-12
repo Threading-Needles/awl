@@ -287,11 +287,9 @@ awl/
 │   │   │   ├── create_plan.md
 │   │   │   ├── implement_plan.md
 │   │   │   ├── validate_plan.md
-│   │   │   ├── create_worktree.md
 │   │   │   └── README.md
 │   │   ├── scripts/         # Runtime scripts bundled with plugin
 │   │   │   ├── check-prerequisites.sh
-│   │   │   ├── create-worktree.sh
 │   │   │   └── workflow-context.sh
 │   │   ├── LINEAR_DOCUMENTS.md  # Linear documents conventions
 │   │   └── plugin.json      # Plugin manifest
@@ -397,21 +395,16 @@ awl/
 - Validation: ...
 - PR: ...
 
-### Worktree Development
+### Parallel Development
 
-Create isolated workspace for parallel work:
+Use Claude Code's native worktree support for parallel work:
 
 ```bash
-/create-worktree PROJ-123 feature-name
+claude --worktree feature-name    # Creates isolated worktree
+claude -w feature-name            # Short form
 ```
 
-This creates:
-
-- Git worktree at `~/wt/{repo-name}/feature-name/`
-- New branch `PROJ-123-feature-name`
-- `.claude/` copied over
-- Dependencies installed
-- Current ticket set to PROJ-123
+Worktrees are auto-cleaned if no changes are made. Claude prompts to keep/remove when changes exist.
 
 **Key benefit:** Multiple features in progress, context shared via Linear documents.
 
@@ -581,7 +574,7 @@ to tickets instead of filesystem-based storage.
 - Team members can see documents in Linear UI
 - No filesystem path management
 - Documents automatically shared across worktrees
-- Simplified architecture (no separate "thoughts" system)
+- Simplified architecture
 
 **Consequences**:
 
@@ -609,42 +602,6 @@ to tickets instead of filesystem-based storage.
 - Documents are discovered by querying Linear for the current ticket
 - Context is lost when worktree is deleted (by design)
 - Each worktree can work on a different ticket
-
----
-
-### ADR-005: Configurable Worktree Convention
-
-**Decision**: Use `GITHUB_SOURCE_ROOT` environment variable to organize repositories and worktrees
-by org/repo.
-
-**Rationale**:
-
-- Developers have different preferences for where code lives
-- Hardcoded paths (`~/Source`, `~/wt`) don't work for everyone
-- Main branches and worktrees should be organized together
-- Clear separation between main checkout and feature branches
-
-**Convention**:
-
-- Main repository: `${GITHUB_SOURCE_ROOT}/<org>/<repo>`
-- Worktrees: `${GITHUB_SOURCE_ROOT}/<org>/<repo>-worktrees/<feature>`
-
-**Consequences**:
-
-- `create-worktree.sh` detects GitHub org from git remote
-- Falls back to `~/wt/<repo>` if `GITHUB_SOURCE_ROOT` not set
-- No hardcoded paths in scripts or documentation
-- Clean organization by org and repo
-- Easy cleanup: delete `<repo>-worktrees` directory when done
-
-**Example**:
-
-```
-~/code-repos/github/
-├── ralfschimmel/awl/          # Main branch
-├── ralfschimmel/awl-worktrees/ # Feature branches
-└── acme/api/                         # Client project
-```
 
 ## Context Management Principles
 

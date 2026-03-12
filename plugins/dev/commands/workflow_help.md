@@ -27,7 +27,7 @@ I can help you navigate the supported workflows in this workspace.
    - `/create-plan` → Create implementation plan
    - `/implement-plan` → Execute approved plan
    - `/validate-plan` → Verify implementation
-   - Handoffs & worktrees for context management
+   - Handoffs for context management
 
 **2. Workflow Discovery** (discover → import → create → validate)
    - `/discover-workflows` → Research external repositories
@@ -83,23 +83,12 @@ Return: Current ticket and any documents (research, plan, handoff) found"
 Tools: Bash
 ```
 
-**Task 3 - Detect Worktree**:
-
-```
-"Check if currently in a git worktree (not main repo).
-Run: pwd and git worktree list
-Return: Whether in worktree, worktree name if applicable"
-
-Tools: Bash
-```
-
 WAIT for all tasks to complete.
 
 ### Step 2: Analyze Context
 
 Based on detection results, determine user's current state:
 
-- **In Worktree with Plan** → Likely in Implementation phase
 - **Current Ticket with Research Doc** → May be ready for Planning
 - **Current Ticket with Plan Doc** → May be ready for Implementation
 - **Current Ticket with Handoff** → May want to resume
@@ -215,21 +204,8 @@ WAIT for all tasks.
 
 ---
 
-### Phase 3: Worktree Creation 🌲
+### Phase 3: Implementation ⚙️
 **When**: Plan approved, ready to implement
-**How**:
-
-\`\`\`bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/create-worktree.sh" PROJ-123 feature-name
-cd ~/wt/{project}/PROJ-123-feature
-\`\`\`
-
-**After**: ✅ **CLEAR CONTEXT** (fresh session in worktree)
-
----
-
-### Phase 4: Implementation ⚙️
-**When**: In worktree with approved plan
 **Command**: `/implement-plan`
 
 The plan is automatically discovered from Linear documents attached to the current ticket.
@@ -241,7 +217,7 @@ The plan is automatically discovered from Linear documents attached to the curre
 
 ---
 
-### Phase 5: Validation ✅
+### Phase 4: Validation ✅
 **When**: All implementation phases complete
 **Command**: `/validate-plan`
 
@@ -249,7 +225,7 @@ The plan is automatically discovered from Linear documents attached to the curre
 
 ---
 
-### Phase 6: PR Creation 🚀
+### Phase 5: PR Creation 🚀
 **Commands**:
 \`\`\`bash
 /commit
@@ -361,7 +337,6 @@ Present targeted answer with examples.
 - Clear context between phases for best performance
 - Read outputs completely before next phase
 - Use handoffs liberally - context is precious
-- Worktrees isolate your changes safely
 
 Type a command or ask another question!
 ```
@@ -398,7 +373,7 @@ If user asks about external concepts:
 **Use external-research agent**:
 
 ```
-"Research {topic} from HumanLayer or Anthropic documentation.
+"Research {topic} from Anthropic documentation or external sources.
 Return: Summary with links to sources"
 
 Tools: WebSearch, WebFetch, mcp__deepwiki__ask_question
@@ -419,7 +394,6 @@ Agent: 🎯 **I see you're currently working on PROJ-123 OAuth implementation**
 
 **Current State:**
 - Ticket: PROJ-123
-- Worktree: `~/wt/my-project/PROJ-123-oauth`
 - Plan: "Plan: OAuth Implementation" (Linear document)
 - Status: Phase 2/4 complete (checkboxes updated)
 
@@ -549,7 +523,6 @@ See full guide: `docs/AGENTIC_WORKFLOW_GUIDE.md` (Handoff System section)
 The parallel agents can detect:
 
 - Current git branch
-- Worktree vs main repo
 - Current ticket from workflow context
 - Linear documents attached to ticket
 - Plan documents with checkboxes
@@ -572,8 +545,6 @@ When relevant, include links:
 
 ```
 **Further Reading:**
-- [HumanLayer Advanced Context Engineering](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents)
-- [12 Factor Agents](https://github.com/humanlayer/12-factor-agents)
 - [Anthropic Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices)
 ```
 

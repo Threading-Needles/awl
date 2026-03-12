@@ -41,10 +41,6 @@ Awl integrates with your development tools through both **CLI-based** (token-eff
 - **Exa** - Web research and external documentation (API)
   - `awl-dev`: External research agent
 
-### Thoughts & Memory System
-- **HumanLayer** - Persistent memory, shared context, team collaboration (CLI via `humanlayer`)
-  - All plugins: Foundation for research, plans, handoffs, and reports
-
 ### Token Efficiency Strategy
 
 **Why CLI + lightweight MCP?** Most development sessions don't need heavy integrations:
@@ -113,12 +109,9 @@ chmod +x setup-awl.sh
 ```
 
 This script will guide you through:
-- ✅ Prerequisites check and installation (HumanLayer CLI, jq, etc.)
-- ✅ Thoughts repository setup (one per org, backed up to GitHub)
-- ✅ Project configuration (ticket prefix, project name)
-- ✅ Integration setup (Linear, Sentry, Railway, PostHog, Exa)
-- ✅ Worktree directory creation
-- ✅ HumanLayer thoughts initialization and syncing
+- Prerequisites check and installation (jq, etc.)
+- Project configuration (ticket prefix, project name)
+- Integration setup (Linear, Sentry, Railway, PostHog, Exa)
 
 **Then install the plugins:**
 
@@ -247,13 +240,7 @@ before running out of context, creating structured handoff documents that add to
 1. **Parallel Agent Research** - Multiple specialized agents research concurrently
 2. **Context Compression** - Research compressed into structured summaries
 3. **Focused Planning** - Planning agents work with compressed context
-4. **Persistent Memory** - Handoffs and thoughts system preserve context across sessions
-
-### Reusability and Shared Memory
-
-Uses the [HumanLayer thoughts system](https://github.com/humanlayer/humanlayer) for shared
-persistent memory across teams and projects. The research → plan → implement → validate workflow is
-adapted from HumanLayer's approach.
+4. **Persistent Memory** - Handoffs preserve context across sessions
 
 ### CLI-First Integration
 
@@ -264,9 +251,8 @@ When possible, uses CLIs instead of MCPs for token efficiency:
 
 ## Key Features
 
-**Large Long-Term Memory and Context**
+**Context Persistence**
 
-- Thoughts system for persistent memory across projects
 - Structured handoff documents for context preservation
 - Research artifacts saved and referenceable
 - Plan documents that persist implementation context
@@ -298,7 +284,6 @@ When possible, uses CLIs instead of MCPs for token efficiency:
 - `gh` - GitHub CLI
 - `railway` - Railway deployments
 - `sentry-cli` - Error monitoring
-- `humanlayer` - Thoughts system ([install](https://github.com/humanlayer/humanlayer))
 
 **MCP Tools** (bundled with plugins):
 
@@ -311,15 +296,6 @@ Run the prerequisite check:
 ```bash
 /check_prerequisites
 ```
-
-## Credits
-
-Built on patterns from:
-
-- [HumanLayer](https://github.com/humanlayer/humanlayer) - Thoughts system for shared persistent
-  memory and research/plan/implement/validate workflow
-
-Personal refinement over hundreds of hours on real projects.
 
 ## Contributing
 

@@ -31,7 +31,6 @@ Discovers and catalogs workflows from the Claude Code community.
   - **Workflow Discovery** - Lists all available workflows
   - **Frontmatter Analysis** - Extracts frontmatter patterns
   - **Implementation Patterns** - Finds reusable templates
-- Catalogs findings in `thoughts/shared/workflows/`
 - Creates searchable catalog with categorization
 
 **Usage**:
@@ -49,9 +48,7 @@ Discovers and catalogs workflows from the Claude Code community.
 
 **Output**:
 
-- Repository analysis at `thoughts/shared/workflows/{repo}/analysis.md`
-- Master catalog at `thoughts/shared/workflows/catalog.md`
-- Organized by category and use case
+- Repository analysis organized by category and use case
 
 **Supported Repositories**:
 
@@ -83,7 +80,7 @@ Imports workflows from external repositories and adapts them to your workspace s
 - Replaces repository-specific values (ticket prefixes, paths, IDs)
 - Validates tool compatibility
 - Tracks provenance and modifications
-- Records imports in `thoughts/shared/workflows/imports.md`
+- Records imports for tracking
 
 **Usage**:
 
@@ -115,7 +112,6 @@ Imports workflows from external repositories and adapts them to your workspace s
 **Output**:
 
 - Workflow saved to `plugins/dev/agents/{name}.md` or `plugins/dev/commands/{name}.md`
-- Import record in `thoughts/shared/workflows/imports.md`
 - Attribution and source tracking
 
 ### 3. `/create-workflow` - Interactive Workflow Creator
@@ -134,7 +130,7 @@ Creates new agents or commands using discovered patterns and templates.
 - Provides templates (minimal, standard, advanced)
 - Enforces frontmatter consistency
 - Validates before saving
-- Records creation in `thoughts/shared/workflows/created.md`
+- Records creation for tracking
 
 **Usage**:
 
@@ -239,9 +235,9 @@ Validates frontmatter across all workflows and auto-fixes issues.
               │
               ├─→ Aggregate results
               │
-              └─→ Create catalog at thoughts/shared/workflows/
-                  • {repo}/analysis.md (per repo)
-                  • catalog.md (master index)
+              └─→ Create catalog
+                  • Per-repo analysis
+                  • Master index
 
 2. Import Phase
    ┌──────────────────────┐
@@ -263,7 +259,6 @@ Validates frontmatter across all workflows and auto-fixes issues.
               │
               └─→ Save and record import
                   • plugins/dev/agents/{name}.md or plugins/dev/commands/{name}.md
-                  • thoughts/shared/workflows/imports.md
 
 3. Create Phase
    ┌──────────────────────┐
@@ -283,7 +278,6 @@ Validates frontmatter across all workflows and auto-fixes issues.
               │
               └─→ Save and record creation
                   • plugins/dev/agents/{name}.md or plugins/dev/commands/{name}.md
-                  • thoughts/shared/workflows/created.md
 
 4. Validate Phase
    ┌──────────────────────┐
@@ -385,31 +379,9 @@ When importing or creating workflows:
 - Use config for Linear integration
 - Maintain portability across projects
 
-### Thoughts Repository
+### Workflow Context
 
-All discovery work is stored in the thoughts repository:
-
-```
-thoughts/
-└── shared/
-    └── workflows/
-        ├── catalog.md              # Master index
-        ├── imports.md              # Import history
-        ├── created.md              # Creation history
-        ├── wshobson-commands/
-        │   └── analysis.md         # Repo analysis
-        ├── wshobson-agents/
-        │   └── analysis.md
-        └── [more repos]/
-            └── analysis.md
-```
-
-Benefits:
-
-- Persistent across worktrees
-- Shareable across team
-- Searchable history
-- Context for future decisions
+Discovery results and import history are tracked locally for future reference.
 
 ### DeepWiki MCP Integration
 
@@ -499,7 +471,6 @@ version: 1.0.0
 - Run `/validate-frontmatter` before committing
 - Keep catalog updated with new discoveries
 - Document why you imported/created workflows
-- Track modifications in thoughts/
 - Use version numbers for breaking changes
 
 ## Advanced Patterns
@@ -509,9 +480,6 @@ version: 1.0.0
 ```bash
 # Discover all repos
 /discover-workflows all
-
-# Review catalog
-cat thoughts/shared/workflows/catalog.md
 
 # Import top picks
 /import-workflow wshobson/commands code-review
@@ -540,9 +508,6 @@ cat thoughts/shared/workflows/catalog.md
 ```bash
 # Re-discover repos quarterly to catch updates
 /discover-workflows all
-
-# Check for new workflows in catalog
-diff thoughts/shared/workflows/catalog.md <previous-version>
 
 # Import new interesting workflows
 /import-workflow <repo> <new-workflow>
@@ -606,7 +571,6 @@ If you create excellent workflows, consider:
 - [Frontmatter Standard](FRONTMATTER_STANDARD.md) - Complete standard reference
 - [README](../README.md) - Workspace overview
 - `.claude/config.json` - Project configuration
-- `thoughts/shared/workflows/` - Discovery catalog
 
 ## Version History
 

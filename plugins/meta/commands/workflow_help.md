@@ -27,7 +27,7 @@ I can help you navigate the supported workflows in this workspace.
    - `/create-plan` → Create implementation plan
    - `/implement-plan` → Execute approved plan
    - `/validate-plan` → Verify implementation
-   - Handoffs & worktrees for context management
+   - Handoffs for context management
 
 **2. Workflow Discovery** (discover → import → create → validate)
    - `/discover-workflows` → Research external repositories
@@ -73,25 +73,13 @@ Return: Evidence of active work with file paths"
 Tools: Bash (git status), Grep, Glob
 ```
 
-**Task 2 - Find Recent Documents**:
+**Task 2 - Check Current Ticket**:
 
 ```
-Use thoughts-locator agent (or Glob if no thoughts):
-"Find the most recent research, plan, or handoff documents. Look in:
-- thoughts/shared/research/ (or research/)
-- thoughts/shared/plans/ (or plans/)
-- thoughts/shared/handoffs/ (or handoffs/)
-Return: 3 most recent documents with dates and topics"
-
-Tools: Bash (ls -t), Grep, Glob
-```
-
-**Task 3 - Detect Worktree**:
-
-```
-"Check if currently in a git worktree (not main repo).
-Run: pwd and git worktree list
-Return: Whether in worktree, worktree name if applicable"
+"Get the current ticket from workflow context.
+Run: ${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh get-ticket
+If ticket exists, query Linear for documents attached to it.
+Return: Current ticket and any documents (research, plan, handoff) found"
 
 Tools: Bash
 ```
@@ -102,10 +90,9 @@ WAIT for all tasks to complete.
 
 Based on detection results, determine user's current state:
 
-- **In Worktree with Plan** → Likely in Implementation phase
-- **Recent Research Doc** → May be ready for Planning
-- **Recent Plan Doc** → May be ready for Implementation
-- **Recent Handoff** → May want to resume
+- **Current Ticket with Research Doc** → May be ready for Planning
+- **Current Ticket with Plan Doc** → May be ready for Implementation
+- **Current Ticket with Handoff** → May want to resume
 - **No Active Work** → Starting fresh
 
 ### Step 3: Provide Context-Aware Guidance
@@ -175,14 +162,13 @@ Return: Concrete examples users can follow"
 Tools: Read, Grep
 ```
 
-**Task 3 - Check for User Files**:
+**Task 3 - Check for User's Current Ticket**:
 
 ```
-"Check if user has any existing research, plans, or handoffs.
-Look in thoughts/ or research/, plans/, handoffs/ directories.
-Return: What files exist, suggesting next steps based on what's there"
+"Get the current ticket from workflow context and query Linear for documents.
+Return: What documents exist for current ticket, suggesting next steps"
 
-Tools: Glob, Bash
+Tools: Bash
 ```
 
 WAIT for all tasks.
@@ -203,7 +189,7 @@ WAIT for all tasks.
 {Include example from Task 2}
 {Note any existing research docs from Task 3}
 
-**Output**: `thoughts/shared/research/YYYY-MM-DD-PROJ-XXXX-description.md`
+**Output**: Linear document "Research: {description}" attached to ticket
 **After**: ✅ **CLEAR CONTEXT**
 
 ---
@@ -214,27 +200,14 @@ WAIT for all tasks.
 
 {Include example}
 
-**Output**: `thoughts/shared/plans/YYYY-MM-DD-PROJ-XXXX-description.md`
+**Output**: Linear document "Plan: {description}" attached to ticket
 **After**: ✅ **CLEAR CONTEXT**
 
 ---
 
-### Phase 3: Worktree Creation 🌲
+### Phase 3: Implementation ⚙️
 **When**: Plan approved, ready to implement
-**How**:
-
-\`\`\`bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/create-worktree.sh" PROJ-123 feature-name
-cd ~/wt/{project}/PROJ-123-feature
-\`\`\`
-
-**After**: ✅ **CLEAR CONTEXT** (fresh session in worktree)
-
----
-
-### Phase 4: Implementation ⚙️
-**When**: In worktree with approved plan
-**Command**: `/implement-plan thoughts/shared/plans/YYYY-MM-DD-PROJ-XXXX-feature.md`
+**Command**: `/implement-plan`
 
 {Include example}
 
@@ -243,7 +216,7 @@ cd ~/wt/{project}/PROJ-123-feature
 
 ---
 
-### Phase 5: Validation ✅
+### Phase 4: Validation ✅
 **When**: All implementation phases complete
 **Command**: `/validate-plan`
 
@@ -251,7 +224,7 @@ cd ~/wt/{project}/PROJ-123-feature
 
 ---
 
-### Phase 6: PR Creation 🚀
+### Phase 5: PR Creation 🚀
 **Commands**:
 \`\`\`bash
 /awl-dev:commit
@@ -259,7 +232,7 @@ gh pr create --fill
 /describe-pr
 \`\`\`
 
-**Output**: `thoughts/shared/prs/pr_{number}_{description}.md`
+**Output**: Linear document "PR: #{number} - {title}" attached to ticket
 **After**: ✅ **CLEAR CONTEXT** - workflow complete!
 
 ---
@@ -270,11 +243,11 @@ gh pr create --fill
 \`\`\`bash
 /create-handoff
 \`\`\`
-**Output**: `thoughts/shared/handoffs/PROJ-XXXX/YYYY-MM-DD_HH-MM-SS_description.md`
+**Output**: Linear document "Handoff: {description}" attached to ticket
 
 **Resume Handoff**:
 \`\`\`bash
-/resume-handoff {path-or-ticket}
+/resume-handoff PROJ-123
 \`\`\`
 
 ---
@@ -363,7 +336,6 @@ Present targeted answer with examples.
 - Clear context between phases for best performance
 - Read outputs completely before next phase
 - Use handoffs liberally - context is precious
-- Worktrees isolate your changes safely
 
 Type a command or ask another question!
 ```
@@ -400,7 +372,7 @@ If user asks about external concepts:
 **Use external-research agent**:
 
 ```
-"Research {topic} from HumanLayer or Anthropic documentation.
+"Research {topic} from Anthropic documentation or external sources.
 Return: Summary with links to sources"
 
 Tools: WebSearch, WebFetch, mcp__deepwiki__ask_question
@@ -420,8 +392,8 @@ User: /workflow-help
 Agent: 🎯 **I see you're currently working on PROJ-123 OAuth implementation**
 
 **Current State:**
-- Worktree: `~/wt/my-project/PROJ-123-oauth`
-- Plan: `thoughts/shared/plans/2025-01-08-PROJ-123-oauth.md`
+- Ticket: PROJ-123
+- Plan: "Plan: OAuth Implementation" (Linear document)
 - Status: Phase 2/4 complete (checkboxes updated)
 
 **You're in Implementation Phase**
@@ -429,7 +401,7 @@ Agent: 🎯 **I see you're currently working on PROJ-123 OAuth implementation**
 **Suggested Next Steps:**
 1. ✅ Continue implementing Phase 3: `/implement-plan` (will resume from checkboxes)
 2. 🔄 Need to pause? `/create-handoff` before stopping
-3. 📖 Review plan: Check `thoughts/shared/plans/2025-01-08-PROJ-123-oauth.md`
+3. 📖 Review plan in Linear
 
 **Context Management:**
 ⚠️ If context feels full (>60%), clear and resume with plan file
@@ -462,7 +434,7 @@ First, understand how authentication currently works:
 
 When prompted, ask: "How does authentication currently work? What patterns exist?"
 
-**Output**: `thoughts/shared/research/YYYY-MM-DD-PROJ-XXX-auth-system.md`
+**Output**: Linear document "Research: Auth System" attached to PROJ-XXX
 
 **After research**: ✅ **CLEAR CONTEXT** (close this conversation, start fresh)
 
@@ -477,7 +449,7 @@ Create implementation plan:
 
 Reference your research doc when planning.
 
-**Output**: `thoughts/shared/plans/YYYY-MM-DD-PROJ-XXX-oauth-support.md`
+**Output**: Linear document "Plan: OAuth Support" attached to PROJ-XXX
 
 **After plan approved**: ✅ **CLEAR CONTEXT**
 
@@ -504,7 +476,7 @@ Use the **Handoff System** to pause/resume:
 /create-handoff
 \`\`\`
 
-Creates: `thoughts/shared/handoffs/PROJ-XXXX/YYYY-MM-DD_HH-MM-SS_description.md`
+Creates a Linear document "Handoff: {description}" attached to the current ticket.
 
 The handoff captures:
 - Current progress
@@ -518,13 +490,10 @@ The handoff captures:
 
 ### To Resume:
 \`\`\`bash
-/resume-handoff thoughts/shared/handoffs/PROJ-123/2025-01-08_14-30-45_oauth.md
+/resume-handoff PROJ-123
 \`\`\`
 
-Or if command supports:
-\`\`\`bash
-/resume-handoff PROJ-123  # Finds latest handoff
-\`\`\`
+The handoff is automatically discovered from Linear documents attached to the ticket.
 
 **The resume process:**
 1. Reads handoff + linked docs
@@ -552,9 +521,9 @@ See full guide: `docs/AGENTIC_WORKFLOW_GUIDE.md` (Handoff System section)
 The parallel agents can detect:
 
 - Current git branch
-- Worktree vs main repo
-- Recent files modified
-- Plan files with checkboxes
+- Current ticket from workflow context
+- Linear documents attached to ticket
+- Plan documents with checkboxes
 - Research documents
 - Handoff documents
 - PR status
@@ -563,7 +532,7 @@ The parallel agents can detect:
 
 Based on detected state, provide:
 
-- Specific file paths to reference
+- Specific ticket IDs and documents found
 - Exact commands to run next
 - Progress indicators (Phase X of Y)
 - Context clearing reminders at right moments
@@ -574,8 +543,6 @@ When relevant, include links:
 
 ```
 **Further Reading:**
-- [HumanLayer Advanced Context Engineering](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents)
-- [12 Factor Agents](https://github.com/humanlayer/12-factor-agents)
 - [Anthropic Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices)
 ```
 

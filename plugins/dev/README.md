@@ -71,7 +71,6 @@ See [commands/README.md](commands/README.md) for full command documentation.
 | `/awl-dev:doctor` | Check setup and diagnose issues |
 | `/awl-dev:commit` | Create conventional commits |
 | `/awl-dev:debug` | Debug with logs and database |
-| `/awl-dev:create-worktree` | Set up parallel workspace |
 
 ## Agents
 

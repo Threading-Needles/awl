@@ -37,8 +37,7 @@ Personal configuration overrides team config.
     ],
     "defaultProject": "project-id-i-work-on-most",
     "preferences": {
-      "verboseLogging": true,
-      "autoSyncThoughts": true
+      "verboseLogging": true
     }
   },
   "commit": {

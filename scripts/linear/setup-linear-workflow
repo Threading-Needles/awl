@@ -29,18 +29,6 @@ if ! command -v linear-cli &>/dev/null && [ -z "$LINEAR_API_KEY" ]; then
 	exit 1
 fi
 
-# Check if Linear MCP is available (alternative)
-if command -v humanlayer &>/dev/null; then
-	echo -e "${BLUE}ℹ️  HumanLayer MCP detected - you can also use Claude to set this up!${NC}"
-	echo "Just run: /linear setup-workflow"
-	echo ""
-	read -p "Continue with script setup anyway? (y/N) " -n 1 -r
-	echo
-	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-		exit 0
-	fi
-fi
-
 echo "This script will create the recommended workflow statuses in your Linear team."
 echo ""
 

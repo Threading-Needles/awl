@@ -79,7 +79,7 @@ Instead of: One agent that does everything
 Use: Multiple focused agents in parallel
   - codebase-locator (find files)
   - codebase-analyzer (understand logic)
-  - thoughts-locator (find history)
+  - linear-document-locator (find history)
 ```
 
 #### 4. Structured Persistence
@@ -97,7 +97,7 @@ Use: Multiple focused agents in parallel
 
 ```
 Ephemeral: All research in conversation
-Persistent: Save to thoughts/ directory
+Persistent: Save to Linear documents attached to tickets
   - Research documents
   - Implementation plans
   - Architectural decisions
@@ -233,7 +233,7 @@ Step 1: Read ticket file Context loaded: Ticket content (1-2K tokens)
 Step 2: Spawn parallel research agents Agent A (codebase-locator): Context: Ticket keywords + file
 paths Returns: List of relevant files Context used: ~5K tokens Context persisted: File paths only
 
-Agent B (thoughts-locator): Context: Ticket keywords + thoughts structure Returns: Relevant
+Agent B (linear-document-locator): Context: Ticket keywords + Linear documents Returns: Relevant
 documents Context used: ~3K tokens Context persisted: Document paths only
 
 Agent C (codebase-analyzer): Context: Specific files from exploration Returns: Implementation
@@ -340,14 +340,14 @@ Plan provides continuity
 ```
 [Research authentication approaches]
 ↓
-Write summary to thoughts/shared/research/auth_approaches.md:
+Save summary to Linear document attached to ticket:
   - Key finding: Use JWT with RS256
   - Rationale: Mobile app compatibility
   - Implementation: Short-lived tokens + refresh pattern
   - Security considerations: Token rotation every 1 hour
 ↓
 [Later conversation]
-Read thoughts/shared/research/auth_approaches.md
+Query Linear for research document attached to ticket
 ← Instant context recovery (2K tokens vs 20K original research)
 ```
 
@@ -395,8 +395,7 @@ Must re-run analysis or scroll through history
 
 [Agent analysis: 10K tokens]
 
-Take those findings and write to:
-thoughts/shared/research/rate_limiting_implementation.md
+Save findings to Linear document attached to ticket:
 
 Content:
   - Current implementation: Redis-based sliding window
@@ -406,7 +405,7 @@ Content:
   - Limits: 100/min anonymous, 1000/min authenticated
 
 [Later]
-Read thoughts/shared/research/rate_limiting_implementation.md
+Query Linear for research document attached to ticket
 ← 2K tokens, instant context
 ```
 
@@ -442,13 +441,13 @@ Read thoughts/shared/research/rate_limiting_implementation.md
 
 [Research: 20K tokens]
 [Create plan]
-Plan saved to thoughts/shared/plans/2025-01-08-rate-limiting.md
+Plan saved to Linear as "Plan: ..." document attached to ticket
 ← 5K tokens, comprehensive
 
 [Conversation 2]
-/awl-dev:implement_plan thoughts/shared/plans/2025-01-08-rate-limiting.md
+/awl-dev:implement_plan
 
-Read plan: 5K tokens
+Read plan from Linear: 5K tokens
 ← Full context recovered
 ← All decisions preserved
 ← Ready to implement
@@ -507,36 +506,28 @@ Start Phase 2
 ← Continue from checkpoint
 ```
 
-### Strategy 4: Thought Documents as Cache
+### Strategy 4: Linear Documents as Cache
 
-**Pattern: Personal → Refined → Shared**
+**Pattern: Research → Refine → Persist**
 
 ```
-Step 1: Explore (personal thoughts)
-thoughts/ryan/notes/exploring_rate_limiting.md
-- Random observations
-- Questions
-- Rough ideas
-← Scratchpad, can be messy
+Step 1: Research (conversation context)
+- Spawn research agents
+- Explore codebase
+- Gather findings
+← 50K tokens in conversation
 
-Step 2: Refine (personal research)
-thoughts/ryan/tickets/eng_1234_research.md
-- Organized findings
-- Key insights
-- Decision points
-← Structured, personal
-
-Step 3: Distill (shared knowledge)
-thoughts/shared/research/rate_limiting_decision.md
+Step 2: Distill (Linear document)
+Save to Linear as "Research: ..." attached to ticket:
 - Final decision: Redis-based
 - Rationale: Multi-instance compatibility
 - Implementation approach: Sliding window
 - Configuration: 100/min anon, 1000/min auth
 ← Minimal, high-value, shareable
 
-Step 4: Reference (efficient reuse)
+Step 3: Reference (efficient reuse)
 Later work:
-Read thoughts/shared/research/rate_limiting_decision.md
+Query Linear for research document attached to ticket
 ← 1K tokens
 ← Instant context
 ← No re-research needed
@@ -547,16 +538,12 @@ Read thoughts/shared/research/rate_limiting_decision.md
 ```
 Exploration: 50K tokens (conversation)
     ↓
-Personal notes: 10K tokens (document)
+Linear document: 2K tokens (persisted)
     ↓
-Refined research: 5K tokens (document)
-    ↓
-Shared decision: 1K tokens (document)
-    ↓
-Future reuse: 1K tokens (read)
+Future reuse: 2K tokens (read)
 
 Total investment: 50K once
-Future cost: 1K always
+Future cost: 2K always
 ```
 
 ---
@@ -716,7 +703,7 @@ Task: Understand payment system
 
 Independent questions:
 1. Where are payment files? (codebase-locator)
-2. What's our past payment research? (thoughts-locator)
+2. What's our past payment research? (linear-document-locator)
 3. What payment patterns exist? (codebase-pattern-finder)
 
 Spawn all three in parallel:
@@ -735,7 +722,7 @@ Instead of: Sum(agent1, agent2, agent3)
 
 Need to understand:
 - Codebase state (codebase-analyzer)
-- Historical context (thoughts-locator)
+- Historical context (linear-document-locator)
 - Similar implementations (pattern-finder)
 - Current tickets (ticket-reader)
 
@@ -802,7 +789,7 @@ Sequential because each step informs the next
 ```
 Phase 1: Parallel broad research
   @awl-dev:codebase-locator find payment files
-  @awl-dev:thoughts-locator search payment docs
+  @awl-dev:linear-document-locator search payment docs
   @awl-dev:codebase-pattern-finder show payment patterns
 
 [All run in parallel]
@@ -1068,9 +1055,9 @@ Result: Efficient usage, room to explore
 1. **Compact Context**
 
    ```
-   Write current understanding to thoughts/shared/research/
+   Save current understanding to Linear document
    Start fresh conversation
-   Read compacted summary
+   Read compacted summary from Linear
    → Context reset with preserved knowledge
    ```
 
@@ -1111,7 +1098,7 @@ Good: Read 10 files completely
 ```
 Research phase (30K tokens accumulated)
 ↓
-Write to thoughts/shared/research/finding.md
+Save to Linear document attached to ticket
 ↓
 Context compacted to 3K tokens (summary)
 ↓
@@ -1167,8 +1154,7 @@ Phase 1: Research (Conversation 1)
   1. Spawn parallel research agents (15K)
   2. Read key files based on findings (30K)
   3. Create comprehensive plan (10K)
-  4. Write plan to thoughts/ (5K)
-  5. Sync thoughts (0K)
+  4. Save plan to Linear document (5K)
 
   Total used: 60K
   Plan persisted: 5K tokens reusable
@@ -1224,7 +1210,7 @@ All progress tracked
 ```
 Step 1: Parallel Investigation (15K tokens)
   @awl-dev:codebase-locator find webhook files
-  @awl-dev:thoughts-locator search webhook issues
+  @awl-dev:linear-document-locator search webhook issues
   @awl-dev:codebase-analyzer trace webhook flow
 
   Results:
@@ -1239,7 +1225,7 @@ Step 2: Targeted Deep Dive (25K tokens)
   Analyze error patterns (10K)
 
 Step 3: Document Findings (5K tokens)
-  Write to thoughts/shared/research/webhook_timeout_analysis.md
+  Save to Linear document attached to ticket:
   - Root cause: Missing timeout on queue processing
   - Affected endpoints: All async webhooks
   - Solution: Add 30s timeout with graceful degradation
@@ -1277,7 +1263,7 @@ Result: Knowledge lost when conversation ends
 
 ```
 Previous work:
-  thoughts/shared/research/auth_architecture.md
+  Linear document "Research: Auth Architecture" attached to ticket
   - Overview
   - Key components
   - Flow diagrams
@@ -1287,7 +1273,7 @@ Previous work:
 New dev asks: "How does auth work?"
 
 Response:
-  Read thoughts/shared/research/auth_architecture.md (3K)
+  Read research document from Linear (3K)
   [Instant, comprehensive context]
   Answer specific questions (10K)
 
@@ -1302,13 +1288,13 @@ Result: Knowledge persisted, reusable for next person
 
 **Scenario**: Pattern used in repo A, need to implement in repo B
 
-**Without Thoughts System:**
+**Without Linear Documents:**
 
 ```
 Repo A:
   [Research pattern]
   [Implement]
-  [Knowledge stays in repo A]
+  [Knowledge stays in repo A conversation]
 
 Repo B:
   [Research same pattern again]
@@ -1316,20 +1302,20 @@ Repo B:
   [Possibly different implementation]
 ```
 
-**With Thoughts System:**
+**With Linear Documents:**
 
 ```
 Repo A:
   [Research pattern]
   [Implement]
-  Write to ~/thoughts/global/patterns/pagination_approach.md
+  Save to Linear document attached to ticket:
   - Cursor-based pattern
   - Why chosen
   - Implementation template
   - Gotchas
 
 Repo B:
-  Read ~/thoughts/global/patterns/pagination_approach.md
+  Query Linear for research document
   [Implement same pattern]
   [Consistent approach]
   [No duplicated research]
@@ -1369,9 +1355,9 @@ Think of context window like CPU cache:
 - Limited size (200K tokens)
 - Currently loaded files and conversation
 
-**L2 Cache (Thoughts Directory)**
+**L2 Cache (Linear Documents)**
 
-- Fast access (Read tool)
+- Fast access (query by ticket)
 - Larger size (unlimited)
 - Persisted research and plans
 
@@ -1390,7 +1376,7 @@ Think of context window like CPU cache:
 **Optimization Strategy:**
 
 1. Keep hot path in L1 (current context)
-2. Store frequently accessed in L2 (thoughts)
+2. Store frequently accessed in L2 (Linear documents)
 3. Load from L3 on-demand (codebase files)
 4. Use RAM for parallel work (sub-agents)
 
@@ -1428,19 +1414,19 @@ Solution: Reset before entropy too high
 
 ### Meta-Context Management
 
-The thoughts system itself reduces meta-context:
+The Linear documents system itself reduces meta-context:
 
 ```
-Without thoughts:
+Without Linear documents:
   "Where did we save that research?"
   "What did we decide about authentication?"
   "Did we already investigate this?"
   ← Meta-questions waste context
 
-With thoughts:
-  "Check thoughts/shared/research/"
-  "Read thoughts/shared/decisions/"
-  "Search thoughts/searchable/"
+With Linear documents:
+  "Query Linear for research attached to PROJ-123"
+  "Read plan document for current ticket"
+  "Search Linear documents by title"
   ← Clear, systematic, efficient
 ```
 

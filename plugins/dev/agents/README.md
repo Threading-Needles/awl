@@ -95,53 +95,6 @@ error logging" )
 
 **Returns**: Concrete code examples showing patterns in use
 
-### Thoughts System Agents
-
-#### thoughts-locator
-
-**Purpose**: Discover existing thought documents about a topic
-
-**Use when**: You need to find related research or plans
-
-- Finding previous research on a topic
-- Discovering related plans
-- Locating historical decisions
-- Searching for related discussions
-
-**Tools**: Grep, Glob, LS
-
-**Example invocation:**
-
-```markdown
-Task( subagent_type="awl-dev:thoughts-locator", prompt="Find all thoughts documents about authentication" )
-```
-
-**Returns**: List of relevant thought documents with paths
-
----
-
-#### thoughts-analyzer
-
-**Purpose**: Extract key insights from thought documents
-
-**Use when**: You need to understand documented decisions
-
-- Analyzing research documents
-- Understanding plan rationale
-- Extracting historical context
-- Identifying previous decisions
-
-**Tools**: Read, Grep, Glob, LS
-
-**Example invocation:**
-
-```markdown
-Task( subagent_type="awl-dev:thoughts-analyzer", prompt="Analyze the authentication research document and
-extract key findings" )
-```
-
-**Returns**: Summary of insights and decisions from documents
-
 ### External Research Agents
 
 #### external-research
@@ -211,8 +164,9 @@ Commands spawn multiple agents concurrently for efficiency:
 ```markdown
 # Spawn three agents in parallel
 
-Task(subagent_type="awl-dev:codebase-locator", ...) Task(subagent_type="awl-dev:thoughts-locator", ...)
+Task(subagent_type="awl-dev:codebase-locator", ...)
 Task(subagent_type="awl-dev:codebase-analyzer", ...)
+Task(subagent_type="awl-dev:codebase-pattern-finder", ...)
 
 # Wait for all to complete
 
@@ -361,15 +315,7 @@ Task(subagent_type="awl-dev:codebase-locator", ...)
 Task(subagent_type="awl-dev:codebase-analyzer", ...)
 ```
 
-### Pattern 2: Parallel Search
-
-```markdown
-# Search codebase and thoughts simultaneously
-
-Task(subagent_type="awl-dev:codebase-locator", ...) Task(subagent_type="awl-dev:thoughts-locator", ...)
-```
-
-### Pattern 3: Pattern Discovery
+### Pattern 2: Pattern Discovery
 
 ```markdown
 # Find patterns after understanding the code

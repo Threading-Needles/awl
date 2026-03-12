@@ -8,9 +8,7 @@ Complete guide to installing and configuring Awl for Claude Code.
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [CLAUDE.md Setup](#claudemd-setup)
-- [Thoughts System Setup](#thoughts-system-setup)
 - [Service Integration](#service-integration)
-- [Worktree Setup](#worktree-setup)
 - [Core Workflow](#core-workflow)
 - [Commands & Agents Reference](#commands--agents-reference)
 - [Troubleshooting](#troubleshooting)
@@ -30,12 +28,9 @@ chmod +x setup-awl.sh
 ```
 
 **What this does:**
-- ✅ Checks/installs prerequisites (HumanLayer, jq)
-- ✅ Sets up thoughts repository (one per org)
-- ✅ Creates project configuration
-- ✅ Configures worktree directories
-- ✅ Prompts for API tokens (Linear, Sentry, etc.)
-- ✅ Links project to shared thoughts
+- Checks/installs prerequisites (jq)
+- Creates project configuration
+- Prompts for API tokens (Linear, Sentry, etc.)
 
 **Then:**
 ```bash
@@ -55,15 +50,6 @@ You're ready! Try `/research-codebase` in your next session.
 ### Prerequisites
 
 - **Claude Code** installed and working
-- **HumanLayer CLI** (for thoughts system)
-  ```bash
-  pip install humanlayer
-  # or
-  pipx install humanlayer
-
-  # Verify
-  humanlayer --version
-  ```
 
 ### Install Awl Plugins
 
@@ -153,15 +139,11 @@ curl -fsSL https://raw.githubusercontent.com/ralfschimmel/awl/main/setup-awl.sh 
 1. Project location (existing repo or clone fresh)
 2. Project key (defaults to GitHub org name)
 3. Ticket prefix (e.g., "ENG", "PROJ")
-4. Your name (for thoughts system)
-5. API tokens for integrations (can skip optional ones)
+4. API tokens for integrations (can skip optional ones)
 
 **Result:**
-- ✅ `.claude/config.json` (committable, no secrets)
-- ✅ `~/.config/humanlayer/config-{projectKey}.json` (thoughts location)
-- ✅ `~/.config/awl/config-{projectKey}.json` (API tokens)
-- ✅ Thoughts repository at org level
-- ✅ Worktree directory created
+- `.claude/config.json` (committable, no secrets)
+- `~/.config/awl/config-{projectKey}.json` (API tokens)
 
 **Idempotent:** Safe to re-run to add/update integrations.
 
@@ -183,9 +165,6 @@ This file contains **non-sensitive** project metadata and is **safe to commit** 
     "project": {
       "ticketPrefix": "ACME",
       "name": "Acme Corp Project"
-    },
-    "thoughts": {
-      "user": null
     }
   }
 }
@@ -310,72 +289,6 @@ Run `/awl-dev:doctor` to verify your setup - it will show the CLAUDE.md status.
 
 ---
 
-## Thoughts System Setup
-
-The thoughts system provides git-backed persistent context across sessions.
-
-### Automatic Setup
-
-**Automatic setup** (included in unified setup script):
-
-The setup script automatically:
-- Creates org-level thoughts repo (`<org_root>/thoughts/`)
-- Configures HumanLayer CLI
-- Initializes thoughts in your project
-- Creates symlinks to shared thoughts
-
-### Manual Setup
-
-**Manual setup** (if needed):
-
-If you skipped thoughts setup or want to initialize additional projects:
-
-```bash
-# Initialize thoughts in current project
-cd /path/to/your-project
-humanlayer thoughts init --directory <repo-name>
-```
-
-**Directory structure:**
-```
-<org_root>/
-├── thoughts/                    # Shared by all org projects
-│   ├── repos/
-│   │   ├── project-a/
-│   │   │   ├── {your_name}/
-│   │   │   └── shared/
-│   │   └── project-b/
-│   └── global/
-├── project-a/
-│   └── thoughts/                # Symlinks to ../thoughts/repos/project-a/
-└── project-b/
-    └── thoughts/                # Symlinks to ../thoughts/repos/project-b/
-```
-
-### Syncing Thoughts
-
-```bash
-# Sync thoughts (creates searchable index)
-humanlayer thoughts sync
-
-# Check status
-humanlayer thoughts status
-
-# Sync with message
-humanlayer thoughts sync -m "Updated research on feature X"
-```
-
-### Backing Up to GitHub
-
-```bash
-cd <org_root>/thoughts
-gh repo create my-thoughts --private --source=. --push
-```
-
-Now thoughts automatically sync to GitHub.
-
----
-
 ## Service Integration
 
 ### Linear (Project Management)
@@ -466,52 +379,6 @@ Secrets config:
 
 ---
 
-## Worktree Setup
-
-For clean parallel work organization, set the `GITHUB_SOURCE_ROOT` environment variable.
-
-### Configuration
-
-Add to `~/.zshrc` or `~/.bashrc`:
-
-```bash
-export GITHUB_SOURCE_ROOT="$HOME/code-repos/github"
-```
-
-### Directory Structure
-
-This organizes your code as:
-
-- **Main repos**: `~/code-repos/github/<org>/<repo>`
-- **Worktrees**: `~/code-repos/github/<org>/<repo>-worktrees/<feature>`
-
-**Example**:
-```
-~/code-repos/github/
-├── ralfschimmel/awl/          # Main branch
-├── ralfschimmel/awl-worktrees/ # Feature branches
-│   ├── PROJ-123/
-│   └── PROJ-456/
-└── acme/api/                         # Client project
-```
-
-### Creating Worktrees
-
-```bash
-/create-worktree PROJ-123 main
-```
-
-This creates:
-- Isolated git worktree
-- Separate branch
-- Shared `.claude/` config (symlink)
-- Thoughts automatically synced
-- Dependencies installed
-
-**Fallback**: If `GITHUB_SOURCE_ROOT` not set, defaults to `~/wt/<repo>`
-
----
-
 ## Core Workflow
 
 Awl provides a research → plan → implement → validate → ship workflow.
@@ -525,7 +392,7 @@ Awl provides a research → plan → implement → validate → ship workflow.
 Follow prompts to research your codebase. This:
 - Spawns parallel research agents
 - Documents what exists (no critique)
-- Saves to `thoughts/shared/research/`
+- Saves findings to Linear as a document attached to the ticket
 
 ### 2. Planning Phase
 
@@ -536,7 +403,7 @@ Follow prompts to research your codebase. This:
 This:
 - Reads research documents
 - Interactively builds a plan with you
-- Saves to `thoughts/shared/plans/YYYY-MM-DD-TICKET-description.md`
+- Saves plan to Linear as a document attached to the ticket
 
 ### 3. Implementation Phase
 
@@ -608,7 +475,6 @@ Awl tracks your workflow via `.claude/.workflow-context.json`:
 | `/validate-plan` | Verify implementation |
 | `/create-pr` | Create PR with rich description |
 | `/merge-pr` | Merge PR and update Linear |
-| `/create-worktree` | Set up parallel workspace |
 | `/create-handoff` | Save context for later |
 | `/resume-handoff` | Restore previous context |
 
@@ -628,9 +494,7 @@ Awl tracks your workflow via `.claude/.workflow-context.json`:
 |-------|---------|
 | `@awl-dev:codebase-locator` | Find files by topic |
 | `@awl-dev:codebase-analyzer` | Understand implementation |
-| `@awl-dev:thoughts-locator` | Find historical docs |
 | `@awl-dev:codebase-pattern-finder` | Find code examples |
-| `@awl-dev:thoughts-analyzer` | Extract key insights |
 
 **Example**:
 ```
@@ -653,33 +517,12 @@ Awl tracks your workflow via `.claude/.workflow-context.json`:
    ```
 3. Restart Claude Code
 
-### "humanlayer command not found"
-
-Install the HumanLayer CLI:
-```bash
-pip install humanlayer
-# or
-pipx install humanlayer
-```
-
-### Thoughts not syncing
-
-1. Check status:
-   ```bash
-   humanlayer thoughts status
-   ```
-2. Re-initialize:
-   ```bash
-   humanlayer thoughts init
-   ```
-
 ### Config not being read
 
 **Check**:
 1. File exists: `ls .claude/config.json`
 2. Valid JSON: `cat .claude/config.json | jq`
 3. Correct location: Must be in `.claude/` directory
-4. Secrets file exists: `ls ~/.config/awl/config-{projectKey}.json`
 
 ### Commands still use generic placeholders
 

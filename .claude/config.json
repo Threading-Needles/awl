@@ -4,10 +4,6 @@
     "project": {
       "ticketPrefix": "PROJ",
       "defaultTicketPrefix": "PROJ"
-    },
-    "thoughts": {
-      "user": null,
-      "configName": null
     }
   }
 }

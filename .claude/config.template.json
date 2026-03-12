@@ -25,9 +25,5 @@
   "posthog": {
     "apiKey": "[NEEDS_SETUP]",
     "projectId": "[NEEDS_SETUP]"
-  },
-  "thoughts": {
-    "user": null,
-    "configName": null
   }
 }

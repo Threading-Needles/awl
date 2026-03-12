@@ -188,7 +188,7 @@ Generates or updates PR description with comprehensive analysis, preserving manu
 8. Adds Linear ticket reference
 9. Generates updated title
 10. Runs verification checks automatically
-11. Saves to `thoughts/shared/prs/{number}_description.md`
+11. Saves to Linear as "PR: ..." document attached to ticket
 12. Updates PR title and body on GitHub
 13. Updates Linear ticket
 
@@ -452,7 +452,6 @@ View linked PRs in Linear:
   "linear": {
     "teamId": "your-team-id",
     "projectId": "your-project-id",
-    "thoughtsRepoUrl": "https://github.com/org/thoughts/blob/main",
     "inReviewStatusName": "In Review",
     "doneStatusName": "Done"
   },

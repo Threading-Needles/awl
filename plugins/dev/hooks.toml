@@ -1,7 +1,3 @@
 # Claude Code Hooks for Awl Dev Plugin
 #
-# Previously contained 8 hooks for tracking thoughts documents.
-# Now empty - Linear documents are tracked via ticket ID, not filesystem events.
-#
-# The workflow-context.sh script tracks the current ticket, and commands
-# query Linear directly to find documents attached to that ticket.
+# Add project-specific hooks here as needed.
