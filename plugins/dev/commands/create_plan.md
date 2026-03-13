@@ -360,6 +360,9 @@ After getting initial clarifications:
    - **codebase-analyzer** - Understand implementation details
    - **codebase-pattern-finder** - Find similar features to model after
 
+   **For historical context:**
+   - **history-reader** - Find relevant decisions and patterns from completed work
+
    **For external research:**
    - **external-research** - Research framework patterns and best practices
 

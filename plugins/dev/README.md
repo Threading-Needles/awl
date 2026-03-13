@@ -83,6 +83,7 @@ Research agents for parallel codebase exploration:
 | `@awl-dev:codebase-pattern-finder` | Find code patterns |
 | `@awl-dev:linear-document-locator` | Find workflow documents |
 | `@awl-dev:linear-document-analyzer` | Analyze Linear documents |
+| `@awl-dev:history-reader` | Find context from completed work |
 | `@awl-dev:external-research` | Research external sources |
 
 ## Related Plugins

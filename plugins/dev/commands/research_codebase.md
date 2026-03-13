@@ -144,6 +144,12 @@ suggesting improvements or identifying issues.
 - Use the **linear-document-locator** agent to find any existing documents attached to the ticket
 - Use the **linear-document-analyzer** agent to extract insights from relevant documents
 
+**For historical context from completed work:**
+
+- Use the **history-reader** agent to find relevant decisions, patterns, and lessons from completed
+  tickets in the same project
+- This surfaces how similar problems were solved before
+
 **For external research (only if user explicitly asks):**
 
 - Use the **external-research** agent for external documentation and resources
@@ -177,6 +183,9 @@ Task 2 - Understand HOW it works:
 
 Task 3 - Find existing patterns:
 "Use codebase-pattern-finder to find similar implementations of [pattern] in the codebase. Show concrete examples."
+
+Task 4 - Find historical context:
+"Use history-reader to find relevant decisions and patterns from completed work on [topic] in the project."
 ```
 
 ### Step 4: Wait for All Sub-Agents to Complete and Synthesize Findings
@@ -527,6 +536,7 @@ This command integrates with the complete development workflow:
 #    - codebase-locator: Find auth-related files
 #    - codebase-analyzer: Understand auth middleware implementation
 #    - codebase-pattern-finder: Find auth usage patterns
+#    - history-reader: Find past auth-related decisions and patterns
 #    - linear-document-locator: Find existing research on PROJ-123
 # 5. Wait for all agents
 # 6. Synthesize findings

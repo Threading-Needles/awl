@@ -95,6 +95,74 @@ error logging" )
 
 **Returns**: Concrete code examples showing patterns in use
 
+### Linear Integration Agents
+
+#### linear-document-locator
+
+**Purpose**: Find documents attached to a specific Linear ticket
+
+**Use when**: You need to discover research, plans, handoffs, or PR descriptions
+
+- Finding existing workflow documents for a ticket
+- Checking what context already exists
+- Listing document IDs for the analyzer agent
+
+**Tools**: Bash(linearis \*)
+
+**Example invocation:**
+
+```markdown
+Task( subagent_type="awl-dev:linear-document-locator", prompt="Find documents for PROJ-123" )
+```
+
+**Returns**: Table of documents with IDs, types, and creation dates
+
+---
+
+#### linear-document-analyzer
+
+**Purpose**: Extract insights from a specific Linear document
+
+**Use when**: You need to read and analyze document content
+
+- Extracting decisions from research documents
+- Understanding plan details
+- Reading handoff context
+
+**Tools**: Bash(linearis \*)
+
+**Example invocation:**
+
+```markdown
+Task( subagent_type="awl-dev:linear-document-analyzer", prompt="Analyze document doc_abc123" )
+```
+
+**Returns**: Structured analysis with key decisions, findings, and actionable items
+
+---
+
+#### history-reader
+
+**Purpose**: Find relevant context from completed work across the project
+
+**Use when**: You need historical decisions, patterns, or lessons from past tickets
+
+- Understanding how similar problems were solved before
+- Finding architectural decisions from previous work
+- Surfacing lessons learned from past implementations
+
+**Tools**: Bash(linearis \*), Bash(jq \*)
+
+**Example invocation:**
+
+```markdown
+Task( subagent_type="awl-dev:history-reader", prompt="How was authentication implemented? Project: MyProject" )
+```
+
+**Returns**: Structured historical context with related tickets, decisions, patterns, and lessons
+
+---
+
 ### External Research Agents
 
 #### external-research
