@@ -1,10 +1,8 @@
 # Awl - Claude Code Workspace
 
-A development workflow for Claude Code, open sourced and packaged as a Claude Code plugin marketplace.
+[Threading Needles](https://github.com/Threading-Needles)' development workflow for Claude Code, open sourced and packaged as a Claude Code plugin marketplace.
 
-This is the workspace I use daily for AI-assisted development. It's battle-tested on real projects
-and optimized for efficient, context-aware AI collaboration. I'm sharing it so others can use it,
-fork it, and contribute ideas back.
+Awl is the workflow we use daily at Threading Needles for AI-assisted development. It's battle-tested on real projects and optimized for efficient, context-aware AI collaboration.
 
 ## Tech Stack & Integrations
 
@@ -289,20 +287,7 @@ Run the prerequisite check:
 
 ## Contributing
 
-**This is my personal workflow workspace**, primarily built for my own development style and
-preferences. That said, I'm happy to:
-
-- **Discuss ideas** - Open issues with workflow suggestions or improvements
-- **See your forks** - Adapt it to your needs and share what you built
-- **Fix bugs** - If something's broken, let me know
-- **Learn together** - Share your workflow patterns and approaches
-
-**Important**: I may not accept PRs that change core workflows or add features I don't personally
-use, since this is the workspace I rely on daily. But I **love** seeing how others adapt these
-patterns to their own needs!
-
-**Best approach**: Fork it, make it yours, and share what you learned. That's how we all get
-better!
+We welcome contributions! Open issues for bugs, workflow suggestions, or to share how you've adapted Awl to your needs.
 
 ## Documentation
 
@@ -316,12 +301,6 @@ better!
 
 MIT - Use it however you want!
 
-## Contributing
-
-You're welcome to use Awl as-is, fork it, or adapt the patterns to your own needs. Some decisions are opinionated, so think of it as a starting point rather than a one-size-fits-all solution — take what works, adapt what doesn't.
-
 ---
 
 Built by [Threading Needles](https://github.com/Threading-Needles)
-
-Want to chat about workflows, contribute ideas, or share your fork? Open an issue or discussion!
