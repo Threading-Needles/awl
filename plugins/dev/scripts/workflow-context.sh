@@ -6,7 +6,7 @@
 #   workflow-context.sh set-ticket ID     - Set current ticket
 #   workflow-context.sh get-ticket        - Get current ticket
 #   workflow-context.sh clear             - Clear current ticket
-#   workflow-context.sh detect-mode       - Detect interactive vs headless mode (or use CLAUDE_MODE env var)
+#   workflow-context.sh detect-mode       - Detect interactive vs headless mode (via CLAUDE_NON_INTERACTIVE)
 
 set -euo pipefail
 
@@ -98,15 +98,23 @@ clear)
 	;;
 detect-mode)
 	# Detect if running in interactive or headless mode
-	# Headless: claude -p "prompt" (no TTY)
-	# Interactive: user typing in Claude Code terminal
-	# Override: CLAUDE_MODE environment variable takes precedence
+	#
+	# Priority order:
+	#   1. CLAUDE_MODE env var (explicit override, always wins)
+	#   2. CLAUDE_NON_INTERACTIVE=1 (set by piped input, CI/CD, scheduled tasks)
+	#   3. CLAUDE_CODE_ENTRYPOINT=sdk-cli (set by claude -p)
+	#   4. Default: interactive
+	#
+	# Note: TTY checks ([ -t 0 ]) don't work because Claude Code runs bash
+	# commands in subprocesses without a real TTY even in interactive mode.
 	if [[ -n "${CLAUDE_MODE:-}" ]]; then
 		echo "$CLAUDE_MODE"
-	elif [ -t 0 ] && [ -t 1 ]; then
-		echo "interactive"
-	else
+	elif [[ "${CLAUDE_NON_INTERACTIVE:-}" == "1" ]]; then
 		echo "headless"
+	elif [[ "${CLAUDE_CODE_ENTRYPOINT:-}" == "sdk-cli" ]]; then
+		echo "headless"
+	else
+		echo "interactive"
 	fi
 	;;
 *)
@@ -117,7 +125,7 @@ detect-mode)
 	echo "  set-ticket <id>   Set current ticket (e.g., PROJ-123)"
 	echo "  get-ticket        Get current ticket ID"
 	echo "  clear             Clear current ticket"
-	echo "  detect-mode       Detect interactive vs headless mode (CLAUDE_MODE overrides)"
+	echo "  detect-mode       Detect interactive vs headless mode (via CLAUDE_NON_INTERACTIVE)"
 	exit 1
 	;;
 esac

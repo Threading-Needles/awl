@@ -694,12 +694,18 @@ MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
 # Returns "interactive" or "headless"
 ```
 
-**Interactive mode** (TTY detected):
+**Detection priority:**
+1. `CLAUDE_MODE` env var (explicit override, always wins)
+2. `CLAUDE_NON_INTERACTIVE=1` (set by piped input, CI/CD)
+3. `CLAUDE_CODE_ENTRYPOINT=sdk-cli` (set by `claude -p`)
+4. Default: `interactive`
+
+**Interactive mode:**
 - Uses `AskUserQuestion` tool for clarifications
 - Waits for user responses
 - Presents options and discusses trade-offs
 
-**Headless mode** (no TTY):
+**Headless mode** (`CLAUDE_MODE=headless`):
 - Uses ticket title/description as context
 - Makes reasonable decisions based on research
 - Embeds questions in Linear documents
