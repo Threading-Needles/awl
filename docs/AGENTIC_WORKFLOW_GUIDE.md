@@ -2,7 +2,7 @@
 
 A comprehensive guide to using AI-assisted development workflows effectively with Claude Code.
 
-**Version**: 1.0.0 **Last Updated**: 2025-01-08 **Based on**: HumanLayer's Advanced Context
+**Version**: 1.0.0 **Last Updated**: 2025-01-08 **Based on**: Advanced Context
 Engineering & 12 Factor Agents
 
 ## Table of Contents
@@ -13,8 +13,7 @@ Engineering & 12 Factor Agents
 4. [File Naming Conventions](#file-naming-conventions)
 5. [Handoff System](#handoff-system)
 6. [Prompting Best Practices](#prompting-best-practices)
-7. [Worktree Management](#worktree-management)
-8. [Common Patterns](#common-patterns)
+7. [Common Patterns](#common-patterns)
 
 ---
 
@@ -33,7 +32,7 @@ Core Principles
 2. **Human-in-the-Loop** - Clear checkpoints between phases
 3. **Context as Precious Resource** - Clear context between phases
 4. **Parallel Sub-Agents** - Focused tasks, isolated contexts
-5. **Structured Persistence** - Save all context to thoughts/ directory
+5. **Structured Persistence** - Save all context to Linear documents
 
 ### Benefits
 
@@ -51,10 +50,10 @@ Core Principles
 ### Phase Overview
 
 ```
-Research → Plan → [Handoff] → Worktree → Implement → Validate → PR → Done
-   ↓         ↓                               ↓          ↓         ↓
-Clear    Clear                            Clear     Clear    Clear
-Context  Context                          Context   Context  Context
+Research → Plan → [Handoff] → Implement → Validate → PR → Done
+   ↓         ↓                    ↓          ↓         ↓
+Clear    Clear                 Clear     Clear    Clear
+Context  Context               Context   Context  Context
 ```
 
 **Key**: Clear context between EVERY phase for optimal performance.
@@ -74,7 +73,7 @@ Context  Context                          Context   Context  Context
 3. Review findings
 4. Ask follow-up questions (appended to same doc)
 
-**Output**: `thoughts/shared/research/YYYY-MM-DD-PROJ-XXXX-description.md`
+**Output**: Linear document "Research: ..." attached to the ticket
 
 **Context Management**:
 
@@ -103,7 +102,7 @@ Context  Context                          Context   Context  Context
 4. Review plan structure
 5. Approve detailed plan
 
-**Output**: `thoughts/shared/plans/YYYY-MM-DD-PROJ-XXXX-description.md`
+**Output**: Linear document "Plan: ..." attached to the ticket
 
 **Context Management**:
 
@@ -137,9 +136,9 @@ Context  Context                          Context   Context  Context
 1. Document current state
 2. List action items
 3. Reference critical files
-4. Sync: `humanlayer thoughts sync` (if using thoughts)
+4. Save to Linear
 
-**Output**: `thoughts/shared/handoffs/PROJ-XXXX/YYYY-MM-DD_HH-MM-SS_description.md`
+**Output**: Linear document "Handoff: ..." attached to the ticket
 
 **Context Management**:
 
@@ -148,48 +147,24 @@ Context  Context                          Context   Context  Context
 
 ---
 
-### Phase 4: Worktree Creation
+### Phase 4: Parallel Development (Optional)
 
-**When**: Ready to implement (after plan approval)
+**When**: Ready to implement and want isolation from main development
 
-**Why Worktrees**:
-
-- Isolate changes from main development
-- Work on multiple tasks in parallel
-- Clean slate for implementation
-- No risk of contaminating main branch
-
-**Process**:
-
-```bash
-# If you have a create-worktree script
-/create-worktree PROJ-123 feature-name
-
-# Manual creation
-git worktree add ~/wt/my-project/PROJ-123-feature main
-cd ~/wt/my-project/PROJ-123-feature
-git checkout -b PROJ-123-feature
-cp -r /path/to/main/.claude .
-# If using thoughts:
-humanlayer thoughts init
-humanlayer thoughts sync
-```
-
-**Location**: `~/wt/{project-name}/{ticket-feature}`
-
-**What Gets Copied**:
-
-- `.claude/` directory (agents & commands)
-- Dependencies installed (run project setup)
-- Thoughts synced (if using thoughts system)
+> **Parallel Development**: Use Claude Code's native worktree support:
+> ```bash
+> claude --worktree feature-name    # Creates isolated worktree
+> claude -w feature-name            # Short form
+> ```
+> Worktrees are auto-cleaned if no changes are made.
 
 ---
 
 ### Phase 5: Implementation
 
-**When**: In worktree with approved plan
+**When**: With approved plan
 
-**Command**: `/implement-plan thoughts/shared/plans/YYYY-MM-DD-PROJ-XXXX-feature.md`
+**Command**: `/implement-plan`
 
 **Process**:
 
@@ -255,7 +230,7 @@ gh pr create --fill        # Create PR
 /describe-pr              # Generate PR description
 ```
 
-**PR Description File**: `thoughts/shared/prs/pr_{number}_{description}.md`
+**PR Description**: Linear document "PR: ..." attached to the ticket
 
 **Process**:
 
@@ -352,62 +327,20 @@ This command shows:
 
 ---
 
-## File Naming Conventions
+## Document Naming Conventions
 
-### Research Documents
+All workflow documents are stored as Linear documents attached to tickets. The naming convention
+uses title prefixes for easy discovery:
 
-**Location**: `thoughts/shared/research/` or `research/`
+| Document Type | Title Format | Example |
+|---------------|-------------|---------|
+| Research | "Research: ..." | "Research: OAuth Implementation" |
+| Plan | "Plan: ..." | "Plan: OAuth Implementation" |
+| Handoff | "Handoff: ..." | "Handoff: Session 2025-01-08" |
+| PR Description | "PR: ..." | "PR: #456 - Add OAuth Support" |
+| Validation | "Validation: ..." | "Validation: OAuth Implementation" |
 
-**Format**: `YYYY-MM-DD-PROJ-XXXX-description.md`
-
-**Examples**:
-
-- `2025-01-08-PROJ-1478-parent-child-tracking.md`
-- `2025-01-08-authentication-flow.md` (no ticket)
-
-### Implementation Plans
-
-**Location**: `thoughts/shared/plans/` or `plans/`
-
-**Format**: `YYYY-MM-DD-PROJ-XXXX-description.md`
-
-**Examples**:
-
-- `2025-01-08-PROJ-456-oauth-support.md`
-- `2025-01-08-improve-error-handling.md` (no ticket)
-
-### Handoff Documents
-
-**Location**: `thoughts/shared/handoffs/PROJ-XXXX/` or `handoffs/PROJ-XXXX/`
-
-**Format**: `YYYY-MM-DD_HH-MM-SS_PROJ-XXXX_description.md`
-
-**Examples**:
-
-- `2025-01-08_14-30-45_PROJ-123_implement-oauth.md`
-- Directory: `handoffs/PROJ-123/` (all handoffs for this ticket)
-
-### PR Descriptions
-
-**Location**: `thoughts/shared/prs/` or `prs/`
-
-**Format**: `pr_{number}_{description}.md`
-
-**Examples**:
-
-- `pr_456_rate_limiting.md`
-- `pr_789_oauth_support.md`
-
-### Ticket Documentation
-
-**Location**: `thoughts/shared/tickets/` or `tickets/`
-
-**Format**: `PROJ-XXXX.md`
-
-**Examples**:
-
-- `PROJ-123.md`
-- `PROJ-456.md`
+Documents are discovered by querying Linear via `linearis attachments list --issue PROJ-123`.
 
 ---
 
@@ -450,7 +383,7 @@ status: in_progress
 
 ## Current Task
 
-Implementing OAuth2 support per plan at thoughts/shared/plans/2025-01-08-PROJ-123-oauth.md
+Implementing OAuth2 support per plan "Plan: OAuth Implementation" (Linear doc on PROJ-123)
 
 ## Progress
 
@@ -461,8 +394,8 @@ Completed:
 
 ## Critical References
 
-- Implementation plan: `thoughts/shared/plans/2025-01-08-PROJ-123-oauth.md`
-- Research: `thoughts/shared/research/2025-01-08-auth-system.md`
+- Implementation plan: Linear document "Plan: OAuth Implementation" on PROJ-123
+- Research: Linear document "Research: Auth System" on PROJ-123
 - Key files:
   - `src/auth/oauth-provider.ts:45` - Provider configuration
   - `src/auth/token-validator.ts:120` - Token validation (working on this)
@@ -507,12 +440,12 @@ Completed:
 
 ### Resuming from Handoff
 
-**Command**: `/resume-handoff` (with path or ticket number)
+**Command**: `/resume-handoff` (with ticket number)
 
 **Process**:
 
-1. Read handoff document
-2. Read linked research/plans
+1. Read handoff document from Linear
+2. Read linked research/plans from Linear
 3. Spawn parallel verification tasks to check current state
 4. Present comprehensive analysis
 5. Propose next actions
@@ -521,14 +454,8 @@ Completed:
 **Example**:
 
 ```bash
-/resume-handoff thoughts/shared/handoffs/PROJ-123/2025-01-08_14-30-45_oauth.md
-```
-
-Or if command supports ticket numbers:
-
-```bash
 /resume-handoff PROJ-123
-# Finds latest handoff for this ticket
+# Finds latest handoff attached to this ticket in Linear
 ```
 
 ---
@@ -580,7 +507,7 @@ Format: `path/to/file.ext:123`
 **Good**:
 
 ```
-Read the entire implementation plan at thoughts/shared/plans/2025-01-08-PROJ-123-feature.md
+Read the entire implementation plan from the Linear document attached to PROJ-123
 ```
 
 **Bad**:
@@ -645,108 +572,6 @@ Make sure it works
 
 ---
 
-## Worktree Management
-
-### What Are Worktrees?
-
-Git worktrees allow multiple working directories for the same repository, enabling parallel
-development on different tasks.
-
-### Benefits
-
-- **Isolation**: Changes don't affect main development
-- **Parallel Work**: Multiple tasks simultaneously
-- **Clean Slate**: Fresh environment per task
-- **No Stashing**: Switch tasks without stashing changes
-- **Safety**: No risk to main branch
-
-### Creating Worktrees
-
-**Automated** (if you have script):
-
-```bash
-/create-worktree PROJ-123 oauth-support
-
-# Creates: ~/wt/my-project/PROJ-123-oauth-support
-# Copies: .claude/ directory
-# Runs: make setup (or equivalent)
-# Syncs: thoughts/ (if using thoughts system)
-```
-
-**Manual**:
-
-```bash
-# Create worktree
-git worktree add ~/wt/my-project/PROJ-123-feature main
-cd ~/wt/my-project/PROJ-123-feature
-
-# Create feature branch
-git checkout -b PROJ-123-oauth-support
-
-# Copy Claude configuration
-cp -r /path/to/main/.claude .
-
-# Install dependencies
-make setup
-# or: npm install, bundle install, etc.
-
-# Initialize thoughts (if using thoughts system)
-humanlayer thoughts init
-humanlayer thoughts sync
-```
-
-### Worktree Workflow
-
-```bash
-# 1. Create worktree for new task
-/create-worktree PROJ-123 feature-name
-cd ~/wt/my-project/PROJ-123-feature
-
-# 2. Start Claude Code in worktree
-claude
-
-# 3. Implement feature
-/implement-plan thoughts/shared/plans/2025-01-08-PROJ-123-feature.md
-
-# 4. Commit and push
-/awl-dev:commit
-git push -u origin PROJ-123-feature
-
-# 5. Create PR
-gh pr create --fill
-/describe-pr
-
-# 6. Return to main repo
-cd /path/to/main/repo
-
-# 7. Clean up worktree after PR merged
-git worktree remove ~/wt/my-project/PROJ-123-feature
-```
-
-### Listing Worktrees
-
-```bash
-git worktree list
-
-# Output:
-# /path/to/main                         abc123 [main]
-# /Users/ryan/wt/my-project/PROJ-123    def456 [PROJ-123-feature]
-# /Users/ryan/wt/my-project/PROJ-456    ghi789 [PROJ-456-oauth]
-```
-
-### Removing Worktrees
-
-**After PR Merged**:
-
-```bash
-git worktree remove ~/wt/my-project/PROJ-123-feature
-
-# If worktree has uncommitted changes, force:
-git worktree remove --force ~/wt/my-project/PROJ-123-feature
-```
-
----
-
 ## Common Patterns
 
 ### Pattern 1: Quick Research → Plan → Implement
@@ -755,7 +580,7 @@ git worktree remove --force ~/wt/my-project/PROJ-123-feature
 
 ```bash
 # 1. Research (optional if codebase familiar)
-/research-codebase
+/research-codebase PROJ-123
 > "How does rate limiting work?"
 # CLEAR CONTEXT
 
@@ -764,16 +589,11 @@ git worktree remove --force ~/wt/my-project/PROJ-123-feature
 > "Add rate limiting to API endpoints"
 # CLEAR CONTEXT
 
-# 3. Worktree
-/create-worktree PROJ-123 rate-limiting
-cd ~/wt/my-project/PROJ-123-rate-limiting
+# 3. Implement
+/implement-plan
 # CLEAR CONTEXT
 
-# 4. Implement
-/implement-plan thoughts/shared/plans/2025-01-08-PROJ-123-rate-limiting.md
-# CLEAR CONTEXT
-
-# 5. PR
+# 4. PR
 /awl-dev:commit && gh pr create --fill && /describe-pr
 ```
 
@@ -783,7 +603,7 @@ cd ~/wt/my-project/PROJ-123-rate-limiting
 
 ```bash
 # Day 1 - Research
-/research-codebase
+/research-codebase PROJ-123
 > "Understand OAuth2 implementation patterns"
 /create-handoff
 # END OF DAY - CLEAR CONTEXT
@@ -797,15 +617,14 @@ cd ~/wt/my-project/PROJ-123-rate-limiting
 
 # Day 3 - Implementation Phase 1
 /resume-handoff PROJ-123
-/create-worktree PROJ-123 oauth
-/implement-plan thoughts/shared/plans/2025-01-08-PROJ-123-oauth.md
+/implement-plan
 # Complete Phase 1 only
 /create-handoff
 # END OF DAY - CLEAR CONTEXT
 
 # Day 4 - Implementation Phase 2-3
 /resume-handoff PROJ-123
-/implement-plan (continues from checkboxes)
+/implement-plan  # Continues from checkboxes
 # Complete remaining phases
 # CLEAR CONTEXT
 
@@ -819,20 +638,17 @@ cd ~/wt/my-project/PROJ-123-rate-limiting
 **Use When**: Working on multiple tickets
 
 ```bash
-# Terminal 1 - Task A
-cd ~/wt/my-project/PROJ-123-feature-a
-claude
-/implement-plan thoughts/shared/plans/2025-01-08-PROJ-123-feature-a.md
+# Terminal 1 - Task A (using native worktree)
+claude --worktree feature-a
+/implement-plan
 
-# Terminal 2 - Task B
-cd ~/wt/my-project/PROJ-456-feature-b
-claude
-/implement-plan thoughts/shared/plans/2025-01-08-PROJ-456-feature-b.md
+# Terminal 2 - Task B (using native worktree)
+claude --worktree feature-b
+/implement-plan
 
 # Terminal 3 - Task C (research only)
-cd /path/to/main/repo
 claude
-/research-codebase
+/research-codebase PROJ-789
 > "How does X work?"
 ```
 
@@ -971,8 +787,6 @@ See `plugins/dev/LINEAR_DOCUMENTS.md` for the complete embedded questions specif
 
 ### Official Documentation
 
-- [HumanLayer Advanced Context Engineering](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents)
-- [12 Factor Agents](https://github.com/humanlayer/12-factor-agents)
 - [Anthropic Claude Code Best Practices](https://www.anthropic.com/engineering/claude-code-best-practices)
 
 ### Repository Documentation
@@ -984,7 +798,6 @@ See `plugins/dev/LINEAR_DOCUMENTS.md` for the complete embedded questions specif
 ### Configuration
 
 - `.claude/config.json` - Project-specific settings
-- `thoughts/` - Persistent context storage
 
 ---
 
@@ -995,7 +808,6 @@ See `plugins/dev/LINEAR_DOCUMENTS.md` for the complete embedded questions specif
 - [ ] After creating research document
 - [ ] After approving implementation plan
 - [ ] After creating handoff
-- [ ] Before starting implementation in worktree
 - [ ] After completing implementation
 - [ ] Before validation phase
 - [ ] After creating PR
@@ -1022,16 +834,18 @@ See `plugins/dev/LINEAR_DOCUMENTS.md` for the complete embedded questions specif
 /describe-pr                 # Generate PR description
 ```
 
-### File Naming Quick Reference
+### Document Naming Quick Reference
+
+All documents are stored in Linear with title prefixes:
 
 ```
-Research:  YYYY-MM-DD-PROJ-XXXX-description.md
-Plans:     YYYY-MM-DD-PROJ-XXXX-description.md
-Handoffs:  YYYY-MM-DD_HH-MM-SS_PROJ-XXXX_description.md
-PRs:       pr_{number}_{description}.md
-Tickets:   PROJ-XXXX.md
+Research:   "Research: <description>"
+Plans:      "Plan: <description>"
+Handoffs:   "Handoff: <description>"
+PRs:        "PR: #<number> - <description>"
+Validation: "Validation: <description>"
 ```
 
 ---
 
-**Remember**: Context is precious. Clear it frequently. Let the thoughts/ directory be your memory.
+**Remember**: Context is precious. Clear it frequently. Let Linear documents be your memory.

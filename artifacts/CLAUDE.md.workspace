@@ -35,7 +35,6 @@ This project uses the ryan-claude-workspace for AI-assisted development workflow
 
 ### Project Management (project:project)
 
-- `/project:create_worktree TICKET branch-name` - Create git worktree for parallel work
 - `/project:update_project [path]` - Update project with workspace changes
 
 ### Meta Commands (project:meta)
@@ -102,9 +101,9 @@ See `.claude/.personal/README.md` for personal customization (gitignored).
 ## Prerequisites
 
 Workflow commands require:
-- HumanLayer CLI: `brew install humanlayer/tap/humanlayer`
 - jq: `brew install jq`
 - GitHub CLI: `brew install gh` (for PR commands)
+- Linearis CLI: `npm install -g linearis` (for Linear integration)
 
 Commands will verify prerequisites and provide installation instructions if missing.
 

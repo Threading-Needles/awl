@@ -32,11 +32,7 @@ The commands look for tickets in:
    ---
    ```
 
-2. **Ticket in filename**:
-
-   ```
-   thoughts/shared/plans/2025-01-08-PROJ-123-feature.md
-   ```
+2. **Ticket in workflow context** (`.claude/.workflow-context.json`)
 
 3. **Ticket in handoff document**
 
@@ -150,7 +146,7 @@ Here's how tickets flow through the granular workflow:
 # Automatically:
 # - Moves ticket to "Research in Progress"
 # - Adds comment: "Starting research: How does authentication currently work?"
-# - Saves research document
+# - Saves research as Linear document
 # - Attaches research to ticket
 # - When complete, human moves to "Ready for Plan"
 ```
@@ -182,7 +178,7 @@ Here's how tickets flow through the granular workflow:
 
 ```bash
 # Agent or human picks up from "Ready for Dev"
-/awl-dev:implement_plan thoughts/shared/plans/2025-10-04-PROJ-123-oauth.md
+/awl-dev:implement_plan
 
 # Automatically:
 # - Moves ticket to "In Dev"
@@ -301,8 +297,8 @@ cp ~/ryan-claude-workspace/commands/linear/linear.md .claude/commands/linear/
 # 2. What's your default project ID?
 #    Project ID: [you enter: proj456]
 #
-# 3. What's your thoughts repository URL?
-#    Your pattern: https://github.com/coalesce-labs/thoughts/blob/main
+# 3. What's your GitHub repository URL?
+#    Your pattern: https://github.com/your-org/your-repo
 
 # Command updates itself:
 # ✅ Configuration complete! I've updated the linear.md file.
@@ -312,7 +308,7 @@ cp ~/ryan-claude-workspace/commands/linear/linear.md .claude/commands/linear/
 #   git commit -m "Configure Linear command"
 
 # Now it works:
-/awl-dev:linear create thoughts/shared/research/feature.md
+/awl-dev:linear create "Add feature X"
 ```
 
 ---
@@ -329,7 +325,7 @@ cp ~/ryan-claude-workspace/commands/linear/linear.md .claude/commands/linear/
    b. Update ticket status → "Planning"
    c. Add comment: "Creating implementation plan"
 4. Create plan document
-5. Save to thoughts/shared/plans/
+5. Save as Linear document attached to ticket
 6. When complete:
    a. Attach plan to Linear ticket via links
    b. Add comment with plan summary
@@ -339,9 +335,9 @@ cp ~/ryan-claude-workspace/commands/linear/linear.md .claude/commands/linear/
 ### During `/awl-dev:implement_plan`
 
 ```javascript
-1. User runs: /awl-dev:implement_plan thoughts/shared/plans/plan.md
-2. Read plan document
-3. Check plan frontmatter for ticket ID
+1. User runs: /awl-dev:implement_plan
+2. Read plan from Linear (attached to current ticket)
+3. Check plan for ticket ID
 4. If ticket found:
    a. Update ticket status → "In Progress"
    b. Add comment: "Started implementation from plan: [link]"
@@ -409,33 +405,6 @@ const config = loadConfig(".claude/linear-config.json");
 
 ---
 
-## Integration with Worktrees
-
-### Worktree + Linear Workflow
-
-When you create a worktree for a ticket:
-
-```bash
-# In main repo
-/awl-dev:create_worktree PROJ-123
-
-# This:
-# 1. Creates worktree with ticket in name
-# 2. Auto-detects ticket from worktree name
-# 3. Sets up thoughts
-# 4. Ready to work
-
-# In worktree
-cd ~/wt/project/PROJ-123
-
-/awl-dev:implement_plan  # Auto-detects PROJ-123 from directory name
-# → Updates Linear ticket to "In Progress"
-```
-
-**Enhancement idea**: Worktree creation could auto-update Linear ticket to "In Progress"
-
----
-
 ## Best Practices
 
 ### 1. Reference Tickets in Plan Frontmatter
@@ -477,7 +446,7 @@ When auto-updating ticket status, add a comment explaining:
 ```markdown
 Moving to In Progress
 
-Starting implementation from plan: thoughts/shared/plans/2025-01-08-auth.md
+Starting implementation from plan: "Plan: Auth Implementation" (Linear doc)
 
 Phases:
 
@@ -505,7 +474,7 @@ Adjust as needed!
 **Check**:
 
 1. Ticket mentioned in plan frontmatter?
-2. Ticket in filename?
+2. Ticket set in workflow context?
 3. Correct format (PROJ-123)?
 
 **Fix**: Manually specify ticket:
@@ -521,7 +490,7 @@ Adjust as needed!
 **Fix**: Be explicit about which ticket
 
 ```bash
-/awl-dev:implement_plan thoughts/shared/plans/plan.md --ticket PROJ-123
+/awl-dev:implement_plan --ticket PROJ-123
 ```
 
 ### "Status not found in Linear"
@@ -544,13 +513,13 @@ Update command to use exact names.
 
 - **Automatic status updates** from workflow commands
 - **One-time configuration** per project
-- **Proven workflow** from HumanLayer
+- **Proven workflow** with queue/active state separation
 - **Portable** across projects
 - **Team-shareable** once configured
 
 ### 🎯 Recommended Approach
 
-1. **Start simple**: Use HumanLayer's proven statuses
+1. **Start simple**: Use the proven queue/active statuses
 2. **Configure per-project**: Each project gets own settings
 3. **Let automation work**: Trust the workflow commands to update tickets
 4. **Review in 1 month**: Adjust statuses based on what you learn

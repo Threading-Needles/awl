@@ -3,8 +3,8 @@
 **Date**: 2025-10-13 **Branch**:
 `ryan/rcw-13-implement-pr-lifecycle-commands-with-linear-integration` **Plans**:
 
-- Base: `thoughts/shared/plans/2025-10-13-config-migration-embedded-to-centralized.md`
-- Supplement: `thoughts/shared/plans/2025-10-13-workflow-enhancements-supplement.md`
+- Base: Config migration - embedded to centralized
+- Supplement: Workflow enhancements supplement
 
 ## Completed Phases
 
@@ -42,7 +42,7 @@
 **Commit**: `425d829`
 
 - Created `hack/check-prerequisites.sh` script ✅
-- Checks for humanlayer CLI, thoughts init, and jq ✅
+- Checks for jq and other prerequisites ✅
 - Provides helpful installation instructions ✅
 
 ### ✅ Phase 11: CLAUDE.md Artifact System (Batch 5)

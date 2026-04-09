@@ -71,7 +71,6 @@ See [commands/README.md](commands/README.md) for full command documentation.
 | `/awl-dev:doctor` | Check setup and diagnose issues |
 | `/awl-dev:commit` | Create conventional commits |
 | `/awl-dev:debug` | Debug with logs and database |
-| `/awl-dev:create-worktree` | Set up parallel workspace |
 
 ## Agents
 
@@ -84,6 +83,7 @@ Research agents for parallel codebase exploration:
 | `@awl-dev:codebase-pattern-finder` | Find code patterns |
 | `@awl-dev:linear-document-locator` | Find workflow documents |
 | `@awl-dev:linear-document-analyzer` | Analyze Linear documents |
+| `@awl-dev:history-reader` | Find context from completed work |
 | `@awl-dev:external-research` | Research external sources |
 
 ## Related Plugins

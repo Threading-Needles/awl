@@ -3,7 +3,7 @@
 This directory contains **setup scripts** for integrating Linear and other services. These scripts
 are **not bundled in the Awl plugin** - they're used during initial setup only.
 
-**Note**: Runtime scripts (workflow-context.sh, check-prerequisites.sh, create-worktree.sh, etc.)
+**Note**: Runtime scripts (workflow-context.sh, check-prerequisites.sh, etc.)
 are bundled in the plugin at `plugins/dev/scripts/` and `plugins/meta/scripts/`.
 
 ## Directory Structure
@@ -133,12 +133,10 @@ source ./scripts/load-awl-config.sh
 These scripts are bundled in the Awl plugin:
 
 - `plugins/dev/scripts/check-prerequisites.sh` - Validates Linear is configured
-- `plugins/dev/scripts/create-worktree.sh` - Creates git worktrees
 - `plugins/dev/scripts/workflow-context.sh` - Manages current ticket context
 
 **Use commands instead**:
 
-- `/create-worktree` - Creates worktrees
 - `/validate-frontmatter` - Validates frontmatter
 
 ---

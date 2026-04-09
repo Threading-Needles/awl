@@ -12,11 +12,9 @@ NC='\033[0m' # No Color
 
 # Required tools (command:name:install-instruction)
 REQUIRED_TOOLS=(
-	"humanlayer:HumanLayer CLI:pip install humanlayer"
 	"jq:JSON processor:brew install jq"
 	"gh:GitHub CLI:brew install gh"
-	"linearis:Linear CLI:npm install -g --install-links ryanrozich/linearis#feat/cycles-cli"
-	"sentry-cli:Sentry CLI:curl -sL https://sentry.io/get-cli/ | sh"
+	"linearis:Linear CLI:npm install -g linearis"
 )
 
 # Optional MCP servers (name:purpose:install-command)

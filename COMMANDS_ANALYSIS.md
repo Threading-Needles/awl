@@ -1,4 +1,4 @@
-# HumanLayer Commands Analysis
+# Commands Analysis
 
 ## What We Should Use Directly
 
@@ -8,12 +8,11 @@ These are universally useful and work with any project:
 
 1. **commit.md** - Smart git commit creation
    - Analyzes changes and creates logical commits
-   - No HumanLayer-specific dependencies
+   - No external dependencies
    - Works with any git repository
 
 2. **describe_pr.md** - PR description generation
    - Uses `gh` CLI (GitHub CLI)
-   - Reads PR template from `thoughts/shared/pr_description.md`
    - Runs verification commands
    - Updates PR via GitHub API
 
@@ -22,72 +21,14 @@ These are universally useful and work with any project:
    - Can be adapted for any project's logging structure
    - Helps debug without burning main context
 
-### 🔧 HumanLayer CLI Commands (Use Directly)
+### Previously Not Copied
 
-These are CLI commands that should be called directly, not duplicated:
+These were tightly coupled to upstream infrastructure:
 
-1. **humanlayer thoughts** - Thoughts repository management
-   - `init` - Initialize thoughts for a project
-   - `sync` - Sync thoughts to repository
-   - `status` - Check sync status
-   - `uninit` - Remove thoughts setup
-
-2. **humanlayer launch** - Launch Claude Code sessions
-   - Used by `/create_worktree` to spawn parallel sessions
-   - Manages daemon communication
-   - Handles working directory and context
-
-### ❌ HumanLayer-Specific (Don't Copy)
-
-These are tightly coupled to HumanLayer's infrastructure:
-
-1. **linear.md** - Linear ticket management
-   - Uses Linear MCP server
-   - HumanLayer-specific workflow statuses
-   - HumanLayer project IDs
-   - Can be adapted if you use Linear, but needs customization
-
-2. **ci_commit.md / ci_describe_pr.md** - CI-specific versions
-   - Hardcoded for HumanLayer's CI environment
-   - Different behavior than local versions
-
-3. **create_handoff.md / resume_handoff.md** - Session handoff
-   - Uses HumanLayer daemon for session management
-   - Specific to their multi-Claude workflow
-
-4. **ralph\_\*.md commands** - Internal workflows
-   - Named after their process "Ralph"
-   - HumanLayer-specific conventions
-
-5. **research_codebase\*.md** - Variations of create_plan
-   - Duplicates of create_plan with slight tweaks
-   - We already have create_plan
-
-6. **founder_mode.md** - Internal joke/tool
-   - Not generally useful
-
-## Recommendations
-
-### What to Add Now
-
-1. ✅ **commit.md** - Already copied
-2. ✅ **describe_pr.md** - Already copied
-3. ✅ **debug.md** - Already copied
-
-### What to Consider Adding
-
-If you use **Linear** for issue tracking:
-
-- Copy `linear.md` but customize:
-  - Remove HumanLayer-specific project IDs
-  - Adjust workflow statuses for your team
-  - Update thoughts URL mappings
-
-### What to Keep Using from CLI
-
-- `humanlayer thoughts init` - Don't duplicate
-- `humanlayer thoughts sync` - Don't duplicate
-- `humanlayer launch` - Use when creating worktrees
+1. **ci_commit.md / ci_describe_pr.md** - CI-specific versions
+2. **create_handoff.md / resume_handoff.md** - Session handoff (now reimplemented)
+3. **research_codebase\*.md** - Variations of create_plan (consolidated)
+4. **founder_mode.md** - Internal tool (not generally useful)
 
 ## Commands We Have Now
 
@@ -95,7 +36,6 @@ If you use **Linear** for issue tracking:
 commands/
 ├── commit.md              # Git commit creation (copied from HL)
 ├── create_plan.md         # Interactive planning (copied from HL)
-├── create_worktree.md     # Worktree management (adapted from HL)
 ├── debug.md               # Debugging helper (copied from HL)
 ├── describe_pr.md         # PR description (copied from HL)
 ├── implement_plan.md      # Plan execution (copied from HL)
@@ -113,7 +53,6 @@ commands/
 ### describe_pr.md
 
 - Requires: `gh` CLI installed
-- Requires: PR template at `thoughts/shared/pr_description.md`
 - Runs verification commands automatically
 - Updates PR via GitHub API
 
@@ -122,36 +61,6 @@ commands/
 - Use when hitting issues during implementation
 - Investigates without burning main context
 - Adapt log paths for your project structure
-
-## Creating Your Own PR Template
-
-For `describe_pr.md` to work, create:
-
-`thoughts/shared/pr_description.md`:
-
-```markdown
-## Summary
-
-What does this PR do?
-
-## Problem
-
-What problem does this solve?
-
-## Solution
-
-How does it solve it?
-
-## How to verify it
-
-- [ ] Tests pass: `make test`
-- [ ] Linting passes: `make lint`
-- [ ] Manually tested: [describe how]
-
-## Changelog
-
-Brief user-facing description for CHANGELOG.md
-```
 
 ## Extending This
 

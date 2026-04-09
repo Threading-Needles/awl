@@ -34,7 +34,7 @@ We use **semantic versioning** (MAJOR.MINOR.PATCH):
 - ✅ Fixing bugs
 
 **Version bump magnitude:**
-- **MAJOR**: Thoughts system now required, config format changed
+- **MAJOR**: Required new dependencies, config format changed
 - **MINOR**: New `/pm:analyze-milestone` command added
 - **PATCH**: Fixed bug in workflow-context.sh
 
@@ -187,21 +187,21 @@ After version bump and push:
 ```bash
 # Create GitHub release for major/minor versions
 gh release create awl-dev-v2.0.0 \
-  --title "awl-dev v2.0.0 - Thoughts System Enforcement" \
+  --title "awl-dev v2.0.0 - Linear Integration Required" \
   --notes "
 ## Breaking Changes
-- Thoughts system now required for all commands
+- Linear integration now required for all commands
 - Config security with two-layer system
 
 ## New Features
-- Automatic thoughts validation
+- Automatic Linear validation
 - Clear setup error messages
 
 ## Migration
-Users must run:
+Users must configure:
 \`\`\`bash
-./scripts/humanlayer/init-project.sh . {project-name}
-./scripts/setup-awl-config.sh
+npm install -g linearis
+export LINEAR_API_TOKEN=your_token
 \`\`\`
 "
 ```

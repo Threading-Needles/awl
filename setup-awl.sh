@@ -18,9 +18,6 @@ PROJECT_KEY=""
 ORG_NAME=""
 REPO_NAME=""
 ORG_ROOT=""
-THOUGHTS_REPO=""
-WORKTREE_BASE=""
-USER_NAME=""
 
 #
 # Utility functions
@@ -241,14 +238,6 @@ check_prerequisites() {
     print_success "jq installed"
   fi
 
-  # Critical: humanlayer (for thoughts system)
-  if ! check_command_exists "humanlayer"; then
-    print_warning "HumanLayer CLI not found (required for thoughts system)"
-    offer_install_humanlayer || missing_critical=true
-  else
-    print_success "HumanLayer CLI installed"
-  fi
-
   # Optional: gh (for Linear, GitHub backup)
   if ! check_command_exists "gh"; then
     print_warning "GitHub CLI not found (optional, for Linear integration)"
@@ -303,37 +292,11 @@ check_prerequisites() {
   echo ""
 }
 
-offer_install_humanlayer() {
-  echo ""
-  echo "HumanLayer CLI is required for the thoughts system."
-  echo ""
-  echo "Installation options:"
-  echo "  1. pip install humanlayer"
-  echo "  2. pipx install humanlayer"
-  echo ""
-
-  if ask_yes_no "Attempt to install via pip now?"; then
-    if command -v pip &>/dev/null; then
-      pip install humanlayer
-      return 0
-    elif command -v pip3 &>/dev/null; then
-      pip3 install humanlayer
-      return 0
-    else
-      print_error "pip not found. Please install Python and pip first."
-      return 1
-    fi
-  else
-    print_warning "Skipping HumanLayer installation. Setup cannot continue."
-    return 1
-  fi
-}
-
 offer_install_gh_cli() {
   echo ""
   echo "GitHub CLI is useful for:"
   echo "  - Linear integration (via gh api)"
-  echo "  - Backing up thoughts repo to GitHub"
+  echo "  - PR creation and management"
   echo ""
   echo "Installation: https://cli.github.com/"
   echo ""
@@ -496,133 +459,6 @@ determine_project_location() {
 # Setup functions
 #
 
-setup_thoughts_repo() {
-  print_header "Setting Up Thoughts Repository"
-
-  THOUGHTS_REPO="${ORG_ROOT}/thoughts"
-
-  if [ -d "$THOUGHTS_REPO" ]; then
-    print_success "Found existing thoughts repository: $THOUGHTS_REPO"
-
-    # Validate structure
-    if [ ! -d "$THOUGHTS_REPO/repos" ] || [ ! -d "$THOUGHTS_REPO/global" ]; then
-      print_warning "Thoughts repo exists but missing expected structure"
-      echo "Expected: repos/ and global/ directories"
-
-      if ask_yes_no "Initialize proper structure?"; then
-        mkdir -p "$THOUGHTS_REPO/repos"
-        mkdir -p "$THOUGHTS_REPO/global"
-      fi
-    fi
-
-    # Check if it's a git repo
-    if [ ! -d "$THOUGHTS_REPO/.git" ]; then
-      print_warning "Thoughts repo is not a git repository"
-
-      if ask_yes_no "Initialize as git repo?"; then
-        cd "$THOUGHTS_REPO"
-        git init
-        git add .
-        git commit -m "Initial commit" || true
-        cd "$PROJECT_DIR"
-      fi
-    fi
-  else
-    echo "Thoughts repository will be created at: $THOUGHTS_REPO"
-    echo ""
-    echo "This will be shared by all projects in org: $ORG_NAME"
-    echo ""
-
-    if ask_yes_no "Create thoughts repository?"; then
-      mkdir -p "$THOUGHTS_REPO/repos"
-      mkdir -p "$THOUGHTS_REPO/global"
-
-      # Initialize as git repo
-      cd "$THOUGHTS_REPO"
-      git init
-
-      # Create README
-      cat > README.md <<'EOF'
-# Thoughts Repository
-
-This is a shared thoughts repository for all projects in this organization.
-
-## Structure
-
-```
-thoughts/
-├── repos/           # Per-project thoughts
-│   ├── project-a/
-│   │   ├── {user}/
-│   │   └── shared/
-│   └── project-b/
-│       ├── {user}/
-│       └── shared/
-└── global/          # Cross-project thoughts
-    ├── {user}/
-    └── shared/
-```
-
-## Usage
-
-Projects symlink into this repo via `humanlayer thoughts init`.
-
-See: https://github.com/humanlayer/humanlayer/blob/main/hlyr/THOUGHTS.md
-EOF
-
-      git add README.md
-      git commit -m "Initial thoughts repository"
-
-      print_success "Created thoughts repository: $THOUGHTS_REPO"
-      cd "$PROJECT_DIR"
-    else
-      print_error "Thoughts repository required for Awl. Exiting."
-      exit 1
-    fi
-  fi
-
-  # Offer GitHub backup
-  if [ -d "$THOUGHTS_REPO/.git" ]; then
-    offer_github_backup
-  fi
-
-  echo ""
-}
-
-setup_worktree_directory() {
-  print_header "Setting Up Worktree Directory"
-
-  WORKTREE_BASE="${ORG_ROOT}/${REPO_NAME}-worktrees"
-
-  echo "Worktrees will be created at: $WORKTREE_BASE"
-  echo ""
-
-  if [ -d "$WORKTREE_BASE" ]; then
-    print_success "Worktree directory already exists"
-
-    # List existing worktrees
-    local count
-    count=$(find "$WORKTREE_BASE" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
-
-    if [ "$count" -gt 0 ]; then
-      echo "Existing worktrees:"
-      ls -1 "$WORKTREE_BASE" | sed 's/^/  - /'
-    fi
-  else
-    if ask_yes_no "Create worktree directory?"; then
-      mkdir -p "$WORKTREE_BASE"
-      print_success "Created worktree directory: $WORKTREE_BASE"
-    else
-      print_warning "Skipped worktree setup. You can create it later."
-    fi
-  fi
-
-  echo ""
-  echo "To create worktrees, use:"
-  echo "  /create-worktree PROJ-123 main"
-  echo ""
-}
-
 setup_project_config() {
   print_header "Setting Up Project Configuration"
 
@@ -672,7 +508,7 @@ setup_project_config() {
   echo ""
   echo "Project Name Configuration:"
   echo "  This is a human-friendly display name (not the repo name)."
-  echo "  Used in documentation, reports, and thought documents."
+  echo "  Used in documentation and reports."
   echo "  Example: 'Acme API' instead of 'acme-api-backend'"
   echo ""
   read -p "Enter project name [${REPO_NAME}]: " project_name
@@ -690,9 +526,6 @@ setup_project_config() {
     "project": {
       "ticketPrefix": "${ticket_prefix}",
       "name": "${project_name}"
-    },
-    "thoughts": {
-      "user": null
     }
   }
 }
@@ -703,69 +536,6 @@ EOF
   echo "✓ projectKey: ${PROJECT_KEY}"
   echo "✓ org/repo: ${ORG_NAME}/${REPO_NAME}"
   echo "✓ ticketPrefix: ${ticket_prefix}"
-  echo ""
-}
-
-setup_humanlayer_config() {
-  print_header "Setting Up HumanLayer Configuration"
-
-  local config_dir="$HOME/.config/humanlayer"
-  local config_file="${config_dir}/config-${PROJECT_KEY}.json"
-
-  mkdir -p "$config_dir"
-
-  # Check if config already exists
-  if [ -f "$config_file" ]; then
-    print_warning "Found existing HumanLayer config: $config_file"
-
-    # Validate it points to correct thoughts repo
-    local existing_repo
-    existing_repo=$(jq -r '.thoughts.thoughtsRepo // empty' "$config_file")
-
-    if [ -n "$existing_repo" ] && [ "$existing_repo" = "$THOUGHTS_REPO" ]; then
-      print_success "Config already points to correct thoughts repo"
-      return 0
-    elif [ -n "$existing_repo" ]; then
-      print_warning "Config points to different thoughts repo: $existing_repo"
-
-      if ! ask_yes_no "Update to use $THOUGHTS_REPO?"; then
-        THOUGHTS_REPO="$existing_repo"
-        print_warning "Using existing thoughts repo: $existing_repo"
-        return 0
-      fi
-    fi
-  fi
-
-  # Prompt for username
-  echo ""
-  echo "Thoughts Username Configuration:"
-  echo "  This creates a personal directory for your notes and research."
-  echo "  Structure: thoughts/{your_name}/ (e.g., thoughts/ryan/)"
-  echo "  Used to separate your work from shared team documents."
-  echo ""
-  echo "  Detected system user: ${USER}"
-  echo "  You can use your system username or choose something else (like your first name)."
-  echo ""
-  read -p "Enter your name for thoughts [${USER}]: " thoughts_user
-  thoughts_user="${thoughts_user:-${USER}}"
-  USER_NAME="$thoughts_user"
-
-  # Create config
-  cat > "$config_file" <<EOF
-{
-  "thoughts": {
-    "thoughtsRepo": "${THOUGHTS_REPO}",
-    "user": "${thoughts_user}",
-    "reposDir": "repos",
-    "globalDir": "global"
-  }
-}
-EOF
-
-  print_success "Created HumanLayer config: $config_file"
-  echo ""
-  echo "✓ Thoughts repo: ${THOUGHTS_REPO}"
-  echo "✓ User: ${thoughts_user}"
   echo ""
 }
 
@@ -1353,80 +1123,6 @@ prompt_exa_config() {
 # Initialization functions
 #
 
-init_humanlayer_thoughts() {
-  print_header "Initializing HumanLayer Thoughts"
-
-  cd "$PROJECT_DIR"
-
-  # Check if already initialized
-  if [ -L "thoughts/shared" ] && [ -L "thoughts/global" ]; then
-    print_success "Thoughts already initialized in this project"
-
-    # Verify symlinks are correct
-    local shared_target
-    shared_target=$(readlink "thoughts/shared" 2>/dev/null || echo "")
-
-    if [[ "$shared_target" =~ ${THOUGHTS_REPO} ]]; then
-      print_success "Symlinks point to correct thoughts repo"
-      return 0
-    else
-      print_warning "Symlinks point to different location: $shared_target"
-
-      if ! ask_yes_no "Re-initialize thoughts?"; then
-        return 0
-      fi
-
-      # Remove old symlinks
-      rm -rf thoughts/
-    fi
-  fi
-
-  echo ""
-  echo "Running: humanlayer thoughts init --directory \"${REPO_NAME}\""
-  echo ""
-
-  # Run humanlayer thoughts init with the correct config
-  local config_file="$HOME/.config/humanlayer/config-${PROJECT_KEY}.json"
-
-  if ! HUMANLAYER_CONFIG="$config_file" humanlayer thoughts init --directory "$REPO_NAME"; then
-    print_error "Failed to initialize thoughts"
-    echo ""
-    echo "You can try manually:"
-    echo "  cd $PROJECT_DIR"
-    echo "  HUMANLAYER_CONFIG=$config_file humanlayer thoughts init --directory \"${REPO_NAME}\""
-    return 1
-  fi
-
-  print_success "Thoughts initialized!"
-
-  # Verify structure
-  if [ -d "thoughts" ]; then
-    echo ""
-    echo "Created structure:"
-    ls -la thoughts/ | grep -v "^total" | tail -n +2 | sed 's/^/  /'
-  fi
-
-  echo ""
-}
-
-sync_thoughts() {
-  echo "Creating searchable index..."
-
-  cd "$PROJECT_DIR"
-
-  local config_file="$HOME/.config/humanlayer/config-${PROJECT_KEY}.json"
-
-  if HUMANLAYER_CONFIG="$config_file" humanlayer thoughts sync; then
-    print_success "Thoughts synced and indexed"
-  else
-    print_warning "Failed to sync thoughts. You can run manually:"
-    echo "  cd $PROJECT_DIR"
-    echo "  humanlayer thoughts sync"
-  fi
-
-  echo ""
-}
-
 #
 # Validation functions
 #
@@ -1463,30 +1159,6 @@ validate_setup() {
     validation_failed=true
   fi
 
-  # Check HumanLayer config
-  local hl_config="$HOME/.config/humanlayer/config-${PROJECT_KEY}.json"
-  if [ -f "$hl_config" ]; then
-    if jq empty "$hl_config" 2>/dev/null; then
-      print_success "✓ HumanLayer config is valid JSON"
-
-      local repo_path
-      repo_path=$(jq -r '.thoughts.thoughtsRepo // empty' "$hl_config")
-
-      if [ -d "$repo_path" ]; then
-        print_success "✓ Thoughts repo exists: $repo_path"
-      else
-        print_error "✗ Thoughts repo not found: $repo_path"
-        validation_failed=true
-      fi
-    else
-      print_error "✗ HumanLayer config is invalid JSON"
-      validation_failed=true
-    fi
-  else
-    print_error "✗ HumanLayer config not found"
-    validation_failed=true
-  fi
-
   # Check Awl secrets
   local secrets_config="$HOME/.config/awl/config-${PROJECT_KEY}.json"
   if [ -f "$secrets_config" ]; then
@@ -1498,21 +1170,6 @@ validate_setup() {
     fi
   else
     print_warning "⚠ Awl secrets config not found (okay if skipped integrations)"
-  fi
-
-  # Check thoughts symlinks
-  if [ -L "${PROJECT_DIR}/thoughts/shared" ]; then
-    print_success "✓ Thoughts symlinks created"
-  else
-    print_error "✗ Thoughts not initialized in project"
-    validation_failed=true
-  fi
-
-  # Check worktree directory
-  if [ -d "$WORKTREE_BASE" ]; then
-    print_success "✓ Worktree directory exists: $WORKTREE_BASE"
-  else
-    print_warning "⚠ Worktree directory not created (okay if skipped)"
   fi
 
   echo ""
@@ -1541,18 +1198,8 @@ print_summary() {
   echo "   Project Key: ${PROJECT_KEY}"
   echo ""
 
-  echo "🧠 Thoughts Repository:"
-  echo "   Location: ${THOUGHTS_REPO}"
-  echo "   User: ${USER_NAME}"
-  echo ""
-
-  echo "🌳 Worktrees:"
-  echo "   Location: ${WORKTREE_BASE}"
-  echo ""
-
   echo "⚙️  Configuration Files:"
   echo "   Project: ${PROJECT_DIR}/.claude/config.json"
-  echo "   HumanLayer: ~/.config/humanlayer/config-${PROJECT_KEY}.json"
   echo "   Secrets: ~/.config/awl/config-${PROJECT_KEY}.json"
   echo ""
 
@@ -1573,10 +1220,6 @@ print_summary() {
   echo "   /research-codebase"
   echo ""
 
-  echo "4. Create a worktree for parallel work:"
-  echo "   /create-worktree PROJ-123 main"
-  echo ""
-
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
   echo "📚 Documentation:"
@@ -1589,77 +1232,6 @@ print_summary() {
   echo "   - Fix configuration issues"
   echo "   - Set up additional projects in same org"
   echo ""
-}
-
-#
-# GitHub backup functions
-#
-
-offer_github_backup() {
-  echo ""
-  print_header "GitHub Backup for Thoughts"
-
-  cd "$THOUGHTS_REPO"
-
-  # Check if already has remote
-  if git remote get-url origin >/dev/null 2>&1; then
-    local remote_url
-    remote_url=$(git remote get-url origin)
-    print_success "Thoughts repo already backed up to: $remote_url"
-    cd "$PROJECT_DIR"
-    return 0
-  fi
-
-  echo "Your thoughts repository is not backed up to GitHub."
-  echo ""
-  echo "Options:"
-  echo "  1. Create new private GitHub repo (requires 'gh' CLI)"
-  echo "  2. Link to existing GitHub repo (provide URL)"
-  echo "  3. Skip (set up backup manually later)"
-  echo ""
-
-  read -p "Select option (1, 2, or 3): " backup_option
-
-  case $backup_option in
-    1)
-      if ! command -v gh &>/dev/null; then
-        print_error "GitHub CLI ('gh') not found"
-        cd "$PROJECT_DIR"
-        return 1
-      fi
-
-      local repo_name="${ORG_NAME}-thoughts"
-      echo ""
-      echo "Creating private GitHub repo: ${ORG_NAME}/${repo_name}"
-
-      if gh repo create "${repo_name}" --private --source=. --push; then
-        print_success "Thoughts backed up to GitHub!"
-      else
-        print_error "Failed to create GitHub repo"
-      fi
-      ;;
-    2)
-      echo ""
-      read -p "Enter GitHub repo URL (git@github.com:org/repo.git): " remote_url
-
-      git remote add origin "$remote_url"
-
-      if ask_yes_no "Push now?"; then
-        git push -u origin main || git push -u origin master
-        print_success "Thoughts pushed to GitHub"
-      fi
-      ;;
-    3)
-      echo "Skipping GitHub backup. You can set it up later with:"
-      echo "  cd $THOUGHTS_REPO"
-      echo "  gh repo create my-thoughts --private --source=. --push"
-      ;;
-    *)
-      print_warning "Invalid option. Skipping GitHub backup."
-      ;;
-  esac
-
-  cd "$PROJECT_DIR"
 }
 
 #
@@ -1677,13 +1249,8 @@ main() {
   # Run setup steps
   check_prerequisites
   detect_git_repo
-  setup_thoughts_repo
-  setup_worktree_directory
   setup_project_config
-  setup_humanlayer_config
   setup_awl_secrets
-  init_humanlayer_thoughts
-  sync_thoughts
 
   # Validate
   if validate_setup; then

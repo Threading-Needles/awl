@@ -5,20 +5,19 @@ helps you find the documentation you need.
 
 ## Core Concepts
 
-**Three-Layer Memory System**: Awl separates context into three layers:
+**Two-Layer Memory System**: Awl separates context into two layers:
 
 1. **Short-term Memory** (`.claude/.workflow-context.json`) - Session state, command chaining
-2. **Long-term Memory** (HumanLayer thoughts repo) - Git-backed persistence, shared knowledge
-3. **Project Configuration** (`.claude/config.json`) - Which thoughts repo to use, project settings
+2. **Long-term Memory** (Linear documents) - Persistent workflow documents attached to tickets
 
 **Structured Development Workflow**:
 
 ```
-research → plan → branch/worktree → implement → validate → merge_pr
+research → plan → branch → implement → validate → merge_pr
 ```
 
 **Multiple Projects**: Work on separate projects (work/personal, different clients) with isolated
-contexts via different HumanLayer configs.
+contexts via different Linear workspace configs.
 
 See [CLAUDE.md](../CLAUDE.md) for complete architecture details.
 
@@ -40,7 +39,7 @@ See [CLAUDE.md](../CLAUDE.md) for complete architecture details.
 
 #### [Installation & Configuration Guide](../QUICKSTART.md)
 
-Complete guide covering installation, configuration, thoughts system setup, service integration (Linear, Sentry, PostHog), and worktree configuration.
+Complete guide covering installation, configuration, service integration (Linear), and project setup.
 
 **Read this when**: Setting up a new project or configuring integrations.
 
@@ -48,7 +47,7 @@ Complete guide covering installation, configuration, thoughts system setup, serv
 
 #### [MULTI_CONFIG_GUIDE.md](MULTI_CONFIG_GUIDE.md)
 
-Managing multiple client configurations, switching configs, separate thoughts repositories per
+Managing multiple client configurations, switching configs, separate Linear workspaces per
 client.
 
 **Read this when**: Working across multiple clients/projects simultaneously.
@@ -59,7 +58,7 @@ client.
 
 #### [USAGE.md](USAGE.md)
 
-Core workflow commands, installation, thoughts system, Linear integration, common workflows.
+Core workflow commands, installation, Linear integration, common workflows.
 
 **Read this when**: Learning the system or looking up command usage.
 
@@ -83,7 +82,7 @@ Research → Plan → Implement → Validate workflow, context management, hando
 
 #### [PATTERNS.md](PATTERNS.md)
 
-Parallel development, feature branches, worktrees, documentation patterns, testing workflows.
+Parallel development, feature branches, documentation patterns, testing workflows.
 
 **Read this when**: Looking for concrete usage examples.
 
@@ -114,14 +113,6 @@ External research using DeepWiki, researching external repositories, learning fr
 patterns.
 
 **Read this when**: Researching how external projects implement features.
-
----
-
-#### [HUMANLAYER_COMMANDS_ANALYSIS.md](HUMANLAYER_COMMANDS_ANALYSIS.md)
-
-Analysis of HumanLayer command patterns, adaptation patterns, command structure comparison.
-
-**Read this when**: Understanding origins of workspace commands.
 
 ---
 
@@ -195,7 +186,6 @@ YAML frontmatter validation, required fields, valid categories/tools, validation
 
 - [Claude Code Documentation](https://docs.claude.com/en/docs/claude-code)
 - [Linear API](https://developers.linear.app/)
-- [HumanLayer](https://github.com/humanlayer/humanlayer)
 
 ---
 

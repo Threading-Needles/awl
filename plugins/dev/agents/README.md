@@ -95,52 +95,73 @@ error logging" )
 
 **Returns**: Concrete code examples showing patterns in use
 
-### Thoughts System Agents
+### Linear Integration Agents
 
-#### thoughts-locator
+#### linear-document-locator
 
-**Purpose**: Discover existing thought documents about a topic
+**Purpose**: Find documents attached to a specific Linear ticket
 
-**Use when**: You need to find related research or plans
+**Use when**: You need to discover research, plans, handoffs, or PR descriptions
 
-- Finding previous research on a topic
-- Discovering related plans
-- Locating historical decisions
-- Searching for related discussions
+- Finding existing workflow documents for a ticket
+- Checking what context already exists
+- Listing document IDs for the analyzer agent
 
-**Tools**: Grep, Glob, LS
+**Tools**: Bash(linearis \*)
 
 **Example invocation:**
 
 ```markdown
-Task( subagent_type="awl-dev:thoughts-locator", prompt="Find all thoughts documents about authentication" )
+Task( subagent_type="awl-dev:linear-document-locator", prompt="Find documents for PROJ-123" )
 ```
 
-**Returns**: List of relevant thought documents with paths
+**Returns**: Table of documents with IDs, types, and creation dates
 
 ---
 
-#### thoughts-analyzer
+#### linear-document-analyzer
 
-**Purpose**: Extract key insights from thought documents
+**Purpose**: Extract insights from a specific Linear document
 
-**Use when**: You need to understand documented decisions
+**Use when**: You need to read and analyze document content
 
-- Analyzing research documents
-- Understanding plan rationale
-- Extracting historical context
-- Identifying previous decisions
+- Extracting decisions from research documents
+- Understanding plan details
+- Reading handoff context
 
-**Tools**: Read, Grep, Glob, LS
+**Tools**: Bash(linearis \*)
 
 **Example invocation:**
 
 ```markdown
-Task( subagent_type="awl-dev:thoughts-analyzer", prompt="Analyze the authentication research document and
-extract key findings" )
+Task( subagent_type="awl-dev:linear-document-analyzer", prompt="Analyze document doc_abc123" )
 ```
 
-**Returns**: Summary of insights and decisions from documents
+**Returns**: Structured analysis with key decisions, findings, and actionable items
+
+---
+
+#### history-reader
+
+**Purpose**: Find relevant context from completed work across the project
+
+**Use when**: You need historical decisions, patterns, or lessons from past tickets
+
+- Understanding how similar problems were solved before
+- Finding architectural decisions from previous work
+- Surfacing lessons learned from past implementations
+
+**Tools**: Bash(linearis \*), Bash(jq \*)
+
+**Example invocation:**
+
+```markdown
+Task( subagent_type="awl-dev:history-reader", prompt="How was authentication implemented? Project: MyProject" )
+```
+
+**Returns**: Structured historical context with related tickets, decisions, patterns, and lessons
+
+---
 
 ### External Research Agents
 
@@ -211,8 +232,9 @@ Commands spawn multiple agents concurrently for efficiency:
 ```markdown
 # Spawn three agents in parallel
 
-Task(subagent_type="awl-dev:codebase-locator", ...) Task(subagent_type="awl-dev:thoughts-locator", ...)
+Task(subagent_type="awl-dev:codebase-locator", ...)
 Task(subagent_type="awl-dev:codebase-analyzer", ...)
+Task(subagent_type="awl-dev:codebase-pattern-finder", ...)
 
 # Wait for all to complete
 
@@ -361,15 +383,7 @@ Task(subagent_type="awl-dev:codebase-locator", ...)
 Task(subagent_type="awl-dev:codebase-analyzer", ...)
 ```
 
-### Pattern 2: Parallel Search
-
-```markdown
-# Search codebase and thoughts simultaneously
-
-Task(subagent_type="awl-dev:codebase-locator", ...) Task(subagent_type="awl-dev:thoughts-locator", ...)
-```
-
-### Pattern 3: Pattern Discovery
+### Pattern 2: Pattern Discovery
 
 ```markdown
 # Find patterns after understanding the code

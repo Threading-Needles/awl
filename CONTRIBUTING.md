@@ -11,7 +11,6 @@ the workspace.
 - **Make** - Build automation
 - **Git** - Version control
 - **jq** - JSON processor (for config handling)
-- **HumanLayer CLI** (optional) - For thoughts system
 
 ### Installation
 
@@ -162,9 +161,7 @@ The frontmatter validator checks:
 
 These scripts have ANSI color codes that confuse shellcheck:
 
-- `hack/create-worktree.sh`
 - `hack/install-user.sh`
-- `hack/setup-personal-thoughts.sh`
 - `hack/update-project.sh`
 
 ## CI/CD

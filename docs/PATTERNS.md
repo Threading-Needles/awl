@@ -369,7 +369,6 @@ You are a specialist at finding WHERE {things} exist.
 **Examples:**
 
 - `codebase-locator` - Finds code files
-- `thoughts-locator` - Finds thought documents
 - `config-locator` - Finds configuration files
 - `dependency-locator` - Finds dependency usage
 
@@ -441,7 +440,6 @@ You are a specialist at understanding HOW {things} work.
 **Examples:**
 
 - `codebase-analyzer` - Analyzes code implementation
-- `thoughts-analyzer` - Analyzes thought documents
 - `performance-analyzer` - Analyzes performance characteristics
 - `security-analyzer` - Analyzes security aspects
 
@@ -737,8 +735,7 @@ When invoked:
 
 ## Step 3: Documentation
 
-- Write plan to thoughts/shared/plans/
-- Sync thoughts directory
+- Save plan to Linear as document attached to ticket
 ```
 
 ### Pattern 2: Validation Command
@@ -824,7 +821,7 @@ You are tasked with researching {topic}.
 
 - Spawn parallel research agents:
   - codebase-locator for files
-  - thoughts-locator for history
+  - linear-document-locator for history
   - {domain}-pattern-finder for examples
 
 ### Phase 2: Deep Analysis
@@ -835,7 +832,7 @@ You are tasked with researching {topic}.
 
 ### Phase 3: Documentation
 
-- Write findings to thoughts/shared/research/
+- Save findings to Linear as document attached to ticket
 - Structure for future reference
 - Include actionable insights
 ```
@@ -1384,7 +1381,7 @@ Beyond coverage:
 
 ## Report Generation
 
-Create report at `thoughts/shared/reports/test_coverage_YYYY-MM-DD.md`:
+Create report:
 
 ```markdown
 # Test Coverage Report
@@ -1513,7 +1510,7 @@ Commands can spawn multiple agents for parallel research:
 Spawn parallel agents:
 
 1. **codebase-locator** - Find all authentication files
-2. **thoughts-locator** - Search for auth-related research
+2. **linear-document-locator** - Search for auth-related research
 3. **codebase-pattern-finder** - Find auth patterns in similar projects
 4. **dependency-analyzer** - Analyze auth library usage
 

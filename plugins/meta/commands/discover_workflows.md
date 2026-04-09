@@ -138,7 +138,7 @@ From the aggregated results, extract:
 
 ### Step 5: Create Catalog Entry
 
-Save research to `thoughts/shared/workflows/{repo-name}/analysis.md`:
+Present the analysis to the user:
 
 ````markdown
 # Workflow Analysis: {Repo Name}
@@ -224,58 +224,7 @@ Save research to `thoughts/shared/workflows/{repo-name}/analysis.md`:
 - Analyzed on: {date}
 ````
 
-### Step 6: Update Master Catalog
-
-Update `thoughts/shared/workflows/catalog.md`:
-
-```markdown
-# Workflow Catalog
-
-Discovered workflows from the Claude Code community.
-
-## Repositories Analyzed
-
-### wshobson/commands
-
-- **Analyzed**: 2025-01-08
-- **Workflows**: 15 commands
-- **Focus**: Production-ready automation
-- **Details**: [See analysis](wshobson-commands/analysis.md)
-- **Top Picks**:
-  - code-review: Automated code review workflow
-  - refactor: Safe refactoring patterns
-
-[... more repos]
-
-## By Category
-
-### Code Review
-
-- wshobson/commands: code-review
-- OneRedOak/claude-code-workflows: review-pr
-
-### Documentation
-
-- qdhenry/Claude-Command-Suite: doc-generator
-- hesreallyhim/awesome-claude-code: readme-generator
-
-[... more categories]
-
-## By Use Case
-
-### "I want to automate code reviews"
-
-1. wshobson/commands/code-review
-2. OneRedOak/claude-code-workflows/review-pr
-3. [Details in respective analyses]
-
-### "I need project management workflows"
-
-1. automazeio/ccpm - Full PM system
-2. [...]
-```
-
-### Step 7: Present Summary
+### Step 6: Present Summary
 
 Show user what was found:
 
@@ -305,11 +254,8 @@ Discovered {N} workflows ({X} commands, {Y} agents)
 
 ## Next Steps
 
-1. **Review the analysis**: `thoughts/shared/workflows/{repo}/analysis.md`
-2. **Import a workflow**: `/import-workflow {repo} {workflow-name}`
-3. **Discover another repo**: `/discover-workflows`
-
-Catalog updated at: `thoughts/shared/workflows/catalog.md`
+1. **Import a workflow**: `/import-workflow {repo} {workflow-name}`
+2. **Discover another repo**: `/discover-workflows`
 ```
 
 ## Advanced Usage
@@ -353,8 +299,7 @@ Only analyzes agents, skips commands.
 ## Important Notes
 
 - **Read-only**: This command only researches, doesn't import
-- **Catalog persistence**: Saved in thoughts/ for future reference
-- **Reusable**: Run anytime to update catalog
+- **Reusable**: Run anytime to research new repos
 - **Combinable**: Use with `/import-workflow` to actually import
 
 ## Integration with Other Commands

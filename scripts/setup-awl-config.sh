@@ -31,8 +31,7 @@ if [[ -f ".claude/config.json" ]]; then
   # Update .claude/config.json to reference external config
   jq '{
     projectKey: $projectKey,
-    project: .project,
-    thoughts: .thoughts
+    project: .project
   } | .projectKey = $projectKey' \
     --arg projectKey "$PROJECT_KEY" \
     .claude/config.json > .claude/config.json.tmp
@@ -74,9 +73,6 @@ EOF
   "project": {
     "ticketPrefix": "PROJ",
     "name": "My Project"
-  },
-  "thoughts": {
-    "user": null
   }
 }
 EOF
