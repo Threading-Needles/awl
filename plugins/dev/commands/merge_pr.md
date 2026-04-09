@@ -23,7 +23,7 @@ fi
 
 ## Execution Mode Detection
 
-Detect whether running interactively or headless (e.g., `claude -p`):
+Detect whether running interactively or headless (e.g., `CLAUDE_MODE=headless claude -p`):
 
 ```bash
 MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)

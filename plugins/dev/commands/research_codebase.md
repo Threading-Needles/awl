@@ -34,7 +34,7 @@ fi
 
 ## Execution Mode Detection
 
-Detect whether running interactively or headless (e.g., `claude -p`):
+Detect whether running interactively or headless (e.g., `CLAUDE_MODE=headless claude -p`):
 
 ```bash
 MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
@@ -389,7 +389,7 @@ The research document has been attached to the ticket with {N} questions
 that need answers before proceeding to /awl-dev:create-plan.
 
 Please answer the questions in the Linear document, then run:
-  claude -p "/awl-dev:create-plan"
+  CLAUDE_MODE=headless claude -p "/awl-dev:create-plan"
 ```
 
 ### Step 9: Present Findings to User
