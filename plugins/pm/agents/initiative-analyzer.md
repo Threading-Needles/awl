@@ -33,7 +33,7 @@ Structured markdown with these sections:
 - Risk Factors (off-track projects, target date, resource gaps, staleness)
 - Specific Recommendations (priority-ordered with owners)
 
-**Returns to**: `/pm:analyze-initiative` command formats output into user-facing health report
+**Returns to**: `/awl-pm:analyze-initiative` command formats output into user-facing health report
 
 ## Health Scoring Algorithm
 
@@ -181,7 +181,7 @@ For each project that is behind schedule or flagged:
 ```markdown
 **Establish status update cadence** - [N] projects have no updates in 14+ days
   - Action: Request weekly updates from project leads
-  - Consider: Automate with /pm:update-status command
+  - Consider: Automate with /awl-pm:update-status command
 ```
 
 ## Output Format

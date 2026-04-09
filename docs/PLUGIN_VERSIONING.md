@@ -35,7 +35,7 @@ We use **semantic versioning** (MAJOR.MINOR.PATCH):
 
 **Version bump magnitude:**
 - **MAJOR**: Required new dependencies, config format changed
-- **MINOR**: New `/pm:analyze-milestone` command added
+- **MINOR**: New `/awl-pm:analyze-milestone` command added
 - **PATCH**: Fixed bug in workflow-context.sh
 
 ## Automation Tools

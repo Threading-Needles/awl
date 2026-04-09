@@ -471,11 +471,11 @@ Awl tracks your workflow via `.claude/.workflow-context.json`:
 
 | Command | Purpose |
 |---------|---------|
-| `/pm:analyze-cycle` | Cycle health report |
-| `/pm:analyze-milestone` | Milestone progress |
-| `/pm:report-daily` | Daily standup summary |
-| `/pm:groom-backlog` | Backlog analysis |
-| `/pm:sync-prs` | GitHub-Linear sync |
+| `/awl-pm:analyze-cycle` | Cycle health report |
+| `/awl-pm:analyze-milestone` | Milestone progress |
+| `/awl-pm:report-daily` | Daily standup summary |
+| `/awl-pm:groom-backlog` | Backlog analysis |
+| `/awl-pm:sync-prs` | GitHub-Linear sync |
 
 ### Research Agents
 

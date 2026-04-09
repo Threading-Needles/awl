@@ -498,11 +498,11 @@ a browser for OAuth authentication. No API tokens or CLI tools needed.
 
 For project management workflows with Linear:
 
-- `/pm:analyze-cycle` - Cycle health report
-- `/pm:analyze-milestone` - Milestone progress and target date assessment
-- `/pm:report-daily` - Quick daily standup summary
-- `/pm:groom-backlog` - Backlog analysis
-- `/pm:sync-prs` - GitHub-Linear correlation
+- `/awl-pm:analyze-cycle` - Cycle health report
+- `/awl-pm:analyze-milestone` - Milestone progress and target date assessment
+- `/awl-pm:report-daily` - Quick daily standup summary
+- `/awl-pm:groom-backlog` - Backlog analysis
+- `/awl-pm:sync-prs` - GitHub-Linear correlation
 
 **Features**:
 - Cycle management with health scoring

@@ -49,20 +49,20 @@ The Awl PM plugin provides AI-powered project management workflows that integrat
 ## Commands
 
 ### Cycle Management
-- `/pm:analyze-cycle` - Analyze cycle health with actionable insights
+- `/awl-pm:analyze-cycle` - Analyze cycle health with actionable insights
   - Health assessment (🟢/🟡/🔴)
   - Risk identification (blockers, at-risk issues)
   - Team capacity analysis
   - Specific recommendations
 
 ### Milestone Management
-- `/pm:analyze-milestone` - Analyze milestone health toward target date
+- `/awl-pm:analyze-milestone` - Analyze milestone health toward target date
   - Target date feasibility assessment
   - Progress tracking (actual vs expected)
   - Risk identification (behind schedule, blockers)
   - Specific recommendations (adjust timeline, reduce scope)
 
-### `/pm:analyze-cycle`
+### `/awl-pm:analyze-cycle`
 Generate comprehensive cycle health report with recommendations.
 
 **What it does**:
@@ -88,27 +88,27 @@ Priority Actions:
 ```
 
 ### Initiative Management
-- `/pm:analyze-initiative` - Analyze initiative health across project portfolio
+- `/awl-pm:analyze-initiative` - Analyze initiative health across project portfolio
   - Strategic health assessment (🟢/🟡/🔴)
   - Project portfolio status table
   - Cross-project risk identification
   - Strategic recommendations
 
 ### Status Updates
-- `/pm:update-status` - Generate and post status updates to Linear
+- `/awl-pm:update-status` - Generate and post status updates to Linear
   - Works for both projects and initiatives
   - Auto-gathers recent completions, blockers, progress
   - Preview before posting
   - Saves local copy to `reports/status-updates/`
 
 ### Daily Operations
-- `/pm:report-daily` - Quick daily standup report
+- `/awl-pm:report-daily` - Quick daily standup report
   - Yesterday's deliveries
   - Current work in progress
   - Team members needing assignments
   - Quick blockers/risks
 
-### `/pm:report-daily`
+### `/awl-pm:report-daily`
 Quick daily standup report (scannable in <30 seconds).
 
 **What it does**:
@@ -130,14 +130,14 @@ Quick daily standup report (scannable in <30 seconds).
 ```
 
 ### Backlog Health
-- `/pm:groom-backlog` - Analyze backlog health
+- `/awl-pm:groom-backlog` - Analyze backlog health
   - Orphaned issues (no project)
   - Misplaced issues (wrong project)
   - Stale issues (>30 days inactive)
   - Potential duplicates
   - Missing estimates
 
-### `/pm:groom-backlog`
+### `/awl-pm:groom-backlog`
 Analyze backlog health and generate cleanup recommendations.
 
 **What it does**:
@@ -155,13 +155,13 @@ Analyze backlog health and generate cleanup recommendations.
 4. Skip (report saved for later)
 
 ### GitHub-Linear Sync
-- `/pm:sync-prs` - Correlate GitHub PRs with Linear issues
+- `/awl-pm:sync-prs` - Correlate GitHub PRs with Linear issues
   - Orphaned PRs (no Linear issue)
   - Orphaned issues (no PR)
   - Ready to close (PR merged, issue open)
   - Stale PRs (>14 days)
 
-### `/pm:sync-prs`
+### `/awl-pm:sync-prs`
 Correlate GitHub PRs with Linear issues and identify gaps.
 
 **What it does**:
@@ -336,7 +336,7 @@ cd /path/to/your/project
 
 **Morning Standup**:
 ```bash
-/pm:team-daily
+/awl-pm:report-daily
 ```
 - See what shipped yesterday
 - Review current work
@@ -347,7 +347,7 @@ cd /path/to/your/project
 
 **Start of Week**:
 ```bash
-/pm:analyze-cycle
+/awl-pm:analyze-cycle
 ```
 - Assess cycle health
 - Review capacity
@@ -356,14 +356,14 @@ cd /path/to/your/project
 
 **Mid-Week**:
 ```bash
-/pm:sync-prs
+/awl-pm:sync-prs
 ```
 
 ### Strategic Review
 
 **Bi-Weekly/Monthly**:
 ```bash
-/pm:analyze-initiative
+/awl-pm:analyze-initiative
 ```
 - Assess initiative health across projects
 - Identify cross-project risks
@@ -372,7 +372,7 @@ cd /path/to/your/project
 
 **Weekly Status Posts**:
 ```bash
-/pm:update-status
+/awl-pm:update-status
 ```
 - Auto-compose project/initiative status updates
 - Review and post to Linear
@@ -383,7 +383,7 @@ cd /path/to/your/project
 
 **End of Week**:
 ```bash
-/pm:groom-backlog
+/awl-pm:groom-backlog
 ```
 - Clean up orphaned issues
 - Categorize new issues
