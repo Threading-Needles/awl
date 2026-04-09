@@ -21,10 +21,6 @@ Awl integrates with your development tools through MCP servers and CLI tools:
 - **PostHog** - Error tracking, session replay, stack traces, HogQL queries (MCP)
   - `awl-debugging`: PostHog error tracking MCP integration
 
-### Deployment & Infrastructure
-- **Railway** - Deployment logs, service health, environment variables (CLI via `railway`)
-  - `awl-dev`: Railway research agent for deployment investigation
-
 ### Product Analytics
 - **PostHog** - User behavior, conversion funnels, feature analytics (MCP)
   - `awl-analytics`: PostHog MCP integration (~40k tokens when enabled)
@@ -41,7 +37,7 @@ Awl integrates with your development tools through MCP servers and CLI tools:
 
 **Why CLI + lightweight MCP?** Most development sessions don't need heavy integrations:
 
-- Start with `awl-dev` (~3.5k tokens): Core workflow + Linear + GitHub + Railway
+- Start with `awl-dev` (~3.5k tokens): Core workflow + Linear + GitHub
 - Enable `awl-analytics` when analyzing user behavior (~+40k tokens)
 - Enable `awl-debugging` when investigating production errors (~+20k tokens)
 - Disable when done to free context for code and conversation
@@ -107,7 +103,7 @@ chmod +x setup-awl.sh
 This script will guide you through:
 - Prerequisites check and installation (jq, etc.)
 - Project configuration (ticket prefix, project name)
-- Integration setup (Linear, PostHog, Railway, Exa)
+- Integration setup (Linear, PostHog, Exa)
 
 **Then install the plugins:**
 
@@ -273,7 +269,7 @@ Uses the official Linear MCP server for rich Linear integration with structured 
 **CLI Integrations** (optional but recommended):
 
 - `gh` - GitHub CLI
-- `railway` - Railway deployments
+
 **MCP Tools** (bundled with plugins):
 
 - Context7 & DeepWiki - Built into `awl-dev` (~3.5k tokens)

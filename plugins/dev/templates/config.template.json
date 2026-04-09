@@ -12,10 +12,6 @@
       "defaultTeam": "[NEEDS_SETUP]",
       "apiToken": "[NEEDS_SETUP]"
     },
-    "railway": {
-      "projectId": "[NEEDS_SETUP]",
-      "defaultService": "[NEEDS_SETUP]"
-    },
     "exa": {
       "apiKey": "[NEEDS_SETUP]"
     },
