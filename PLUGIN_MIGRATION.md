@@ -170,7 +170,7 @@ Now lists 4 plugins with clear descriptions and context costs.
 
 ```bash
 # Add marketplace
-/plugin marketplace add ralfschimmel/awl
+/plugin marketplace add Threading-Needles/awl
 
 # Install core (required)
 /plugin install awl-dev

@@ -162,7 +162,7 @@ This workspace has no build process - it's markdown files and bash scripts.
 
 ```bash
 # Add to marketplace
-/plugin marketplace add ralfschimmel/awl
+/plugin marketplace add Threading-Needles/awl
 
 # Install development workflow plugin
 /plugin install awl-dev
@@ -713,7 +713,7 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 **Users install Awl via Claude Code marketplace:**
 
 ```bash
-/plugin marketplace add ralfschimmel/awl
+/plugin marketplace add Threading-Needles/awl
 /plugin install awl-dev
 ```
 
@@ -756,7 +756,7 @@ CLAUDE.md. This section provides the reference snippet that users copy-paste int
 ```markdown
 ## Awl Workflow Integration
 
-This project uses [Awl](https://github.com/ralfschimmel/awl) for Linear-driven development
+This project uses [Awl](https://github.com/Threading-Needles/awl) for Linear-driven development
 workflows.
 
 ### Ticket-Driven Development
@@ -788,7 +788,7 @@ Where `PROJ-123` is your Linear ticket ID (replace `PROJ` with your project's ti
 ### Configuration
 
 Project configuration is in `.claude/config.json`. See
-[Awl Configuration Guide](https://github.com/ralfschimmel/awl/blob/main/docs/CONFIGURATION.md).
+[Awl Configuration Guide](https://github.com/Threading-Needles/awl/blob/main/docs/CONFIGURATION.md).
 ```
 
 **Why this exists here**: This demonstrates the "dogfooding" principle - the Awl repository itself

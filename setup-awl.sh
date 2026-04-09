@@ -1,6 +1,6 @@
 #!/bin/bash
 # setup-awl.sh - Complete Awl setup in one command
-# Usage: curl -fsSL https://raw.githubusercontent.com/ralfschimmel/awl/main/setup-awl.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/Threading-Needles/awl/main/setup-awl.sh | bash
 #        OR ./setup-awl.sh
 
 set -e
@@ -857,7 +857,7 @@ print_summary() {
   echo ""
 
   echo "1. Install Awl plugin in Claude Code:"
-  echo "   /plugin marketplace add ralfschimmel/awl"
+  echo "   /plugin marketplace add Threading-Needles/awl"
   echo "   /plugin install awl-dev"
   echo ""
 
@@ -871,8 +871,8 @@ print_summary() {
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   echo ""
   echo "📚 Documentation:"
-  echo "   Quick Start: https://github.com/ralfschimmel/awl/blob/main/QUICKSTART.md"
-  echo "   Full Guide: https://github.com/ralfschimmel/awl/blob/main/docs/USAGE.md"
+  echo "   Quick Start: https://github.com/Threading-Needles/awl/blob/main/QUICKSTART.md"
+  echo "   Full Guide: https://github.com/Threading-Needles/awl/blob/main/docs/USAGE.md"
   echo ""
 
   echo "💡 Tip: This script is idempotent. Run again anytime to:"

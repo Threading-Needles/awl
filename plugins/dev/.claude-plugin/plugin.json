@@ -3,12 +3,11 @@
   "version": "3.0.1",
   "description": "Complete development workflow: research → plan → implement → validate → ship. Includes research agents, planning tools, handoff system, Linear integration, and PM commands.",
   "author": {
-    "name": "Awl Team",
-    "email": "github@rozich.com",
-    "url": "https://github.com/ralfschimmel"
+    "name": "Threading Needles",
+    "url": "https://github.com/Threading-Needles"
   },
-  "homepage": "https://github.com/ralfschimmel/awl",
-  "repository": "https://github.com/ralfschimmel/awl.git",
+  "homepage": "https://github.com/Threading-Needles/awl",
+  "repository": "https://github.com/Threading-Needles/awl.git",
   "keywords": [
     "workflow",
     "research",

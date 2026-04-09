@@ -1,7 +1,6 @@
 # Awl - Claude Code Workspace
 
-[Ryan Rozich's](https://ryanrozich.bio/) personal development workflow for Claude Code, now open
-sourced and packaged as a Claude Code plugin marketplace.
+A development workflow for Claude Code, open sourced and packaged as a Claude Code plugin marketplace.
 
 This is the workspace I use daily for AI-assisted development. It's battle-tested on real projects
 and optimized for efficient, context-aware AI collaboration. I'm sharing it so others can use it,
@@ -100,7 +99,7 @@ Get started in 5 minutes with the unified setup script:
 
 ```bash
 # Download the setup script
-curl -O https://raw.githubusercontent.com/ralfschimmel/awl/main/setup-awl.sh
+curl -O https://raw.githubusercontent.com/Threading-Needles/awl/main/setup-awl.sh
 chmod +x setup-awl.sh
 
 # Run it (requires interactive input)
@@ -116,7 +115,7 @@ This script will guide you through:
 
 ```bash
 # In Claude Code:
-/plugin marketplace add ralfschimmel/awl
+/plugin marketplace add Threading-Needles/awl
 /plugin install awl-dev
 
 # Restart Claude Code
@@ -135,7 +134,7 @@ Alternatively, install plugins manually via Claude Code plugin system:
 
 ```bash
 # Add the marketplace repository
-/plugin marketplace add ralfschimmel/awl
+/plugin marketplace add Threading-Needles/awl
 
 # Install core workflow (required)
 /plugin install awl-dev
@@ -317,12 +316,12 @@ better!
 
 MIT - Use it however you want!
 
-## Note on Personal Use
+## Contributing
 
-This is my personal workflow shared for learning and inspiration. You're welcome to use it as-is, fork it, or adapt the patterns to your own needs. Just keep in mind that it's optimized for my development style, so your mileage may vary. Some decisions are opinionated based on my preferences, and I may not accept PRs that don't align with how I work. Think of it as a starting point rather than a one-size-fits-all solution—take what works, adapt what doesn't!
+You're welcome to use Awl as-is, fork it, or adapt the patterns to your own needs. Some decisions are opinionated, so think of it as a starting point rather than a one-size-fits-all solution — take what works, adapt what doesn't.
 
 ---
 
-Built by [Ryan Rozich](https://github.com/ryanrozich)
+Built by [Threading Needles](https://github.com/Threading-Needles)
 
 Want to chat about workflows, contribute ideas, or share your fork? Open an issue or discussion!

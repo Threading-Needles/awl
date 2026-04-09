@@ -183,5 +183,5 @@ MIT
 
 ## Support
 
-Issues: https://github.com/ralfschimmel/awl/issues Docs:
-https://github.com/ralfschimmel/awl
+Issues: https://github.com/Threading-Needles/awl/issues Docs:
+https://github.com/Threading-Needles/awl

@@ -3,12 +3,12 @@
   "version": "4.0.0",
   "description": "Linear-focused project management plugin with cycle management, milestone tracking, initiative analysis, status updates, backlog grooming, and team analytics",
   "author": {
-    "name": "Awl Team",
+    "name": "Threading Needles",
     "email": "hello@coalesce.dev",
-    "url": "https://github.com/ralfschimmel"
+    "url": "https://github.com/Threading-Needles"
   },
-  "homepage": "https://github.com/ralfschimmel/awl",
-  "repository": "https://github.com/ralfschimmel/awl.git",
+  "homepage": "https://github.com/Threading-Needles/awl",
+  "repository": "https://github.com/Threading-Needles/awl.git",
   "keywords": [
     "project-management",
     "linear",

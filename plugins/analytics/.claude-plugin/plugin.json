@@ -3,12 +3,12 @@
   "version": "1.0.1",
   "description": "Product analytics with PostHog MCP integration. Enable when analyzing user behavior, conversion metrics, and product usage. ~40k context tokens when enabled.",
   "author": {
-    "name": "Awl Team",
+    "name": "Threading Needles",
     "email": "hello@coalesce.dev",
-    "url": "https://github.com/ralfschimmel"
+    "url": "https://github.com/Threading-Needles"
   },
-  "homepage": "https://github.com/ralfschimmel/awl",
-  "repository": "https://github.com/ralfschimmel/awl.git",
+  "homepage": "https://github.com/Threading-Needles/awl",
+  "repository": "https://github.com/Threading-Needles/awl.git",
   "keywords": [
     "analytics",
     "posthog",

@@ -44,7 +44,7 @@ When fully implemented, this command will:
 - **Summary generation** - Create roadmap document in `reports/milestones/`
 - **Trend analysis** - Compare progress month-over-month
 
-Track progress at: https://github.com/ralfschimmel/awl/issues
+Track progress at: https://github.com/Threading-Needles/awl/issues
 
 ## Configuration
 
