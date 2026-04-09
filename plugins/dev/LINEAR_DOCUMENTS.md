@@ -18,115 +18,92 @@ All workflow documents are stored as Linear documents attached to their associat
 
 ### Research Document
 
-```bash
-# Get team key from config
-TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' .claude/config.json)
+Use `mcp__linear__create_document` with:
+- **title**: `"Research: Authentication Flow"`
+- **content**: The research findings in markdown
+- **icon**: `"Search"`
+- **color**: `"#eb5757"`
 
-linearis documents create \
-  --title "Research: Authentication Flow" \
-  --team "${TEAM_KEY}" \
-  --content "$(cat research.md)" \
-  --attach-to "PROJ-123" \
-  --icon "Search" \
-  --color "#eb5757"
-```
+Then attach to the ticket using `mcp__linear__create_attachment`.
 
 ### Implementation Plan
 
-```bash
-linearis documents create \
-  --title "Plan: OAuth Implementation" \
-  --team "${TEAM_KEY}" \
-  --content "$(cat plan.md)" \
-  --attach-to "PROJ-123" \
-  --icon "Compass" \
-  --color "#f2c94c"
-```
+Use `mcp__linear__create_document` with:
+- **title**: `"Plan: OAuth Implementation"`
+- **content**: The plan in markdown
+- **icon**: `"Compass"`
+- **color**: `"#f2c94c"`
+
+Then attach to the ticket using `mcp__linear__create_attachment`.
 
 ### Validation Document
 
-```bash
-linearis documents create \
-  --title "Validation: OAuth Implementation" \
-  --team "${TEAM_KEY}" \
-  --content "$(cat validation.md)" \
-  --attach-to "PROJ-123" \
-  --icon "CheckCircle" \
-  --color "#27ae60"
-```
+Use `mcp__linear__create_document` with:
+- **title**: `"Validation: OAuth Implementation"`
+- **content**: The validation results in markdown
+- **icon**: `"CheckCircle"`
+- **color**: `"#27ae60"`
+
+Then attach to the ticket using `mcp__linear__create_attachment`.
 
 ### Handoff Document
 
-```bash
-linearis documents create \
-  --title "Handoff: Session 2025-12-04" \
-  --team "${TEAM_KEY}" \
-  --content "$(cat handoff.md)" \
-  --attach-to "PROJ-123" \
-  --icon "Send" \
-  --color "#9b51e0"
-```
+Use `mcp__linear__create_document` with:
+- **title**: `"Handoff: Session 2025-12-04"`
+- **content**: The handoff context in markdown
+- **icon**: `"Send"`
+- **color**: `"#9b51e0"`
+
+Then attach to the ticket using `mcp__linear__create_attachment`.
 
 ### PR Description
 
-```bash
-linearis documents create \
-  --title "PR: Add OAuth Support" \
-  --team "${TEAM_KEY}" \
-  --content "$(cat pr.md)" \
-  --attach-to "PROJ-123" \
-  --icon "CodeBlock" \
-  --color "#2f80ed"
-```
+Use `mcp__linear__create_document` with:
+- **title**: `"PR: Add OAuth Support"`
+- **content**: The PR description in markdown
+- **icon**: `"CodeBlock"`
+- **color**: `"#2f80ed"`
+
+Then attach to the ticket using `mcp__linear__create_attachment`.
 
 ## Querying Documents
 
 ### List All Documents Attached to a Ticket
 
-```bash
-linearis attachments list --issue PROJ-123
-```
+Use `mcp__linear__get_issue` with the ticket identifier (e.g., `PROJ-123`) to retrieve issue details including attached documents.
 
 ### Find Specific Document Type
 
-```bash
-# Find research documents
-linearis attachments list --issue PROJ-123 | jq '.[] | select(.title | startswith("Research:"))'
-
-# Find plans
-linearis attachments list --issue PROJ-123 | jq '.[] | select(.title | startswith("Plan:"))'
-
-# Find handoffs
-linearis attachments list --issue PROJ-123 | jq '.[] | select(.title | startswith("Handoff:"))'
-```
+After retrieving the issue, filter attached documents by their title prefix:
+- **Research documents**: Title starts with `"Research:"`
+- **Plans**: Title starts with `"Plan:"`
+- **Handoffs**: Title starts with `"Handoff:"`
 
 ### Read Document Content
 
-```bash
-linearis documents read <document-id>
-```
+Use `mcp__linear__get_document` with the document ID to read its full content.
 
 ## Workflow Integration
 
 ### Entry Point
 
-All workflows start with a ticket ID. The first command (`/research-codebase PROJ-123`) sets the current ticket in workflow context.
+All workflows start with a ticket ID. The first command (`/awl-dev:research-codebase PROJ-123`) sets the current ticket in workflow context.
 
 ### Document Discovery
 
 Subsequent commands query Linear for documents on the current ticket:
 
 ```
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
   └─→ Creates: Research document attached to PROJ-123
   └─→ Sets: currentTicket = PROJ-123
 
-/create-plan (no args needed)
+/awl-dev:create-plan (no args needed)
   └─→ Reads: currentTicket from workflow-context
   └─→ Queries: Linear for Research documents on PROJ-123
   └─→ Creates: Plan document attached to PROJ-123
 
-/implement-plan (no args needed)
+/awl-dev:implement-plan (no args needed)
   └─→ Reads: currentTicket from workflow-context
   └─→ Queries: Linear for Plan documents on PROJ-123
   └─→ Implements the plan
@@ -197,17 +174,17 @@ When a user answers, they replace the placeholder:
 
 ### Workflow Integration
 
-1. **Research Phase** (`/research-codebase` in headless mode):
+1. **Research Phase** (`/awl-dev:research-codebase` in headless mode):
    - Embeds questions in "Questions for User" section
    - Sets ticket status to "Spec Needed"
    - Mentions assignee for notification
 
-2. **Plan Phase** (`/create-plan`):
+2. **Plan Phase** (`/awl-dev:create-plan`):
    - Validates Research document for unanswered questions
    - Hard-fails with list if blocking questions remain unanswered
    - Embeds its own questions with same pattern
 
-3. **Implementation Phase** (`/implement-plan`):
+3. **Implementation Phase** (`/awl-dev:implement-plan`):
    - Validates Plan document for unanswered questions
    - Hard-fails with list and document link if found
 
@@ -222,13 +199,13 @@ When a document contains unanswered questions:
 If the ticket has an assignee, mention them in the questions section:
 
 ```markdown
-@John Smith - Please answer before proceeding to /create-plan:
+@John Smith - Please answer before proceeding to /awl-dev:create-plan:
 ```
 
 If no assignee, omit the mention:
 
 ```markdown
-Please answer before proceeding to /create-plan:
+Please answer before proceeding to /awl-dev:create-plan:
 ```
 
 ## Icon Reference

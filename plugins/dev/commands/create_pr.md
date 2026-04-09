@@ -1,7 +1,7 @@
 ---
 description: Create pull request with automatic Linear integration
 category: version-control-git
-tools: Bash(linearis *), Bash(git *), Bash(gh *), Read, Task
+tools: mcp__linear__get_issue, mcp__linear__save_issue, mcp__linear__save_comment, Bash(git *), Bash(gh *), Read, Task
 model: inherit
 version: 2.0.0
 ---
@@ -16,7 +16,7 @@ ticket.
 Before executing, verify Linear integration is available:
 
 ```bash
-# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
+# Validate plugin prerequisites
 if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
   "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
 fi
@@ -219,14 +219,10 @@ Immediately call `/awl-dev:describe_pr` with the PR number to:
 
 If ticket was extracted:
 
-```bash
-# Update ticket state to "In Review"
-linearis issues update "$ticket" --state "In Review" --assignee "@me"
+Update the ticket state to "In Review" using `mcp__linear__save_issue` with the ticket ID.
 
-# Add comment with PR link
-linearis comments create "$ticket" \
-    --body "PR created and ready for review!\n\n**PR**: $prUrl\n\nDescription has been auto-generated with verification checks."
-```
+Add a comment using `mcp__linear__save_comment` with the body:
+"PR created and ready for review!\n\n**PR**: $prUrl\n\nDescription has been auto-generated with verification checks."
 
 ### 13. Report success
 
@@ -246,25 +242,25 @@ Review the PR on GitHub!
 ## Integration with Other Commands
 
 ```
-/research-codebase PROJ-123 → research document
+/awl-dev:research-codebase PROJ-123 → research document
                   ↓
-           /create-plan → implementation plan
+           /awl-dev:create-plan → implementation plan
                   ↓
-          /implement-plan → code changes
+          /awl-dev:implement-plan → code changes
                   ↓
-           /validate-plan → verification
+           /awl-dev:validate-plan → verification
                   ↓
-              /describe-pr → PR description
+              /awl-dev:describe-pr → PR description
                   ↓
-              /create-pr → creates PR on GitHub (this command)
+              /awl-dev:create-pr → creates PR on GitHub (this command)
                   ↓
-              /merge-pr → merges PR
+              /awl-dev:merge-pr → merges PR
 ```
 
 **How it connects:**
 
-- **Previous**: Work is done via `/implement-plan`
-- **Next**: `/merge-pr` will merge the PR and update Linear
+- **Previous**: Work is done via `/awl-dev:implement-plan`
+- **Next**: `/awl-dev:merge-pr` will merge the PR and update Linear
 - **Workflow context**: Ticket is used for Linear linking
 
 ## Error Handling
@@ -300,17 +296,6 @@ Resolve conflicts and run:
 
 Run: gh auth login
 Then: gh repo set-default
-```
-
-**Linear API token not set:**
-
-```
-❌ LINEAR_API_TOKEN not set
-
-Set your Linear API token:
-  export LINEAR_API_TOKEN=your_token
-
-Get a token from: https://linear.app/settings/api
 ```
 
 **Linear ticket not found:**
@@ -376,15 +361,12 @@ Calling /awl-dev:describe_pr...
 - **Save to Linear** - PR description stored as Linear document
 - **Fail fast** - stop on conflicts or errors with clear messages
 
-**Note**: This command is typically called automatically by `/implement-plan` after validation passes.
+**Note**: This command is typically called automatically by `/awl-dev:implement-plan` after validation passes.
 You can also run it standalone to create a PR for existing changes.
 
 ## Status Update Convention
 
-This command is a downstream command (typically called by `/implement-plan`) and does NOT update status on start - it updates to "In Review" on successful PR creation. However, on failure, it should roll back to the appropriate previous state:
+This command is a downstream command (typically called by `/awl-dev:implement-plan`) and does NOT update status on start - it updates to "In Review" on successful PR creation. However, on failure, it should roll back to the appropriate previous state:
 
-```bash
-# Roll back to previous state on failure
-linearis issues update "$CURRENT_TICKET" --state "In Dev"
-linearis comments create "$CURRENT_TICKET" --body "PR creation failed: ${ERROR_REASON}. Returning to development state."
-```
+On failure, use `mcp__linear__save_issue` to roll back the ticket state to "In Dev" and
+`mcp__linear__save_comment` to add a comment explaining the failure.

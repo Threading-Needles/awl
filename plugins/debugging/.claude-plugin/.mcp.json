@@ -1,12 +1,16 @@
 {
   "mcpServers": {
-    "sentry": {
+    "posthog": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sentry"],
+      "args": [
+        "-y",
+        "mcp-remote@latest",
+        "https://mcp-eu.posthog.com/mcp",
+        "--header",
+        "Authorization:${POSTHOG_AUTH_HEADER}"
+      ],
       "env": {
-        "SENTRY_AUTH_TOKEN": "${SENTRY_AUTH_TOKEN}",
-        "SENTRY_ORG": "${SENTRY_ORG}",
-        "SENTRY_PROJECT": "${SENTRY_PROJECT}"
+        "POSTHOG_AUTH_HEADER": "${POSTHOG_AUTH_HEADER}"
       }
     }
   }

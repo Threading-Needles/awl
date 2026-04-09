@@ -1,7 +1,7 @@
 ---
-description: Plan work for current or next cycle using Linearis and GitHub
+description: Plan work for current or next cycle using Linear and GitHub
 category: project-task-management
-tools: Bash(linearis *), Bash(gh *), Read, Write, TodoWrite
+tools: mcp__linear__list_issues, mcp__linear__list_cycles, mcp__linear__save_issue, mcp__linear__research, Bash(gh *), Read, Write, TodoWrite
 model: inherit
 version: 2.0.0
 status: placeholder
@@ -23,35 +23,16 @@ This command will help you plan work for the current or upcoming cycle by:
 
 ## Current Workaround
 
-Use Linearis CLI directly:
+Use the Linear MCP tools directly:
 
-```bash
-# Get active cycle
-linearis cycles list --team TEAM --active
-
-# List backlog tickets (filter with jq - issues list only supports --limit)
-linearis issues list --limit 100 | jq '.[] | select(.state.name == "Backlog")'
-
-# Assign ticket to cycle
-linearis issues update TICKET-123 --cycle "Sprint 2025-11"
-
-# Set priority
-linearis issues update TICKET-123 --priority 2
-```
+- **Get active cycle**: `mcp__linear__list_cycles` with team filter
+- **List backlog tickets**: `mcp__linear__list_issues` with status filter "Backlog"
+- **Assign ticket to cycle**: `mcp__linear__save_issue` with cycle field
+- **Set priority**: `mcp__linear__save_issue` with priority field
 
 ### Example Workflow
 
 ```bash
-# 1. View active cycle
-linearis cycles list --team ENG --active | jq '.[] | {name, startsAt, endsAt, progress}'
-
-# 2. View next cycle
-linearis cycles list --team ENG --limit 5 | jq '.[1]'
-
-# 3. List backlog tickets ready for planning (filter with jq)
-linearis issues list --limit 100 | \
-  jq '.[] | select(.state.name == "Backlog") | {id, title, priority}'
-
 # 4. Review recent PRs to understand current work
 # This helps identify work done but not captured in Linear tickets
 gh pr list --state merged --limit 20 --json number,title,author,mergedAt,closedAt
@@ -64,12 +45,8 @@ gh pr list --state merged --search "merged:>=$(date -v-14d +%Y-%m-%d)" \
 gh pr list --state open --json number,title,author,createdAt | \
   jq 'group_by(.author.login) | map({author: .[0].author.login, prs: map({number, title})})'
 
-# 6. Assign high-priority tickets to next cycle
-linearis issues update ENG-123 --cycle "Sprint 2025-11" --priority 2
-linearis issues update ENG-124 --cycle "Sprint 2025-11" --priority 2
-
-# 7. Generate summary (manual)
-# Count tickets by cycle and priority
+# 6. Assign high-priority tickets to next cycle using Linear MCP
+# Use mcp__linear__save_issue to update cycle and priority
 ```
 
 ## Future Implementation

@@ -18,24 +18,19 @@ This instructs you to:
 
 1. Type `/mcp`
 2. Disable **posthog** (~40k tokens)
-3. Disable **sentry** (~20k tokens)
 
-**Result**: Start with ~3.5k MCP tokens instead of ~65k
+**Result**: Start with ~3.5k MCP tokens instead of ~44k
 
-**Time cost**: ~15 seconds per session **Context savings**: ~61k tokens (30% of window)
+**Time cost**: ~10 seconds per session **Context savings**: ~40k tokens (20% of window)
 
 ### 2. Enable Tools As Needed
 
 When you need specific capabilities:
 
 ```bash
-# Need to analyze user behavior?
+# Need to analyze user behavior or debug errors?
 /enable-analytics
-# → Enables PostHog (+40k tokens, 43 tools)
-
-# Need to debug production errors?
-/enable-debugging
-# → Enables Sentry (+20k tokens, 19 tools)
+# → Enables PostHog (+40k tokens, 43 tools - analytics + error tracking)
 ```
 
 ### 3. Disable When Done
@@ -44,7 +39,7 @@ Free up context after debugging/analytics work:
 
 ```bash
 /disable-heavy-mcps
-# → Disables both PostHog and Sentry (-60k tokens)
+# → Disables PostHog (-40k tokens)
 ```
 
 ## Session Patterns
@@ -89,19 +84,18 @@ Free up context after debugging/analytics work:
 # Start
 /start-lightweight-session  # → 3.5k MCP tokens
 
-# Enable debugging tools
-/enable-debugging           # → 24-65k MCP tokens
-# (Sentry only = 24k, Sentry + PostHog = 65k)
+# Enable PostHog for error tracking
+/enable-analytics           # → 44k MCP tokens
 
 # Debug production errors
-# Search Sentry issues
-# Analyze user impact with PostHog
+# Search PostHog error events
+# Analyze user impact with session replays
 
 # Disable after incident resolved
 /disable-heavy-mcps         # → 3.5k MCP tokens
 ```
 
-**Context**: 3.5k → 65k → 3.5k (adaptive)
+**Context**: 3.5k → 44k → 3.5k (adaptive)
 
 ### Pattern 4: Planning Session (Linear/GitHub)
 
@@ -109,12 +103,12 @@ Free up context after debugging/analytics work:
 # Start
 /start-lightweight-session  # → 3.5k MCP tokens
 
-# No need to enable PostHog/Sentry
+# No need to enable PostHog
 # Linear and GitHub MCPs (if configured) stay enabled
 
 # Use workflow commands
-/research-codebase
-/create-plan
+/awl-dev:research-codebase
+/awl-dev:create-plan
 ```
 
 **Context**: 3.5k tokens throughout
@@ -129,22 +123,21 @@ Free up context after debugging/analytics work:
 
 ### Heavy MCPs (Enable When Needed)
 
-- **posthog**: ~40,645 tokens - Product analytics (43 tools)
-- **sentry**: ~20,670 tokens - Error monitoring (19 tools)
-- **Total**: ~61,315 tokens (~30% of 200k window)
+- **posthog**: ~40,645 tokens - Product analytics and error tracking (43 tools)
+- **Total**: ~40,645 tokens (~20% of 200k window)
 
 ### Impact on Conversation
 
 **With all MCPs enabled**:
 
-- System context: ~65k tokens
-- Available for conversation: ~135k tokens
+- System context: ~44k tokens
+- Available for conversation: ~156k tokens
 
 **With lightweight MCPs only**:
 
 - System context: ~3.5k tokens
 - Available for conversation: ~196k tokens
-- **Gain**: +61k tokens for code, docs, discussion
+- **Gain**: +40k tokens for code, docs, discussion
 
 ## Why Manual Toggle?
 
@@ -171,8 +164,7 @@ If Claude Code adds programmatic MCP control, we could implement:
 # → Asks: "What are you working on?"
 #   1. Regular development (lightweight)
 #   2. Analytics/metrics (enable PostHog)
-#   3. Debugging (enable Sentry)
-#   4. Incident response (enable both)
+#   3. Debugging/error tracking (enable PostHog)
 # → Automatically enables/disables based on choice
 ```
 
@@ -190,10 +182,9 @@ Until then, the manual `/mcp` approach with workflow commands is the best soluti
 
 | Command                      | Purpose                     | Context Change |
 | ---------------------------- | --------------------------- | -------------- |
-| `/start-lightweight-session` | Disable heavy MCPs          | 65k → 3.5k     |
+| `/start-lightweight-session` | Disable heavy MCPs          | 44k → 3.5k     |
 | `/enable-analytics`          | Enable PostHog              | +40k           |
-| `/enable-debugging`          | Enable Sentry (+ PostHog)   | +20k to +60k   |
-| `/disable-heavy-mcps`        | Disable PostHog + Sentry    | -60k           |
+| `/disable-heavy-mcps`        | Disable PostHog             | -40k           |
 | `/check-mcp-status`          | Show current MCP usage      | (info only)    |
 | `/context`                   | Show full context breakdown | (info only)    |
 
@@ -212,9 +203,6 @@ Your `~/.claude.json` should have all MCPs configured:
     },
     "posthog": {
       /* heavy - manually disable */
-    },
-    "sentry": {
-      /* heavy - manually disable */
     }
   }
 }
@@ -227,8 +215,7 @@ Your `~/.claude.json` should have all MCPs configured:
 - `docs/MCP_MANAGEMENT_STRATEGY.md` - Overall strategy
 - `plugins/dev/commands/start_lightweight_session.md` - Startup command
 - `plugins/dev/commands/enable_analytics.md` - Enable PostHog
-- `plugins/dev/commands/enable_debugging.md` - Enable Sentry
-- `plugins/dev/commands/disable_heavy_mcps.md` - Disable both
+- `plugins/dev/commands/disable_heavy_mcps.md` - Disable PostHog
 
 ---
 

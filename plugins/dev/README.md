@@ -12,8 +12,7 @@ Core development workflow commands for AI-assisted development.
 
 ### Required
 
-- **Linearis CLI**: `npm install -g linearis`
-- **LINEAR_API_TOKEN**: Environment variable ([Get token](https://linear.app/settings/api))
+- **Linear MCP**: The official Linear MCP server (handles authentication automatically)
 - **GitHub CLI**: `brew install gh` or `gh auth login`
 
 ### Required Plugins
@@ -22,7 +21,7 @@ These plugins are required for full functionality:
 
 | Plugin | Used By | Install |
 |--------|---------|---------|
-| pr-review-toolkit | `/implement-plan` | `/plugin install pr-review-toolkit` |
+| pr-review-toolkit | `/awl-dev:implement-plan` | `/plugin install pr-review-toolkit` |
 
 ### Recommended Plugins
 
@@ -94,5 +93,5 @@ From the same marketplace:
 |--------|---------|
 | awl-pm | Project management (cycles, milestones) |
 | awl-analytics | PostHog integration |
-| awl-debugging | Sentry integration |
+| awl-debugging | PostHog error tracking |
 | awl-meta | Workflow discovery and creation |

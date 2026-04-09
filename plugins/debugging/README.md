@@ -1,29 +1,30 @@
 # Awl Debugging Plugin
 
-Production error monitoring and debugging powered by Sentry MCP integration.
+Production error monitoring and debugging powered by PostHog MCP integration.
 
 ## What This Plugin Provides
 
-**Sentry MCP Integration**: ~20,670 tokens, 19 tools for comprehensive error monitoring
+**PostHog MCP Integration**: Error tracking, session replay, and HogQL queries for comprehensive
+debugging.
 
 **Commands**:
 
-- `/debug-production-error` - Investigate errors with stack traces
-- `/error-impact-analysis` - Assess error severity and scope
-- `/trace-analysis` - Distributed tracing and performance debugging
+- `/awl-debugging:debug-production-error` - Investigate errors with stack traces and session replay
+- `/awl-debugging:error-impact-analysis` - Assess error severity, scope, and user impact
+- `/awl-debugging:trace-analysis` - Session replay analysis and performance debugging
 
 ## When to Enable This Plugin
 
 Enable `awl-debugging` when you need to:
 
-- ✅ Debug production errors and exceptions
-- ✅ Investigate error spikes or incidents
-- ✅ Analyze stack traces and user context
-- ✅ Assess error impact on users
-- ✅ Trace performance bottlenecks
-- ✅ Root cause analysis with Seer AI
+- Debug production errors and exceptions
+- Investigate error spikes or incidents
+- Analyze stack traces and user context
+- Assess error impact on users
+- Watch session replays of error occurrences
+- Run HogQL queries to find error patterns
 
-Disable when you're doing regular development work to save ~20k tokens of context.
+Disable when you're doing regular development work to save context.
 
 ## Installation
 
@@ -40,28 +41,26 @@ Disable when you're doing regular development work to save ~20k tokens of contex
 
 ## Prerequisites
 
-### Environment Variables
+### Environment Variable
 
-Set your Sentry configuration:
+Set your PostHog authentication header:
 
 ```bash
 # Add to ~/.zshrc or ~/.bashrc
-export SENTRY_AUTH_TOKEN="your_auth_token_here"
-export SENTRY_ORG="your-org-slug"
-export SENTRY_PROJECT="your-project-slug"
+export POSTHOG_AUTH_HEADER="Bearer phx_YOUR_PERSONAL_API_KEY"
 ```
 
-To get these values:
+To get your token:
 
-1. Log into Sentry
-2. Go to Settings → Auth Tokens
-3. Create a token with `project:read` and `event:read` permissions
-4. Note your organization and project slugs from URLs
+1. Log into PostHog (eu.posthog.com or us.posthog.com)
+2. Go to Settings -> Personal API Keys
+3. Create a new key with appropriate permissions
+4. Use format: `Bearer phx_...`
 
-### Sentry Access
+### PostHog Access
 
-- Must have access to a Sentry project
-- Recommended: Member or Admin role for full error access
+- Must have access to a PostHog project with error tracking enabled
+- Recommended: Admin or Member role for full error access
 
 ## Usage Examples
 
@@ -72,13 +71,10 @@ To get these values:
 /plugin enable awl-debugging
 
 # Investigate error
-/awl-dev:debug-production-error "MYAPP-456"
+/awl-debugging:debug-production-error "TypeError in checkout flow"
 
-# View stack trace and context
-> "Show me the full stack trace and user actions that led to this error"
-
-# Get fix recommendations
-> "Use Seer to analyze root cause and suggest fixes"
+# View session replay for context
+> "Show me the session replay for the user who hit this error"
 
 # Disable when done
 /plugin disable awl-debugging
@@ -89,17 +85,17 @@ To get these values:
 ```bash
 /plugin enable awl-debugging
 
-/error-impact-analysis "payment gateway errors last 7 days"
+/awl-debugging:error-impact-analysis "payment gateway errors last 7 days"
 
 /plugin disable awl-debugging
 ```
 
-### Performance Investigation
+### Session Replay Investigation
 
 ```bash
 /plugin enable awl-debugging
 
-/trace-analysis "slow API requests in checkout service"
+/awl-debugging:trace-analysis "What was the user doing before the crash?"
 
 /plugin disable awl-debugging
 ```
@@ -120,8 +116,6 @@ Enable both plugins for comprehensive incident analysis:
 
 ## Context Management
 
-**Context cost**: ~20,670 tokens (~10% of 200k window)
-
 **Best practice**: Enable only during incidents/debugging, disable immediately after.
 
 **Check context usage**:
@@ -130,95 +124,77 @@ Enable both plugins for comprehensive incident analysis:
 /context  # Shows MCP token breakdown
 ```
 
-## Available Sentry Tools
+## Available PostHog Debugging Tools
 
 When enabled, this plugin provides access to:
 
 **Error Tracking**:
 
-- Search and filter issues
-- View error details and stack traces
-- Get issue statistics and trends
-- Find recent errors and spikes
+- List and filter error tracking issues by status, assignee, date range
+- Get detailed error information with stack traces
+- View individual error events with full context
+- Search errors by message, type, or pattern
 
-**Root Cause Analysis**:
+**Session Replay**:
 
-- Seer AI-powered analysis
-- Code-level explanations
-- Specific fix recommendations
-- Pattern identification
+- Watch what users did before, during, and after errors
+- View console logs and network requests from the session
+- Link errors to specific session replays via session ID
 
-**Context & Metadata**:
+**HogQL Queries**:
 
-- User information and context
-- Breadcrumb trails (user actions)
-- Environment and release data
-- Device and browser details
+- Run arbitrary SQL-like queries across all PostHog data
+- Correlate errors with feature flags, user segments, pages
+- Aggregate error patterns and trends
+- Cross-reference errors with analytics data
 
-**Issue Management**:
+**Feature Flags**:
 
-- Update issue status (resolve, ignore)
-- Assign to team members
-- Add comments and notes
-- Link to external tickets
+- Check which feature flags were active during errors
+- Identify errors correlated with specific flag states
+- Debug rollout issues
 
-**Performance Monitoring**:
+**Annotations**:
 
-- Distributed trace analysis
-- Transaction performance
-- Span breakdown and timing
-- Bottleneck identification
-
-**Release Health**:
-
-- Compare error rates across releases
-- Identify regressions
-- Track deployment impact
-- Monitor release stability
+- Create annotations for incident timelines
+- Track deployment markers relative to error spikes
 
 ## Tips
 
-1. **Start with searches** - Use natural language queries to find relevant errors
-2. **Check recent errors first** - "last hour" or "last 24 hours" for incidents
-3. **Use Seer for complex issues** - AI analysis provides code-level fixes
-4. **Enable analytics too** - Understand user impact of errors
-5. **Update issue status** - Mark errors as resolved after fixing
+1. **Start with error list** - Use `get_error_tracking_issues` to find relevant errors
+2. **Check session replay** - Every error links to a session showing user actions
+3. **Use HogQL for patterns** - Query across all data to find correlations
+4. **Check feature flags** - Errors may correlate with flag states
+5. **Create annotations** - Mark incidents on your PostHog timeline
 
 ## Troubleshooting
 
-### "Sentry MCP not available"
+### "PostHog MCP not available"
 
 - Plugin may not be enabled: `/plugin enable awl-debugging`
-- Check environment variables: `echo $SENTRY_AUTH_TOKEN`
-- Verify token permissions include `project:read` and `event:read`
+- Check environment variable: `echo $POSTHOG_AUTH_HEADER`
+- Verify token format: `Bearer phx_...`
 
-### "Organization/Project not found"
+### "Authentication failed"
 
-- Check `SENTRY_ORG` matches your organization slug (from Sentry URL)
-- Check `SENTRY_PROJECT` matches your project slug
-- Ensure you have access to the project
+- Token may be expired or invalid
+- Check PostHog project access
+- Regenerate Personal API Key in PostHog
 
-### "Insufficient permissions"
+### "Error tracking not available"
 
-- Auth token needs appropriate scopes
-- Check user role in Sentry project
-- Regenerate token with correct permissions
-
-### High context usage warning
-
-- This is expected (~20k tokens)
-- Disable plugin when not debugging: `/plugin disable awl-debugging`
-- Check `/context` to see breakdown
+- Enable error tracking in your PostHog project settings
+- Ensure your PostHog SDK is configured to capture exceptions
 
 ## Related Plugins
 
 - **awl-dev** - Core development workflow (always enabled)
-- **awl-analytics** - PostHog product analytics (enable for user impact analysis)
+- **awl-analytics** - PostHog product analytics (shares same PostHog backend)
 - **awl-meta** - Workflow discovery and creation
 
 ## Version
 
-1.0.0
+2.0.0
 
 ## License
 

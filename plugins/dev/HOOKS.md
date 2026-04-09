@@ -60,10 +60,10 @@ If hooks aren't working, restart Claude Code:
 
 These commands automatically read workflow context to find the current ticket and query Linear for documents:
 
-- `/resume-handoff` - Finds handoff document for the current ticket
-- `/create-plan` - Finds research document for the current ticket
-- `/implement-plan` - Finds plan document for the current ticket
-- `/validate-plan` - Verifies plan was followed
+- `/awl-dev:resume-handoff` - Finds handoff document for the current ticket
+- `/awl-dev:create-plan` - Finds research document for the current ticket
+- `/awl-dev:implement-plan` - Finds plan document for the current ticket
+- `/awl-dev:validate-plan` - Verifies plan was followed
 
 ## Troubleshooting
 

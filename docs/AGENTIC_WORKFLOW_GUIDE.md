@@ -64,7 +64,7 @@ Context  Context               Context   Context  Context
 
 **When**: Ticket requires codebase understanding before planning
 
-**Command**: `/research-codebase`
+**Command**: `/awl-dev:research-codebase`
 
 **Process**:
 
@@ -92,7 +92,7 @@ Context  Context               Context   Context  Context
 
 **When**: After research OR directly from ticket if codebase is well-understood
 
-**Command**: `/create-plan`
+**Command**: `/awl-dev:create-plan`
 
 **Process**:
 
@@ -129,7 +129,7 @@ Context  Context               Context   Context  Context
 - Switch machines
 - Context is getting full (>60%)
 
-**Commands**: `/create-handoff` or manually create
+**Commands**: `/awl-dev:create-handoff` or manually create
 
 **Process**:
 
@@ -164,7 +164,7 @@ Context  Context               Context   Context  Context
 
 **When**: With approved plan
 
-**Command**: `/implement-plan`
+**Command**: `/awl-dev:implement-plan`
 
 **Process**:
 
@@ -196,7 +196,7 @@ Context  Context               Context   Context  Context
 
 **When**: After all implementation phases complete
 
-**Command**: `/validate-plan` (if exists) or manual validation
+**Command**: `/awl-dev:validate-plan` (if exists) or manual validation
 
 **Process**:
 
@@ -227,7 +227,7 @@ Context  Context               Context   Context  Context
 ```bash
 /awl-dev:commit                    # Create commit
 gh pr create --fill        # Create PR
-/describe-pr              # Generate PR description
+/awl-dev:describe-pr              # Generate PR description
 ```
 
 **PR Description**: Linear document "PR: ..." attached to the ticket
@@ -340,7 +340,7 @@ uses title prefixes for easy discovery:
 | PR Description | "PR: ..." | "PR: #456 - Add OAuth Support" |
 | Validation | "Validation: ..." | "Validation: OAuth Implementation" |
 
-Documents are discovered by querying Linear via `linearis attachments list --issue PROJ-123`.
+Documents are discovered by querying Linear via the `mcp__linear__get_issue` tool with the ticket identifier.
 
 ---
 
@@ -440,7 +440,7 @@ Completed:
 
 ### Resuming from Handoff
 
-**Command**: `/resume-handoff` (with ticket number)
+**Command**: `/awl-dev:resume-handoff` (with ticket number)
 
 **Process**:
 
@@ -454,7 +454,7 @@ Completed:
 **Example**:
 
 ```bash
-/resume-handoff PROJ-123
+/awl-dev:resume-handoff PROJ-123
 # Finds latest handoff attached to this ticket in Linear
 ```
 
@@ -580,21 +580,21 @@ Make sure it works
 
 ```bash
 # 1. Research (optional if codebase familiar)
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
 > "How does rate limiting work?"
 # CLEAR CONTEXT
 
 # 2. Plan
-/create-plan
+/awl-dev:create-plan
 > "Add rate limiting to API endpoints"
 # CLEAR CONTEXT
 
 # 3. Implement
-/implement-plan
+/awl-dev:implement-plan
 # CLEAR CONTEXT
 
 # 4. PR
-/awl-dev:commit && gh pr create --fill && /describe-pr
+/awl-dev:commit && gh pr create --fill && /awl-dev:describe-pr
 ```
 
 ### Pattern 2: Complex Feature with Handoffs
@@ -603,34 +603,34 @@ Make sure it works
 
 ```bash
 # Day 1 - Research
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
 > "Understand OAuth2 implementation patterns"
-/create-handoff
+/awl-dev:create-handoff
 # END OF DAY - CLEAR CONTEXT
 
 # Day 2 - Planning
-/resume-handoff PROJ-123
-/create-plan
+/awl-dev:resume-handoff PROJ-123
+/awl-dev:create-plan
 > Reference research doc
-/create-handoff
+/awl-dev:create-handoff
 # END OF DAY - CLEAR CONTEXT
 
 # Day 3 - Implementation Phase 1
-/resume-handoff PROJ-123
-/implement-plan
+/awl-dev:resume-handoff PROJ-123
+/awl-dev:implement-plan
 # Complete Phase 1 only
-/create-handoff
+/awl-dev:create-handoff
 # END OF DAY - CLEAR CONTEXT
 
 # Day 4 - Implementation Phase 2-3
-/resume-handoff PROJ-123
-/implement-plan  # Continues from checkboxes
+/awl-dev:resume-handoff PROJ-123
+/awl-dev:implement-plan  # Continues from checkboxes
 # Complete remaining phases
 # CLEAR CONTEXT
 
 # Day 5 - Validation & PR
-/validate-plan
-/awl-dev:commit && gh pr create --fill && /describe-pr
+/awl-dev:validate-plan
+/awl-dev:commit && gh pr create --fill && /awl-dev:describe-pr
 ```
 
 ### Pattern 3: Parallel Multi-Task
@@ -640,15 +640,15 @@ Make sure it works
 ```bash
 # Terminal 1 - Task A (using native worktree)
 claude --worktree feature-a
-/implement-plan
+/awl-dev:implement-plan
 
 # Terminal 2 - Task B (using native worktree)
 claude --worktree feature-b
-/implement-plan
+/awl-dev:implement-plan
 
 # Terminal 3 - Task C (research only)
 claude
-/research-codebase PROJ-789
+/awl-dev:research-codebase PROJ-789
 > "How does X work?"
 ```
 
@@ -667,7 +667,7 @@ directly in Linear documents.
 ### How It Works
 
 ```
-Headless: claude -p "/research-codebase TN-123"
+Headless: claude -p "/awl-dev:research-codebase TN-123"
                      ↓
          Research executes autonomously
                      ↓
@@ -677,7 +677,7 @@ Headless: claude -p "/research-codebase TN-123"
                      ↓
          User answers in Linear UI
                      ↓
-Headless: claude -p "/create-plan"
+Headless: claude -p "/awl-dev:create-plan"
                      ↓
          Validates Research answers
                      ↓
@@ -711,7 +711,7 @@ When questions arise in headless mode, they're embedded in the document:
 ```markdown
 ## Questions for User
 
-@Assignee Name - Please answer before proceeding to /create-plan:
+@Assignee Name - Please answer before proceeding to /awl-dev:create-plan:
 
 > **Q1 (blocking)**: What authentication method should we use?
 > **Context**: This affects security model and token storage.
@@ -723,8 +723,8 @@ When questions arise in headless mode, they're embedded in the document:
 
 Downstream commands check for unanswered questions:
 
-- `/create-plan` validates Research document answers
-- `/implement-plan` validates Plan document answers
+- `/awl-dev:create-plan` validates Research document answers
+- `/awl-dev:implement-plan` validates Plan document answers
 
 **If unanswered questions found:**
 
@@ -734,7 +734,7 @@ Downstream commands check for unanswered questions:
 **Q1 (blocking)**: What authentication method should we use?
   → Location: Research document attached to TN-123
 
-Please answer in Linear, then run: /create-plan
+Please answer in Linear, then run: /awl-dev:create-plan
 ```
 
 ### Status Convention
@@ -748,7 +748,7 @@ When a document contains unanswered questions:
 
 ```bash
 # 1. Start research in headless mode
-claude -p "/research-codebase TN-123"
+claude -p "/awl-dev:research-codebase TN-123"
 # → Creates Research doc with embedded questions
 # → Sets ticket to "Spec Needed"
 
@@ -756,14 +756,14 @@ claude -p "/research-codebase TN-123"
 # → Opens Research doc, fills in answers
 
 # 3. Continue with planning
-claude -p "/create-plan"
+claude -p "/awl-dev:create-plan"
 # → Validates Research answers
 # → Creates Plan doc (may have its own questions)
 
 # 4. If Plan has questions, answer them in Linear
 
 # 5. Continue with implementation
-claude -p "/implement-plan"
+claude -p "/awl-dev:implement-plan"
 # → Validates Plan answers
 # → Implements phases
 # → Auto-validates, creates PR, runs review
@@ -824,14 +824,14 @@ See `plugins/dev/LINEAR_DOCUMENTS.md` for the complete embedded questions specif
 ### Command Quick Reference
 
 ```bash
-/research-codebase           # Document existing system
-/create-plan                 # Create implementation plan
-/create-handoff              # Pause/transfer work
-/resume-handoff <path>       # Resume from handoff
-/implement-plan <plan-path>  # Execute plan
-/validate-plan               # Verify implementation
+/awl-dev:research-codebase           # Document existing system
+/awl-dev:create-plan                 # Create implementation plan
+/awl-dev:create-handoff              # Pause/transfer work
+/awl-dev:resume-handoff <path>       # Resume from handoff
+/awl-dev:implement-plan <plan-path>  # Execute plan
+/awl-dev:validate-plan               # Verify implementation
 /awl-dev:commit                      # Create commit
-/describe-pr                 # Generate PR description
+/awl-dev:describe-pr                 # Generate PR description
 ```
 
 ### Document Naming Quick Reference

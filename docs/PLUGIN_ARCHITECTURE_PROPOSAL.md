@@ -10,13 +10,12 @@
 
 **Current Architecture** (2 plugins):
 
-- `awl-dev` - Everything: workflow commands, agents, AND implicit dependency on PostHog/Sentry
-  MCPs
+- `awl-dev` - Everything: workflow commands, agents, AND implicit dependency on PostHog MCP
 - `awl-meta` - Workflow discovery
 
 **Issues**:
 
-1. Heavy MCPs (PostHog ~40k, Sentry ~20k tokens) configured globally
+1. Heavy MCPs (PostHog ~40k tokens) configured globally
 2. All sessions start with heavy MCPs loaded
 3. Manual toggling required every session
 4. No clear separation between core dev tools and specialized use cases
@@ -31,9 +30,9 @@ Organize by **use case** rather than **feature type**:
 
 **Includes**:
 
-- Core workflow commands: `/research-codebase`, `/create-plan`, `/implement-plan`
-- Development commands: `/awl-dev:commit`, `/describe-pr`
-- Handoff system: `/create-handoff`, `/resume-handoff`
+- Core workflow commands: `/awl-dev:research-codebase`, `/awl-dev:create-plan`, `/awl-dev:implement-plan`
+- Development commands: `/awl-dev:commit`, `/awl-dev:describe-pr`
+- Handoff system: `/awl-dev:create-handoff`, `/awl-dev:resume-handoff`
 - All research agents (codebase-locator, analyzer, pattern-finder, etc.)
 - Lightweight MCPs: DeepWiki (~1.9k), Context7 (~1.7k)
 
@@ -71,17 +70,17 @@ Organize by **use case** rather than **feature type**:
 
 ### 3. `awl-debugging` (Error Monitoring)
 
-**Purpose**: Sentry integration for production error analysis
+**Purpose**: PostHog integration for production error tracking, session replay, and HogQL queries
 
 **Includes**:
 
-- Sentry MCP (~20,670 tokens, 19 tools)
-- `/debug-production-error` - Search and analyze Sentry issues
-- `/error-impact-analysis` - Assess error severity and user impact
-- `/trace-analysis` - Distributed tracing investigation
-- `@agent-error-root-cause` - Root cause analysis with Seer
+- PostHog MCP (shared with analytics plugin, ~40,645 tokens)
+- `/awl-debugging:debug-production-error` - Search and analyze PostHog error events
+- `/awl-debugging:error-impact-analysis` - Assess error severity and user impact
+- `/awl-debugging:trace-analysis` - Session replay and performance investigation
+- `@agent-error-root-cause` - Root cause analysis with PostHog data
 
-**Context cost**: ~20k tokens when enabled
+**Context cost**: ~40k tokens when enabled (shares PostHog MCP with analytics)
 
 **Install by default**: ❌ No - optional, enable when needed
 
@@ -90,8 +89,8 @@ Organize by **use case** rather than **feature type**:
 - Investigating production errors
 - Incident response
 - Error trend analysis
-- Release health monitoring
-- Stack trace debugging
+- Session replay debugging
+- Performance investigation
 
 ---
 
@@ -120,9 +119,9 @@ Organize by **use case** rather than **feature type**:
 # Only awl-dev installed
 # Context: ~3.5k MCP tokens
 
-/research-codebase "authentication flow"
-/create-plan "Add OAuth support"
-/implement-plan
+/awl-dev:research-codebase "authentication flow"
+/awl-dev:create-plan "Add OAuth support"
+/awl-dev:implement-plan
 /awl-dev:commit
 ```
 
@@ -154,9 +153,9 @@ Organize by **use case** rather than **feature type**:
 # Enable debugging plugin for incident
 /plugin enable awl-debugging
 
-# Now Sentry MCP available
+# Now PostHog error tracking available
 /awl-dev:debug-production-error "TypeError in checkout"
-/error-impact-analysis
+/awl-debugging:error-impact-analysis
 
 # Optional: Also enable analytics for user impact
 /plugin enable awl-analytics
@@ -166,7 +165,7 @@ Organize by **use case** rather than **feature type**:
 /plugin disable awl-debugging awl-analytics
 ```
 
-**Sentry + PostHog only loaded during incidents** ✅
+**PostHog only loaded during incidents** ✅
 
 ---
 
@@ -198,7 +197,7 @@ awl-analytics/
   "mcpServers": {
     "posthog": {
       "command": "npx",
-      "args": ["-y", "@posthog/mcp-server"],
+      "args": ["-y", "mcp-remote@latest", "https://mcp-eu.posthog.com/mcp"],
       "env": {
         "POSTHOG_AUTH_HEADER": "${POSTHOG_AUTH_HEADER}"
       }
@@ -248,7 +247,7 @@ MCPs should also be unloaded.
 ### Phase 3: Debugging Plugin
 
 - [ ] Create `awl-debugging` plugin structure
-- [ ] Move Sentry MCP config to debugging plugin
+- [ ] Configure PostHog MCP for error tracking in debugging plugin
 - [ ] Create debugging-specific commands
 - [ ] Test debugging plugin enable/disable
 
@@ -256,7 +255,7 @@ MCPs should also be unloaded.
 
 - [ ] Remove MCP management commands from awl-dev
 - [ ] Update documentation
-- [ ] Remove PostHog/Sentry references from core
+- [ ] Remove PostHog references from core
 - [ ] Test all plugins together
 
 ### Phase 5: Marketplace Update
@@ -294,7 +293,7 @@ MCPs should also be unloaded.
 
 ```bash
 # Every session
-/start-lightweight-session  # Disable PostHog, Sentry manually
+/start-lightweight-session  # Disable PostHog manually
 
 # Later: need analytics
 /enable-analytics           # Manual /mcp interaction

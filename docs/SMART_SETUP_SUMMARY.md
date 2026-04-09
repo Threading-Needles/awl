@@ -13,25 +13,12 @@ Intelligent token discovery and validation for Awl setup.
 - `validate_linear_token()` - Calls Linear API to validate and fetch org/teams
 - `format_linear_teams()` - Formats teams for display
 
-**Functions for Sentry:**
-- `discover_sentry_token()` - Checks env var and `~/.sentryclirc`
-- `validate_sentry_token()` - Calls Sentry API to validate and fetch orgs/projects
-- `format_sentry_orgs()` - Formats orgs for display
-- `format_sentry_projects()` - Formats projects for display
-
 ### 2. Smart Configuration Prompts
 
 **`scripts/smart-linear-config.sh`:**
 - Auto-discovers existing token
 - Validates via GraphQL API
 - Fetches all teams and organizations
-- Lets user select from discovered options
-- Falls back to manual entry if needed
-
-**`scripts/smart-sentry-config.sh`:**
-- Auto-discovers existing token
-- Validates via REST API
-- Fetches all orgs and projects
 - Lets user select from discovered options
 - Falls back to manual entry if needed
 
@@ -50,15 +37,12 @@ Checked in order:
 1. `$LINEAR_API_TOKEN` environment variable
 2. `~/.linear_api_token` file
 
-**Compatible with `linearis` CLI** - uses same standard locations!
+**Compatible with standard Linear token locations!**
 
-### Sentry
+### PostHog
 
 Checked in order:
-1. `$SENTRY_AUTH_TOKEN` environment variable
-2. `~/.sentryclirc` file (looks for `token=` line)
-
-**Compatible with `sentry-cli`** - uses same standard locations!
+1. `$POSTHOG_AUTH_HEADER` environment variable (format: `Bearer phx_...`)
 
 ---
 
@@ -155,28 +139,6 @@ User must:
 - Team name (e.g., "Engineering")
 - Organization context
 
-### Sentry REST API Calls
-
-**Call 1: Get Organizations**
-```
-GET https://sentry.io/api/0/organizations/
-Authorization: Bearer {token}
-```
-
-**Call 2: Get Projects**
-```
-GET https://sentry.io/api/0/organizations/{org}/projects/
-Authorization: Bearer {token}
-```
-
-**Returns:**
-- All organizations user has access to
-- All projects in selected organization
-
-**Auto-populated fields:**
-- Organization slug
-- Project slug
-
 ---
 
 ## How to Enable
@@ -187,8 +149,8 @@ Authorization: Bearer {token}
 # Linear
 export LINEAR_API_TOKEN="lin_api_..."
 
-# Sentry
-export SENTRY_AUTH_TOKEN="sntrys_..."
+# PostHog
+export POSTHOG_AUTH_HEADER="Bearer phx_..."
 ```
 
 Good for: Testing, temporary setups
@@ -199,15 +161,6 @@ Good for: Testing, temporary setups
 ```bash
 echo "lin_api_..." > ~/.linear_api_token
 chmod 600 ~/.linear_api_token
-```
-
-#### Sentry
-```bash
-cat > ~/.sentryclirc << 'EOF'
-[auth]
-token=sntrys_...
-EOF
-chmod 600 ~/.sentryclirc
 ```
 
 Good for: Permanent setups, shared with other CLIs
@@ -221,10 +174,6 @@ Good for: Permanent setups, shared with other CLIs
 # Linear
 ./scripts/awl-integration-helpers.sh discover-linear
 # Output: "file" or "env" (source) + token
-
-# Sentry
-./scripts/awl-integration-helpers.sh discover-sentry
-# Output: "file" or "env" (source) + token
 ```
 
 ### Test Validation
@@ -232,10 +181,6 @@ Good for: Permanent setups, shared with other CLIs
 # Linear (replace with real token)
 ./scripts/awl-integration-helpers.sh validate-linear "lin_api_..."
 # Output: JSON with viewer, org, teams
-
-# Sentry (replace with real token)
-./scripts/awl-integration-helpers.sh validate-sentry "sntrys_..."
-# Output: JSON with orgs and projects
 ```
 
 ### Test Full Flow
@@ -258,9 +203,6 @@ echo "lin_api_your_token" > ~/.linear_api_token
 - [x] Linear token discovery (env + file)
 - [x] Linear API validation (GraphQL)
 - [x] Linear team/org extraction
-- [x] Sentry token discovery (env + file)
-- [x] Sentry API validation (REST)
-- [x] Sentry org/project extraction
 - [x] Smart config prompt functions
 - [x] Documentation
 
@@ -268,7 +210,6 @@ echo "lin_api_your_token" > ~/.linear_api_token
 
 - [ ] Source smart functions in `setup-awl.sh`
 - [ ] Replace `prompt_linear_config` with `prompt_linear_config_smart`
-- [ ] Replace `prompt_sentry_config` with `prompt_sentry_config_smart`
 - [ ] Test full setup flow
 - [ ] Update README with smart setup mention
 
@@ -320,7 +261,6 @@ See `scripts/INTEGRATION_GUIDE.md` for step-by-step integration instructions.
 ## Future Enhancements
 
 ### Phase 2: Additional Services
-- [ ] PostHog API key validation
 - [ ] Exa API key validation
 - [ ] GitHub token from `gh` CLI
 
@@ -342,7 +282,6 @@ See `scripts/INTEGRATION_GUIDE.md` for step-by-step integration instructions.
 scripts/
 ├── awl-integration-helpers.sh    # Discovery & validation functions
 ├── smart-linear-config.sh             # Smart Linear prompt
-├── smart-sentry-config.sh             # Smart Sentry prompt
 └── INTEGRATION_GUIDE.md               # Integration instructions
 
 docs/
@@ -360,11 +299,8 @@ docs/
 # Linear
 echo "YOUR_LINEAR_TOKEN" > ~/.linear_api_token
 
-# Sentry
-cat > ~/.sentryclirc << 'EOF'
-[auth]
-token=YOUR_SENTRY_TOKEN
-EOF
+# PostHog
+export POSTHOG_AUTH_HEADER="Bearer phx_YOUR_TOKEN"
 ```
 
 ### 2. Run setup
@@ -412,6 +348,6 @@ Setup will:
 
 1. **Review** the integration guide: `scripts/INTEGRATION_GUIDE.md`
 2. **Integrate** smart functions into `setup-awl.sh`
-3. **Test** with real Linear and Sentry tokens
+3. **Test** with real Linear tokens
 4. **Document** in README and QUICKSTART
 5. **Ship** to users!

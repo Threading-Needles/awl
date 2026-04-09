@@ -12,8 +12,7 @@ Workflow discovery and creation tools.
 
 ### Required
 
-- **Linearis CLI**: `npm install -g linearis`
-- **LINEAR_API_TOKEN**: Environment variable
+- **Linear MCP**: The official Linear MCP server (handles authentication automatically)
 
 ### Recommended Plugins
 
@@ -73,4 +72,4 @@ From the same marketplace:
 | awl-dev | Core development workflow |
 | awl-pm | Project management |
 | awl-analytics | PostHog integration |
-| awl-debugging | Sentry integration |
+| awl-debugging | PostHog error tracking |

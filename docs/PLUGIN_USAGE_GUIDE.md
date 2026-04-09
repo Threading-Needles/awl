@@ -22,7 +22,7 @@ Awl now uses a **use case-based** plugin architecture:
 # Install plugins based on your needs
 /plugin install awl-dev           # Required
 /plugin install awl-analytics     # If you use PostHog
-/plugin install awl-debugging     # If you use Sentry
+/plugin install awl-debugging     # If you need error tracking (uses PostHog)
 /plugin install awl-meta          # If you want workflow discovery
 ```
 
@@ -35,11 +35,11 @@ Awl now uses a **use case-based** plugin architecture:
 claude
 
 # Work with full workflow
-/research-codebase "authentication system"
-/create-plan "Add OAuth support"
-/implement-plan
+/awl-dev:research-codebase "authentication system"
+/awl-dev:create-plan "Add OAuth support"
+/awl-dev:implement-plan
 /awl-dev:commit
-/describe-pr
+/awl-dev:describe-pr
 
 # Context stays light (~3.5k MCP tokens)
 ```
@@ -76,17 +76,17 @@ user behavior
 # Enable debugging
 /plugin enable awl-debugging
 
-# Now Sentry MCP is available
+# Now PostHog error tracking is available
 /awl-dev:debug-production-error "TypeError in checkout"
-/error-impact-analysis "errors from last deployment"
-/trace-analysis "slow API requests"
+/awl-debugging:error-impact-analysis "errors from last deployment"
+/awl-debugging:trace-analysis "slow API requests"
 
 # Disable when incident resolved
 /plugin disable awl-debugging
 ```
 
-**When to use**: Production errors, incident response, performance debugging, release health
-monitoring
+**When to use**: Production errors, incident response, performance debugging, session replay
+analysis
 
 **Context impact**: +20k tokens while enabled
 
@@ -182,12 +182,10 @@ Required before enabling:
 
 ```bash
 # Add to ~/.zshrc or ~/.bashrc
-export SENTRY_AUTH_TOKEN="your_token"
-export SENTRY_ORG="your-org-slug"
-export SENTRY_PROJECT="your-project-slug"
+export POSTHOG_AUTH_HEADER="Bearer phx_YOUR_TOKEN"
 ```
 
-Get these from Sentry → Settings → Auth Tokens
+Get your token from PostHog → Project Settings → API Keys
 
 ## Decision Guide: Which Plugins to Install?
 
@@ -210,12 +208,12 @@ Get these from Sentry → Settings → Auth Tokens
 
 **Install if**:
 
-- You have a Sentry account
+- You have a PostHog account
 - You debug production errors
 - You respond to incidents
-- You monitor application health
+- You use session replay and error tracking
 
-**Skip if**: You don't use Sentry or handle errors differently
+**Skip if**: You don't use PostHog or handle errors differently
 
 ### awl-meta (Optional)
 
@@ -255,13 +253,13 @@ Get these from Sentry → Settings → Auth Tokens
 
 ### With Debugging Enabled (+awl-debugging)
 
-- MCP tools: ~24k tokens (adds Sentry)
-- **Available for conversation**: ~154k tokens
+- MCP tools: ~44k tokens (adds PostHog error tracking)
+- **Available for conversation**: ~134k tokens
 
 ### With Both Enabled
 
-- MCP tools: ~64k tokens (PostHog + Sentry + lightweight)
-- **Available for conversation**: ~114k tokens
+- MCP tools: ~44k tokens (PostHog shared between analytics + debugging)
+- **Available for conversation**: ~134k tokens
 
 **Strategy**: Keep plugins disabled by default. Enable only when needed for specific tasks. Disable
 immediately after to free context.
@@ -296,7 +294,7 @@ immediately after to free context.
 ```bash
 # Verify they're set
 echo $POSTHOG_AUTH_HEADER
-echo $SENTRY_AUTH_TOKEN
+echo $POSTHOG_AUTH_HEADER
 
 # Make sure to restart shell after adding to ~/.zshrc
 source ~/.zshrc

@@ -1,40 +1,22 @@
 ---
 description: Manage Linear tickets with workflow automation
 category: project-task-management
-tools: Bash(linearis *), Read, Write, Edit, Grep
+tools:
+  mcp__linear__get_issue, mcp__linear__list_issues,
+  mcp__linear__save_issue, mcp__linear__save_comment,
+  mcp__linear__get_document, mcp__linear__create_document,
+  mcp__linear__update_document, mcp__linear__list_documents,
+  mcp__linear__list_cycles, mcp__linear__list_issue_statuses,
+  mcp__linear__research,
+  Read, Write, Edit, Grep
 model: inherit
-version: 2.0.0
+version: 3.0.0
 ---
 
 # Linear - Ticket Management
 
 You are tasked with managing Linear tickets, updating ticket statuses, and following a structured
-workflow using the Linearis CLI.
-
-## Prerequisites Check
-
-First, verify that Linearis CLI is installed and configured:
-
-```bash
-if ! command -v linearis &> /dev/null; then
-    echo "❌ Linearis CLI not found"
-    echo ""
-    echo "Install with:"
-    echo "  npm install -g linearis"
-    echo ""
-    echo "Configure with:"
-    echo "  export LINEAR_API_TOKEN=your_token"
-    exit 1
-fi
-
-if [[ -z "$LINEAR_API_TOKEN" ]]; then
-    echo "❌ LINEAR_API_TOKEN not set"
-    echo ""
-    echo "Get a token from: https://linear.app/settings/api"
-    echo "Then: export LINEAR_API_TOKEN=your_token"
-    exit 1
-fi
-```
+workflow using the official Linear MCP tools.
 
 ## Configuration
 
@@ -96,8 +78,8 @@ This workflow ensures alignment through planning before implementation:
 7. **In Review** → PR submitted
 8. **Done** → Completed
 
-**Note**: These statuses must be configured in your Linear workspace settings. The Linearis CLI will
-read and use whatever states exist in your workspace.
+**Note**: These statuses must be configured in your Linear workspace settings. Use
+`mcp__linear__list_issue_statuses` to see available states.
 
 ### Key Principle
 
@@ -107,11 +89,11 @@ read and use whatever states exist in your workspace.
 
 These commands automatically update ticket status:
 
-- `/research-codebase PROJ-123` → Moves ticket to "Research"
-- `/create-plan` → Moves ticket to "Planning"
-- `/implement-plan` → Moves to "In Progress"
-- `/create-pr` → Moves to "In Review"
-- `/merge-pr` → Moves to "Done"
+- `/awl-dev:research-codebase PROJ-123` → Moves ticket to "Research"
+- `/awl-dev:create-plan` → Moves ticket to "Planning"
+- `/awl-dev:implement-plan` → Moves to "In Progress"
+- `/awl-dev:create-pr` → Moves to "In Review"
+- `/awl-dev:merge-pr` → Moves to "Done"
 
 ---
 
@@ -128,13 +110,11 @@ These commands automatically update ticket status:
 
 2. **Create the ticket:**
 
-   ```bash
-   linearis issues create \
-     --title "[title]" \
-     --description "[description in markdown]" \
-     --priority [1-4] \
-     --state "Backlog"
-   ```
+   Use `mcp__linear__save_issue` with:
+   - title
+   - description (markdown)
+   - priority (1-4)
+   - state: "Backlog"
 
 3. **Post-creation:**
    - Show the created ticket URL
@@ -149,7 +129,7 @@ When user wants to add a comment to a ticket:
 
 1. **Determine which ticket:**
    - Use context from the current conversation
-   - Or use `linearis issues read TEAM-123` to confirm
+   - Or use `mcp__linear__get_issue` to confirm
 
 2. **Format comments for clarity:**
    - Keep concise (~10 lines) unless more detail needed
@@ -157,54 +137,44 @@ When user wants to add a comment to a ticket:
    - Focus on key insights
 
 3. **Add comment:**
-   ```bash
-   linearis comments create TEAM-123 --body "Your comment text here"
-   ```
+
+   Use `mcp__linear__save_comment` with the issue ID and body text.
 
 ### 3. Moving Tickets Through Workflow
 
 When moving tickets to a new status:
 
 1. **Get current status:**
-   ```bash
-   linearis issues read TEAM-123 | jq -r '.state.name'
-   ```
+
+   Use `mcp__linear__get_issue` to read the current state.
 
 2. **Suggest next status based on workflow:**
    ```
    Backlog → Research (needs investigation)
-   Research → Planning (starting plan with /create-plan)
+   Research → Planning (starting plan with /awl-dev:create-plan)
    Planning → Ready for Dev (plan approved)
-   Ready for Dev → In Progress (starting work with /implement-plan)
+   Ready for Dev → In Progress (starting work with /awl-dev:implement-plan)
    In Progress → In Review (PR created)
    In Review → Done (PR merged)
    ```
 
 3. **Update status:**
-   ```bash
-   linearis issues update TEAM-123 --state "In Progress"
-   ```
+
+   Use `mcp__linear__save_issue` with the new state.
 
 4. **Add comment explaining the transition:**
-   ```bash
-   linearis comments create TEAM-123 --body "Moving to In Progress: Starting implementation"
-   ```
+
+   Use `mcp__linear__save_comment` with a message like:
+   "Moving to In Progress: Starting implementation"
 
 ### 4. Searching for Tickets
 
 When user wants to find tickets:
 
 1. **Execute search:**
-   ```bash
-   # List issues
-   linearis issues list --limit 100
 
-   # Filter by status using jq
-   linearis issues list --limit 100 | jq '.[] | select(.state.name == "In Progress")'
-
-   # Search by text
-   linearis issues list --limit 100 | jq '.[] | select(.title | contains("search term"))'
-   ```
+   - Use `mcp__linear__list_issues` with filters (team, status, assignee)
+   - For complex queries, use `mcp__linear__research` with natural language
 
 2. **Present results:**
    - Show ticket ID, title, status, assignee
@@ -214,20 +184,15 @@ When user wants to find tickets:
 
 To see documents (research, plans, handoffs, PR descriptions) attached to a ticket:
 
-```bash
-linearis attachments list --issue TEAM-123
-```
+Use `mcp__linear__get_issue` with the ticket ID to see attached documents.
 
-This returns all document attachments on the issue. Documents are categorized by title pattern:
+Documents are categorized by title pattern:
 - `Research: ...` - Research documents
 - `Plan: ...` - Implementation plans
 - `Handoff: ...` - Session handoffs
 - `PR: ...` - PR descriptions
 
-To read a specific document:
-```bash
-linearis documents read <document-id>
-```
+To read a specific document, use `mcp__linear__get_document` with the document ID.
 
 ---
 
@@ -237,24 +202,24 @@ linearis documents read <document-id>
 
 When workflow commands are run, they automatically update the associated ticket:
 
-**During `/research-codebase PROJ-123`:**
+**During `/awl-dev:research-codebase PROJ-123`:**
 1. Sets ticket in workflow context
 2. Moves to "Research" status
 3. Creates "Research: ..." document attached to ticket
 
-**During `/create-plan`:**
+**During `/awl-dev:create-plan`:**
 1. Moves to "Planning" status
 2. Creates "Plan: ..." document attached to ticket
 
-**During `/implement-plan`:**
+**During `/awl-dev:implement-plan`:**
 1. Moves to "In Progress" status
 2. Adds progress comments as phases complete
 
-**During `/create-pr`:**
+**During `/awl-dev:create-pr`:**
 1. Moves to "In Review" status
 2. Creates "PR: ..." document attached to ticket
 
-**During `/merge-pr`:**
+**During `/awl-dev:merge-pr`:**
 1. Moves to "Done" status
 2. Adds merge completion comment
 
@@ -266,105 +231,56 @@ When workflow commands are run, they automatically update the associated ticket:
 
 ```bash
 # 1. Start research with ticket
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
 # Creates "Research: ..." document in Linear
 # Ticket moves to "Research"
 
 # 2. Create plan
-/create-plan
+/awl-dev:create-plan
 # Reads research from Linear
 # Creates "Plan: ..." document in Linear
 # Ticket moves to "Planning"
 
 # 3. Implement
-/implement-plan
+/awl-dev:implement-plan
 # Reads plan from Linear
 # Ticket moves to "In Progress"
 
 # 4. Create PR
-/create-pr
+/awl-dev:create-pr
 # Creates "PR: ..." document in Linear
 # Ticket moves to "In Review"
 
 # 5. Merge PR
-/merge-pr
+/awl-dev:merge-pr
 # Ticket moves to "Done"
 ```
 
 ### Workflow 2: Quick Ticket Updates
 
-```bash
-# Add progress comment
-linearis comments create PROJ-123 --body "Completed phase 1, moving to phase 2"
+Use the Linear MCP tools directly:
 
-# Move ticket forward
-linearis issues update PROJ-123 --state "In Progress"
-
-# Search for related tickets
-linearis issues list --limit 100 | jq '.[] | select(.title | contains("authentication"))'
-
-# View documents attached to ticket
-linearis attachments list --issue PROJ-123
-```
+- Add a comment: `mcp__linear__save_comment` with issue ID and body
+- Move ticket forward: `mcp__linear__save_issue` with new state
+- Search tickets: `mcp__linear__list_issues` with filters or `mcp__linear__research` with natural language
+- View documents: `mcp__linear__get_issue` to find attachments
 
 ---
 
-## Linearis CLI Reference
+## Linear MCP Tool Reference
 
-### Common Commands
+### Common Operations
 
-```bash
-# List issues
-linearis issues list --limit 50
-
-# Filter by status using jq
-linearis issues list --limit 100 | jq '.[] | select(.state.name == "In Progress")'
-
-# Read specific issue
-linearis issues read TICKET-123
-
-# Create issue
-linearis issues create --title "Title" --description "Description" --state "Backlog"
-
-# Update issue state
-linearis issues update TICKET-123 --state "In Progress"
-
-# Update assignee
-linearis issues update TICKET-123 --assignee "@me"
-
-# Add comment
-linearis comments create TICKET-123 --body "Comment text"
-
-# List documents attached to issue
-linearis attachments list --issue TICKET-123
-
-# Read document
-linearis documents read <document-id>
-
-# Create document
-linearis documents create --title "Title" --content "Content" --attach-to TICKET-123
-
-# List cycles
-linearis cycles list --team TEAM [--active]
-```
-
-### JSON Output Parsing
-
-Linearis returns JSON, parse with jq:
-
-```bash
-# Get ticket status
-linearis issues read TEAM-123 | jq -r '.state.name'
-
-# Get ticket title
-linearis issues read TEAM-123 | jq -r '.title'
-
-# Get assignee
-linearis issues read TEAM-123 | jq -r '.assignee.name'
-
-# Filter list by keyword
-linearis issues list --limit 100 | jq '.[] | select(.title | contains("bug"))'
-```
+- **Read issue**: `mcp__linear__get_issue` - Get full ticket details
+- **List issues**: `mcp__linear__list_issues` - Filter by team, status, etc.
+- **Create/update issue**: `mcp__linear__save_issue` - Create new or update existing
+- **Add comment**: `mcp__linear__save_comment` - Add comment to issue
+- **List documents**: `mcp__linear__list_documents` - Find documents
+- **Read document**: `mcp__linear__get_document` - Read document content
+- **Create document**: `mcp__linear__create_document` - Create new document
+- **Update document**: `mcp__linear__update_document` - Update document content
+- **List cycles**: `mcp__linear__list_cycles` - Get cycle information
+- **Research**: `mcp__linear__research` - Natural language queries
 
 ---
 
@@ -373,7 +289,6 @@ linearis issues list --limit 100 | jq '.[] | select(.title | contains("bug"))'
 - **Configuration**: Use `.claude/config.json` for team settings
 - **Status mapping**: Use status names that exist in your Linear workspace
 - **Automation**: Workflow commands auto-update tickets when ticket IDs are used
-- **CLI required**: Linearis CLI must be installed and LINEAR_API_TOKEN set
 - **Documents**: All workflow documents (research, plans, handoffs, PRs) are stored as Linear documents attached to tickets
 
 This command integrates seamlessly with the research → plan → implement → validate workflow while

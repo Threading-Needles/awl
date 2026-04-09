@@ -3,19 +3,6 @@ set -euo pipefail
 
 echo "Checking PM plugin prerequisites..."
 
-# Check for linearis CLI
-if ! command -v linearis &> /dev/null; then
-    echo "❌ Linearis CLI not found"
-    echo "Install with:"
-    echo "  npm install -g --install-links czottmann/linearis"
-    echo ""
-    echo "Note: Requires PR #4 features (cycle management)"
-    echo "  https://github.com/czottmann/linearis/pull/4"
-    exit 1
-fi
-
-echo "✅ Linearis CLI found: $(linearis --version)"
-
 # Check for jq (JSON parsing)
 if ! command -v jq &> /dev/null; then
     echo "❌ jq not found (required for JSON parsing)"
@@ -51,14 +38,6 @@ if [[ -z "$TEAM_KEY" ]]; then
     echo "Add: \"linear\": { \"teamKey\": \"TEAM\" }"
 else
     echo "✅ Linear team key configured: $TEAM_KEY"
-fi
-
-# Check for LINEAR_API_TOKEN
-if [[ -z "${LINEAR_API_TOKEN:-}" ]]; then
-    echo "⚠️  LINEAR_API_TOKEN environment variable not set"
-    echo "Set with: export LINEAR_API_TOKEN=your_token"
-else
-    echo "✅ LINEAR_API_TOKEN set"
 fi
 
 echo ""

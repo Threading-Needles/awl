@@ -33,7 +33,7 @@ else
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts"
 fi
 
-# 2. Check PM plugin prerequisites (validates Linearis CLI and LINEAR_API_TOKEN)
+# 2. Check PM plugin prerequisites
 if [[ -f "${SCRIPT_DIR}/check-prerequisites.sh" ]]; then
   "${SCRIPT_DIR}/check-prerequisites.sh" || exit 1
 else
@@ -257,7 +257,7 @@ Full health report: reports/cycles/2025-01-27-cycle-4-health.md
 - [ ] Prerequisites script passes: `./scripts/check-prerequisites.sh`
 - [ ] Command executes without errors
 - [ ] Report file created in expected location
-- [ ] JSON parsing succeeds for all linearis output
+- [ ] JSON parsing succeeds for all Linear MCP output
 - [ ] TodoWrite tracking works correctly
 - [ ] Health assessment is data-backed
 

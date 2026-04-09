@@ -18,7 +18,7 @@ This system leverages parallel sub-agents for efficiency and follows context eng
 
 ## Commands
 
-### 1. `/discover-workflows` - Research External Repositories
+### 1. `/awl-meta:discover-workflows` - Research External Repositories
 
 Discovers and catalogs workflows from the Claude Code community.
 
@@ -37,13 +37,13 @@ Discovers and catalogs workflows from the Claude Code community.
 
 ```bash
 # Research specific repository
-/discover-workflows wshobson/commands
+/awl-meta:discover-workflows wshobson/commands
 
 # Research all supported repositories (33 parallel agents!)
-/discover-workflows all
+/awl-meta:discover-workflows all
 
 # Research custom repository
-/discover-workflows org/custom-repo
+/awl-meta:discover-workflows org/custom-repo
 ```
 
 **Output**:
@@ -64,7 +64,7 @@ Discovers and catalogs workflows from the Claude Code community.
 - `anthropics/claude-code` - Official Claude Code repo
 - `winfunc/opcode` - GUI toolkit for agents/commands
 
-### 2. `/import-workflow` - Adapt External Workflows
+### 2. `/awl-meta:import-workflow` - Adapt External Workflows
 
 Imports workflows from external repositories and adapts them to your workspace standards.
 
@@ -86,16 +86,16 @@ Imports workflows from external repositories and adapts them to your workspace s
 
 ```bash
 # Interactive import with analysis
-/import-workflow wshobson/commands code-review
+/awl-meta:import-workflow wshobson/commands code-review
 
 # Import with custom adaptations
-/import-workflow wshobson/commands code-review --adapt "Use our custom linting rules"
+/awl-meta:import-workflow wshobson/commands code-review --adapt "Use our custom linting rules"
 
 # Import multiple workflows
-/import-workflow wshobson/commands code-review refactor test-gen
+/awl-meta:import-workflow wshobson/commands code-review refactor test-gen
 
 # Dry run (preview without saving)
-/import-workflow wshobson/commands code-review --dry-run
+/awl-meta:import-workflow wshobson/commands code-review --dry-run
 ```
 
 **Process**:
@@ -114,7 +114,7 @@ Imports workflows from external repositories and adapts them to your workspace s
 - Workflow saved to `plugins/dev/agents/{name}.md` or `plugins/dev/commands/{name}.md`
 - Attribution and source tracking
 
-### 3. `/create-workflow` - Interactive Workflow Creator
+### 3. `/awl-meta:create-workflow` - Interactive Workflow Creator
 
 Creates new agents or commands using discovered patterns and templates.
 
@@ -136,16 +136,16 @@ Creates new agents or commands using discovered patterns and templates.
 
 ```bash
 # Interactive creation
-/create-workflow
+/awl-meta:create-workflow
 
 # Create from catalog entry
-/create-workflow from catalog wshobson/commands/code-review
+/awl-meta:create-workflow from catalog wshobson/commands/code-review
 
 # Quick create with defaults
-/create-workflow agent data-analyzer "Analyzes data patterns"
+/awl-meta:create-workflow agent data-analyzer "Analyzes data patterns"
 
 # Create with template
-/create-workflow command quick-commit "Create conventional commits" --template minimal
+/awl-meta:create-workflow command quick-commit "Create conventional commits" --template minimal
 ```
 
 **Process**:
@@ -164,7 +164,7 @@ Creates new agents or commands using discovered patterns and templates.
 - **Standard**: Full featured (default)
 - **Advanced**: Includes sub-agent patterns
 
-### 4. `/validate-frontmatter` - Consistency Checker
+### 4. `/awl-meta:validate-frontmatter` - Consistency Checker
 
 Validates frontmatter across all workflows and auto-fixes issues.
 
@@ -185,16 +185,16 @@ Validates frontmatter across all workflows and auto-fixes issues.
 
 ```bash
 # Validate all workflows (report only)
-/validate-frontmatter
+/awl-meta:validate-frontmatter
 
 # Validate and auto-fix
-/validate-frontmatter --fix
+/awl-meta:validate-frontmatter --fix
 
 # Validate specific workflow
-/validate-frontmatter plugins/dev/agents/codebase-analyzer.md
+/awl-meta:validate-frontmatter plugins/dev/agents/codebase-analyzer.md
 
 # Generate standard document
-/validate-frontmatter --generate-standard
+/awl-meta:validate-frontmatter --generate-standard
 ```
 
 **Validation Checks**:
@@ -225,7 +225,7 @@ Validates frontmatter across all workflows and auto-fixes issues.
 
 1. Discover Phase
    ┌──────────────────────┐
-   │ /discover-workflows  │  ← Research external repos
+   │ /awl-meta:discover-workflows  │  ← Research external repos
    └──────────┬───────────┘
               │
               ├─→ Spawn 3 parallel sub-agents per repo:
@@ -241,7 +241,7 @@ Validates frontmatter across all workflows and auto-fixes issues.
 
 2. Import Phase
    ┌──────────────────────┐
-   │ /import-workflow     │  ← Bring external workflow in
+   │ /awl-meta:import-workflow     │  ← Bring external workflow in
    └──────────┬───────────┘
               │
               ├─→ Spawn 3 parallel validation tasks:
@@ -262,7 +262,7 @@ Validates frontmatter across all workflows and auto-fixes issues.
 
 3. Create Phase
    ┌──────────────────────┐
-   │ /create-workflow     │  ← Create new workflow
+   │ /awl-meta:create-workflow     │  ← Create new workflow
    └──────────┬───────────┘
               │
               ├─→ Spawn 3 parallel research tasks:
@@ -281,7 +281,7 @@ Validates frontmatter across all workflows and auto-fixes issues.
 
 4. Validate Phase
    ┌──────────────────────┐
-   │ /validate-frontmatter│  ← Ensure consistency
+   │ /awl-meta:validate-frontmatter│  ← Ensure consistency
    └──────────┬───────────┘
               │
               ├─→ Spawn 3 parallel validation tasks:
@@ -331,7 +331,7 @@ Analyze holistically
 Present to user
 ```
 
-### Example: `/discover-workflows`
+### Example: `/awl-meta:discover-workflows`
 
 For each repository:
 
@@ -429,28 +429,28 @@ version: 1.0.0
 
 ### When to Use Each Command
 
-**Use `/discover-workflows` when**:
+**Use `/awl-meta:discover-workflows` when**:
 
 - Starting a new project and want to learn from others
 - Looking for inspiration or examples
 - Researching how others solve similar problems
 - Building a catalog of reusable patterns
 
-**Use `/import-workflow` when**:
+**Use `/awl-meta:import-workflow` when**:
 
 - You found a workflow in the catalog you want to use
 - You need exactly what an external workflow provides
 - You want to adapt an existing workflow to your needs
 - You want to track provenance of external code
 
-**Use `/create-workflow` when**:
+**Use `/awl-meta:create-workflow` when**:
 
 - You need something custom not in the catalog
 - You want to combine patterns from multiple examples
 - You're building something specific to your project
 - You want guidance but need flexibility
 
-**Use `/validate-frontmatter` when**:
+**Use `/awl-meta:validate-frontmatter` when**:
 
 - Before committing new workflows
 - After importing or creating workflows
@@ -468,7 +468,7 @@ version: 1.0.0
 
 ### Maintaining Quality
 
-- Run `/validate-frontmatter` before committing
+- Run `/awl-meta:validate-frontmatter` before committing
 - Keep catalog updated with new discoveries
 - Document why you imported/created workflows
 - Use version numbers for breaking changes
@@ -479,22 +479,22 @@ version: 1.0.0
 
 ```bash
 # Discover all repos
-/discover-workflows all
+/awl-meta:discover-workflows all
 
 # Import top picks
-/import-workflow wshobson/commands code-review
-/import-workflow wshobson/agents codebase-analyzer
-/import-workflow qdhenry/Claude-Command-Suite doc-generator
+/awl-meta:import-workflow wshobson/commands code-review
+/awl-meta:import-workflow wshobson/agents codebase-analyzer
+/awl-meta:import-workflow qdhenry/Claude-Command-Suite doc-generator
 
 # Validate everything
-/validate-frontmatter --fix
+/awl-meta:validate-frontmatter --fix
 ```
 
 ### Custom Workflow with Research
 
 ```bash
 # Create custom workflow but show examples first
-/create-workflow
+/awl-meta:create-workflow
 
 # During creation:
 # - System finds similar workflows
@@ -507,10 +507,10 @@ version: 1.0.0
 
 ```bash
 # Re-discover repos quarterly to catch updates
-/discover-workflows all
+/awl-meta:discover-workflows all
 
 # Import new interesting workflows
-/import-workflow <repo> <new-workflow>
+/awl-meta:import-workflow <repo> <new-workflow>
 ```
 
 ## Troubleshooting
@@ -547,7 +547,7 @@ version: 1.0.0
 
 **Problem**: Many validation failures
 
-- Run `/validate-frontmatter --fix` for auto-fixes
+- Run `/awl-meta:validate-frontmatter --fix` for auto-fixes
 - Review remaining issues manually
 - Update frontmatter standard if needed
 

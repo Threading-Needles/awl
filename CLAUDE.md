@@ -33,12 +33,12 @@ The workspace uses a plugin-based architecture where agents and commands are org
 Workflow documents (research, plans, handoffs, PR descriptions) are stored as **Linear documents**
 attached to tickets:
 
-- **Research**: Created by `/research-codebase`, titled "Research: ..."
-- **Plans**: Created by `/create-plan`, titled "Plan: ..."
-- **Handoffs**: Created by `/create-handoff`, titled "Handoff: ..."
-- **PR Descriptions**: Created by `/describe-pr`, titled "PR: ..."
+- **Research**: Created by `/awl-dev:research-codebase`, titled "Research: ..."
+- **Plans**: Created by `/awl-dev:create-plan`, titled "Plan: ..."
+- **Handoffs**: Created by `/awl-dev:create-handoff`, titled "Handoff: ..."
+- **PR Descriptions**: Created by `/awl-dev:describe-pr`, titled "PR: ..."
 
-Documents are discovered by querying Linear via `linearis attachments list --issue TICKET-123`.
+Documents are discovered by querying Linear via `mcp__linear__get_issue` with the ticket ID.
 
 ### Workflow State Management
 
@@ -48,11 +48,11 @@ Commands track the current ticket via `.claude/.workflow-context.json`:
 
 **How it works**:
 
-- `/research-codebase PROJ-123` sets ticket → saves research to Linear
-- `/create-plan` reads research from Linear → saves plan to Linear
-- `/implement-plan` reads plan from Linear → implements phases
-- `/create-handoff` saves handoff to Linear
-- `/resume-handoff PROJ-123` finds handoff from Linear
+- `/awl-dev:research-codebase PROJ-123` sets ticket → saves research to Linear
+- `/awl-dev:create-plan` reads research from Linear → saves plan to Linear
+- `/awl-dev:implement-plan` reads plan from Linear → implements phases
+- `/awl-dev:create-handoff` saves handoff to Linear
+- `/awl-dev:resume-handoff PROJ-123` finds handoff from Linear
 
 **Structure**:
 
@@ -78,13 +78,13 @@ Awl uses Linear documents attached to tickets for persistent workflow context:
 ```
 ┌─────────────────────────────────────┐
 │  Linear Ticket: PROJ-123            │
-│  ├─ Research: OAuth Implementation  │ ← From /research-codebase
-│  ├─ Plan: OAuth Implementation      │ ← From /create-plan
-│  ├─ Handoff: Session 2025-01-08     │ ← From /create-handoff
-│  └─ PR: #456 - Add OAuth Support    │ ← From /describe-pr
+│  ├─ Research: OAuth Implementation  │ ← From /awl-dev:research-codebase
+│  ├─ Plan: OAuth Implementation      │ ← From /awl-dev:create-plan
+│  ├─ Handoff: Session 2025-01-08     │ ← From /awl-dev:create-handoff
+│  └─ PR: #456 - Add OAuth Support    │ ← From /awl-dev:describe-pr
 └─────────────────────────────────────┘
           │
-          ├──→ Queried via: linearis attachments list --issue PROJ-123
+          ├──→ Queried via: mcp__linear__get_issue(id: PROJ-123)
           │
           ▼
 ┌─────────────────────────────────────┐
@@ -105,11 +105,11 @@ Awl uses Linear documents attached to tickets for persistent workflow context:
 
 **Example Flow:**
 
-1. `/research-codebase PROJ-123` sets ticket, creates "Research: ..." document
-2. `/create-plan` queries PROJ-123 for research, creates "Plan: ..." document
-3. `/implement-plan` queries PROJ-123 for plan, implements phases
-4. `/describe-pr` creates "PR: ..." document
-5. `/create-handoff` creates "Handoff: ..." document if pausing work
+1. `/awl-dev:research-codebase PROJ-123` sets ticket, creates "Research: ..." document
+2. `/awl-dev:create-plan` queries PROJ-123 for research, creates "Plan: ..." document
+3. `/awl-dev:implement-plan` queries PROJ-123 for plan, implements phases
+4. `/awl-dev:describe-pr` creates "PR: ..." document
+5. `/awl-dev:create-handoff` creates "Handoff: ..." document if pausing work
 
 All documents attached to the same ticket for easy discovery.
 
@@ -211,13 +211,8 @@ Awl uses a **two-layer config system** to keep secrets out of git:
 }
 ```
 
-**Layer 2: Environment Variables** (set in shell or `.env` - NEVER committed):
-```bash
-export LINEAR_API_TOKEN="lin_api_..."
-```
-
 **Benefits**:
-- ✅ Secrets never in git (use environment variables)
+- ✅ Secrets never in git
 - ✅ Multiple projects per machine (work/personal/clients)
 - ✅ `.claude/config.json` only has non-sensitive metadata
 
@@ -235,21 +230,13 @@ Awl **requires** Linear for workflow document storage. This provides:
 
 **Prerequisites:**
 
-1. **Linearis CLI** installed: `npm install -g linearis`
-2. **LINEAR_API_TOKEN** environment variable set
+1. Install `awl-dev` plugin (bundles the Linear MCP server automatically)
 
 **Validation:**
 
-Commands automatically validate Linear is configured. If not, you'll see:
-
-```
-❌ Linearis CLI not found
-Install with: npm install -g linearis
-
-❌ LINEAR_API_TOKEN not set
-Get a token from: https://linear.app/settings/api
-Then: export LINEAR_API_TOKEN=your_token
-```
+The Linear MCP server (`https://mcp.linear.app/mcp`) is bundled in the `awl-dev` plugin's
+`.mcp.json` and connects automatically when the plugin is enabled. On first use, Claude Code
+opens a browser for OAuth consent. No API tokens needed - authentication is automatic.
 
 **Why Required?**
 
@@ -353,7 +340,7 @@ awl/
 **1. Research Phase:**
 
 ```
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
 > "How does authentication work in the API?"
 ```
 
@@ -365,7 +352,7 @@ awl/
 **2. Planning Phase:**
 
 ```
-/create-plan
+/awl-dev:create-plan
 ```
 
 - Auto-finds research from Linear (attached to current ticket)
@@ -376,7 +363,7 @@ awl/
 **3. Implementation Phase (AUTOMATED):**
 
 ```
-/implement-plan
+/awl-dev:implement-plan
 ```
 
 - Reads plan from Linear (attached to current ticket)
@@ -413,13 +400,13 @@ Worktrees are auto-cleaned if no changes are made. Claude prompts to keep/remove
 Discover and import workflows from external repos:
 
 ```
-/discover-workflows
+/awl-meta:discover-workflows
 > Research Claude Code repositories for workflow patterns
 
-/import-workflow
+/awl-meta:import-workflow
 > Import workflow from repository X and adapt it
 
-/create-workflow
+/awl-meta:create-workflow
 > Create new agent/command based on discovered patterns
 ```
 
@@ -461,7 +448,7 @@ version: 1.0.0
 ---
 ```
 
-Use `/validate-frontmatter` to check consistency.
+Use `/awl-meta:validate-frontmatter` to check consistency.
 
 ## Dependencies
 
@@ -470,22 +457,16 @@ Use `/validate-frontmatter` to check consistency.
 - Claude Code (claude.ai/code)
 - Git
 - Bash
-- Linearis CLI (`linearis`) - For Linear document storage
-- LINEAR_API_TOKEN environment variable
+- Official Linear MCP server (available through Claude Code)
 
 **Optional:**
 
 - GitHub CLI (`gh`) - For PR creation and GitHub operations
 
-**Installation:**
+**Setup:**
 
-```bash
-# Install Linearis CLI
-npm install -g linearis
-
-# Set Linear API token
-export LINEAR_API_TOKEN="lin_api_..."
-```
+The Linear MCP server is bundled with the `awl-dev` plugin. On first use, Claude Code opens
+a browser for OAuth authentication. No API tokens or CLI tools needed.
 
 ## Update Strategy
 
@@ -508,7 +489,7 @@ export LINEAR_API_TOKEN="lin_api_..."
 
 ### Linear Integration
 
-- `/linear` command for ticket management
+- `/awl-dev:linear` command for ticket management
 - Auto-configures on first use
 - Saves config to `.claude/config.json`
 - See `docs/LINEAR_WORKFLOW_AUTOMATION.md`
@@ -517,11 +498,11 @@ export LINEAR_API_TOKEN="lin_api_..."
 
 For project management workflows with Linear:
 
-- `/pm:analyze-cycle` - Cycle health report
-- `/pm:analyze-milestone` - Milestone progress and target date assessment
-- `/pm:report-daily` - Quick daily standup summary
-- `/pm:groom-backlog` - Backlog analysis
-- `/pm:sync-prs` - GitHub-Linear correlation
+- `/awl-pm:analyze-cycle` - Cycle health report
+- `/awl-pm:analyze-milestone` - Milestone progress and target date assessment
+- `/awl-pm:report-daily` - Quick daily standup summary
+- `/awl-pm:groom-backlog` - Backlog analysis
+- `/awl-pm:sync-prs` - GitHub-Linear correlation
 
 **Features**:
 - Cycle management with health scoring
@@ -578,7 +559,7 @@ to tickets instead of filesystem-based storage.
 
 **Consequences**:
 
-- Requires Linear and Linearis CLI for all workflow commands
+- Requires Linear (via official MCP server) for all workflow commands
 - Workflow-context.json only tracks `currentTicket`, not document paths
 - Commands query Linear by ticket ID to find documents
 - PM reports still go to git (not ticket-specific)
@@ -592,7 +573,7 @@ to tickets instead of filesystem-based storage.
 **Rationale**:
 
 - Users shouldn't remember ticket IDs between commands
-- `/research-codebase PROJ-123` → `/create-plan` → `/implement-plan` should flow naturally
+- `/awl-dev:research-codebase PROJ-123` → `/awl-dev:create-plan` → `/awl-dev:implement-plan` should flow naturally
 - Context must be local to each worktree
 - Must not contain secrets or be committed to git
 
@@ -682,7 +663,7 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 **Validating frontmatter:**
 
 ```
-/validate-frontmatter
+/awl-meta:validate-frontmatter
 ```
 
 **Testing plugin installation:**
@@ -692,7 +673,7 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 # Should show awl-dev and optionally awl-meta
 
 # Test a command
-/research-codebase
+/awl-dev:research-codebase
 ```
 
 ## Deployment and Distribution
@@ -706,9 +687,8 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 
 **Setting up Linear in a new project:**
 
-1. Install Linearis CLI: `npm install -g linearis`
-2. Set `LINEAR_API_TOKEN` environment variable
-3. Configure team in `.claude/config.json`:
+1. Install `awl-dev` plugin (bundles Linear MCP server)
+2. Configure team in `.claude/config.json`:
 
 ```json
 {
@@ -721,7 +701,7 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 ```
 
 **Sharing with team:** Team members see documents in Linear. Each team member installs the Awl
-plugin independently and sets their own `LINEAR_API_TOKEN`.
+plugin independently. OAuth authentication happens automatically on first use.
 
 ## Key Principles When Editing
 
@@ -794,7 +774,7 @@ instructions.
 - Check `docs/` for comprehensive guides
 - Review `README.md` for philosophy
 - Read `QUICKSTART.md` for setup
-- Use `/workflow-help` for interactive guidance
+- Use `/awl-dev:workflow-help` for interactive guidance
 - Examine plugin source in `plugins/dev/` and `plugins/meta/`
 
 ## Version Control

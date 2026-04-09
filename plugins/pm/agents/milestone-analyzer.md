@@ -16,7 +16,7 @@ Transform raw milestone data into actionable health insights with specific recom
 ## Agent Contract
 
 **Input**:
-- Milestone data JSON from linearis (milestone metadata + full issues array)
+- Milestone data JSON from Linear MCP (milestone metadata + full issues array)
 - Current date/time for target date calculations
 - Project configuration (optional)
 
@@ -34,7 +34,7 @@ Structured markdown with these sections:
 - Issue Distribution (by status, assignee, priority)
 - Specific Recommendations (priority-ordered with owners)
 
-**Returns to**: `/pm:analyze-milestone` command formats output into user-facing health report
+**Returns to**: `/awl-pm:analyze-milestone` command formats output into user-facing health report
 
 ## Health Scoring Algorithm
 

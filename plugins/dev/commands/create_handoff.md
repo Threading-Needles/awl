@@ -1,7 +1,7 @@
 ---
 description: Create handoff document for passing work to another session
 category: workflow
-tools: Write, Bash, Read
+tools: mcp__linear__create_document, mcp__linear__save_comment, Write, Bash, Read
 model: inherit
 version: 2.0.0
 ---
@@ -10,17 +10,6 @@ version: 2.0.0
 
 You are tasked with writing a handoff document to hand off your work to another agent in a new
 session. The handoff will be saved as a Linear document attached to the current ticket.
-
-## Prerequisites
-
-Before executing, verify Linear integration is available:
-
-```bash
-# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
-  "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
-fi
-```
 
 ## Initial Setup
 
@@ -136,22 +125,8 @@ or other important things you learned that you want to pass on}
 
 Create the handoff document in Linear:
 
-```bash
-# Get team key from config
-TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' .claude/config.json)
-
-# Create Linear document with handoff content
-linearis documents create \
-  --title "Handoff: ${DESCRIPTION}" \
-  --team "${TEAM_KEY}" \
-  --content "${HANDOFF_CONTENT}" \
-  --attach-to "${CURRENT_TICKET}" \
-  --icon "Send" \
-  --color "#9b51e0"
-
-# Add comment to ticket
-linearis comments create "$CURRENT_TICKET" --body "Handoff document created for session transfer."
-```
+- Use `mcp__linear__create_document` to create a document with the title "Handoff: {DESCRIPTION}" and the handoff content as the body. Attach the document to the current ticket.
+- Use `mcp__linear__save_comment` to add a comment to the ticket: "Handoff document created for session transfer."
 
 ### 4. Present to User
 
@@ -166,7 +141,7 @@ After saving:
 To resume from this handoff in a new session:
 
 1. Clear context (start fresh session)
-2. Run `/resume-handoff {CURRENT_TICKET}`
+2. Run `/awl-dev:resume-handoff {CURRENT_TICKET}`
 
 The handoff document is attached to the ticket and will be automatically discovered.
 ```
@@ -185,21 +160,21 @@ The handoff document is attached to the ticket and will be automatically discove
 ## Integration with Other Commands
 
 ```
-/research-codebase PROJ-123 → research document
+/awl-dev:research-codebase PROJ-123 → research document
                   ↓
-           /create-plan → implementation plan
+           /awl-dev:create-plan → implementation plan
                   ↓
-          /implement-plan → code changes
+          /awl-dev:implement-plan → code changes
                   ↓
-          /create-handoff → handoff document (this command)
+          /awl-dev:create-handoff → handoff document (this command)
                   ↓
-         /resume-handoff → continues work
+         /awl-dev:resume-handoff → continues work
 ```
 
 **How it connects:**
 
 - **Previous**: Can be invoked at any point during implementation
-- **Next**: `/resume-handoff` finds the handoff via linear-document-locator
+- **Next**: `/awl-dev:resume-handoff` finds the handoff via linear-document-locator
 - **Workflow context**: Current ticket is used to attach the handoff
 
 ## Error Handling
@@ -210,9 +185,8 @@ The handoff document is attached to the ticket and will be automatically discove
 ⚠️ Could not create handoff document in Linear.
 
 Please verify:
-1. LINEAR_API_TOKEN is set correctly
-2. You have access to this Linear workspace
-3. The ticket {CURRENT_TICKET} exists
+1. You have access to this Linear workspace
+2. The ticket {CURRENT_TICKET} exists
 
 The handoff content is shown above - you can manually save it if needed.
 ```

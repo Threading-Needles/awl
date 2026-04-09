@@ -149,11 +149,11 @@ Read src/cache/redis-client.js
 @awl-dev:codebase-analyzer deeply analyze authentication system
 
 # Save findings (persistence)
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
 # Saves research as Linear document attached to ticket
 
 # Later conversation (cheap)
-/resume-handoff PROJ-123
+/awl-dev:resume-handoff PROJ-123
 # Instant context recovery without re-research
 ```
 
@@ -710,13 +710,13 @@ Let's add rate limiting. I'll start coding...
 ```
 # Persist everything important
 [research]
-/research-codebase ENG-1234  # Saves to Linear
+/awl-dev:research-codebase ENG-1234  # Saves to Linear
 
 [planning]
-/create-plan  # Saves to Linear
+/awl-dev:create-plan  # Saves to Linear
 
 [handoff if pausing]
-/create-handoff  # Saves to Linear
+/awl-dev:create-handoff  # Saves to Linear
 ```
 
 ### 6. Mixed Automated and Manual Criteria

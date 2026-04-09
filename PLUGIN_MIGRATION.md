@@ -12,14 +12,14 @@ feature type.
 - `awl-dev` - Everything + manual MCP toggling
 - `awl-meta` - Workflow discovery
 
-**Problem**: Heavy MCPs (PostHog ~40k, Sentry ~20k tokens) consumed context even when not needed.
+**Problem**: Heavy MCPs (PostHog ~40k tokens) consumed context even when not needed.
 Required manual `/mcp` toggling every session.
 
 ### After (4 plugins)
 
 1. **awl-dev** (Core) - Always enabled, ~3.5k context
 2. **awl-analytics** (PostHog) - Enable when needed, +40k context
-3. **awl-debugging** (Sentry) - Enable when needed, +20k context
+3. **awl-debugging** (PostHog error tracking) - Enable when needed, +40k context
 4. **awl-meta** (Discovery) - Optional
 
 **Solution**: Plugins bundle MCPs. Enabling/disabling plugin automatically loads/unloads MCPs.
@@ -51,7 +51,7 @@ plugins/
 ├── debugging/              # Error monitoring (enable as needed)
 │   ├── .claude-plugin/
 │   │   ├── plugin.json
-│   │   └── .mcp.json       # Sentry (~20k tokens)
+│   │   └── .mcp.json       # PostHog error tracking (~40k tokens)
 │   ├── commands/
 │   │   ├── debug_production_error.md
 │   │   ├── error_impact_analysis.md
@@ -85,9 +85,9 @@ This means:
 claude
 
 # Work with core tools (~3.5k MCP context)
-/research-codebase
-/create-plan
-/implement-plan
+/awl-dev:research-codebase
+/awl-dev:create-plan
+/awl-dev:implement-plan
 ```
 
 ### Analytics Session
@@ -111,12 +111,12 @@ claude
 # Enable for incident
 /plugin enable awl-debugging
 
-# Sentry now available (+20k context)
-/debug-production-error "TypeError in production"
+# PostHog error tracking now available (+40k context)
+/awl-debugging:debug-production-error "TypeError in production"
 
 # Optionally combine with analytics
 /plugin enable awl-analytics
-# Both active (+60k total)
+# Both active (shared PostHog MCP, +40k total)
 
 # Disable both when resolved
 /plugin disable awl-debugging awl-analytics
@@ -141,9 +141,9 @@ claude
 
 ### Added to awl-debugging
 
-- ✅ `/debug-production-error` - Error investigation
-- ✅ `/error-impact-analysis` - Assess severity
-- ✅ `/trace-analysis` - Performance debugging
+- ✅ `/awl-debugging:debug-production-error` - Error investigation
+- ✅ `/awl-debugging:error-impact-analysis` - Assess severity
+- ✅ `/awl-debugging:trace-analysis` - Performance debugging
 
 ### Updated marketplace.json
 
@@ -153,7 +153,7 @@ Now lists 4 plugins with clear descriptions and context costs.
 
 ### Before
 
-- All MCPs loaded: ~65k tokens (32% of window)
+- All MCPs loaded: ~44k tokens (22% of window)
 - Manual toggling required every session
 - Easy to forget = wasted context
 
@@ -162,7 +162,7 @@ Now lists 4 plugins with clear descriptions and context costs.
 - Default: ~3.5k tokens (1.7% of window)
 - Enable only what you need
 - Automatic load/unload via plugin toggle
-- **Savings**: ~61k tokens (30%) for most sessions
+- **Savings**: ~40k tokens (20%) for most sessions
 
 ## Installation
 
@@ -177,7 +177,7 @@ Now lists 4 plugins with clear descriptions and context costs.
 
 # Install optional plugins as needed
 /plugin install awl-analytics  # If you use PostHog
-/plugin install awl-debugging  # If you use Sentry
+/plugin install awl-debugging  # If you need error tracking (uses PostHog)
 /plugin install awl-meta       # If you want workflow discovery
 ```
 
@@ -209,9 +209,7 @@ export POSTHOG_AUTH_HEADER="Bearer phx_YOUR_TOKEN"
 ### For Debugging Plugin
 
 ```bash
-export SENTRY_AUTH_TOKEN="your_token"
-export SENTRY_ORG="your-org-slug"
-export SENTRY_PROJECT="your-project-slug"
+export POSTHOG_AUTH_HEADER="Bearer phx_YOUR_TOKEN"
 ```
 
 ## Benefits vs Manual Toggling
@@ -249,7 +247,7 @@ Updated files to reflect new architecture:
 
 1. ✅ **Phase 1**: Create plugin structures
 2. ✅ **Phase 2**: Implement analytics plugin with PostHog MCP
-3. ✅ **Phase 3**: Implement debugging plugin with Sentry MCP
+3. ✅ **Phase 3**: Implement debugging plugin with PostHog error tracking
 4. ✅ **Phase 4**: Update marketplace.json
 5. 🔄 **Phase 5**: Update documentation (in progress)
 6. ⏳ **Phase 6**: Publish to marketplace
@@ -263,7 +261,7 @@ Before publishing:
 - [ ] Verify `/context` shows PostHog tools after enable
 - [ ] Verify `/plugin disable awl-analytics` unloads PostHog MCP
 - [ ] Verify `/context` shows reduced MCP tokens after disable
-- [ ] Repeat for awl-debugging with Sentry
+- [ ] Repeat for awl-debugging with PostHog
 - [ ] Verify both plugins can be enabled simultaneously
 - [ ] Test environment variable expansion in `.mcp.json`
 - [ ] Verify no restart required for enable/disable
@@ -290,7 +288,7 @@ Before publishing:
 2. **Phase-based workflows**: Auto-suggest plugins for workflow phases
 
    ```
-   > /create-plan
+   > /awl-dev:create-plan
    > Claude: "Planning phase - enable awl-analytics for data? [y/n]"
    ```
 

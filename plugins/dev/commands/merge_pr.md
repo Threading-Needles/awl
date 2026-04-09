@@ -1,7 +1,7 @@
 ---
 description: Safely merge PR with verification and Linear integration
 category: version-control-git
-tools: Bash(linearis *), Bash(git *), Bash(gh *), Read
+tools: mcp__linear__get_issue, mcp__linear__save_issue, mcp__linear__save_comment, mcp__linear__get_document, Bash(git *), Bash(gh *), Read
 model: inherit
 version: 2.0.0
 ---
@@ -15,7 +15,7 @@ Safely merges a PR after comprehensive verification, with Linear integration and
 Before executing, verify Linear integration is available:
 
 ```bash
-# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
+# Validate plugin prerequisites
 if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
   "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
 fi
@@ -361,14 +361,10 @@ merge_sha=$(git rev-parse HEAD)
 
 If ticket found and not using `--no-update`:
 
-```bash
-# Move to "Done"
-linearis issues update "$ticket" --state "Done"
+Use `mcp__linear__save_issue` to move the ticket state to "Done".
 
-# Add merge comment
-linearis comments create "$ticket" \
-    --body "✅ PR merged!\n\n**PR**: #${prNumber} - ${prTitle}\n**Merge commit**: ${mergeSha}\n**Merged into**: ${baseBranch}\n\nView PR: ${prUrl}"
-```
+Use `mcp__linear__save_comment` to add a merge comment with details:
+"PR merged! PR: #{prNumber} - {prTitle}, Merge commit: {mergeSha}, Merged into: {baseBranch}"
 
 ### 12. Delete local branch and update base
 
@@ -392,22 +388,14 @@ echo "✅ Deleted local branch: $head_branch"
 
 **Read PR description from Linear:**
 
-```bash
-# Find PR document attached to ticket
-linearis attachments list --issue "$ticket"
-```
+Use `mcp__linear__get_issue` with the ticket ID to find attached documents.
 
 Look for document with title starting with "PR:".
 
 **If PR document found:**
 
-```bash
-# Read the document content
-pr_doc_content=$(linearis documents read "$pr_doc_id")
-
-# Extract "Post-Merge Tasks" section
-tasks=$(echo "$pr_doc_content" | sed -n '/## Post-Merge Tasks/,/^##/p' | grep -E '^\- \[')
-```
+Use `mcp__linear__get_document` to read the document content and extract the
+"Post-Merge Tasks" section.
 
 **If tasks exist:**
 
@@ -452,24 +440,24 @@ Next steps:
 ## Integration with Other Commands
 
 ```
-/research-codebase PROJ-123 → research document
+/awl-dev:research-codebase PROJ-123 → research document
                   ↓
-           /create-plan → implementation plan
+           /awl-dev:create-plan → implementation plan
                   ↓
-          /implement-plan → code changes
+          /awl-dev:implement-plan → code changes
                   ↓
-           /validate-plan → verification
+           /awl-dev:validate-plan → verification
                   ↓
-              /describe-pr → PR description
+              /awl-dev:describe-pr → PR description
                   ↓
-              /create-pr → creates PR on GitHub
+              /awl-dev:create-pr → creates PR on GitHub
                   ↓
-              /merge-pr → merges PR (this command)
+              /awl-dev:merge-pr → merges PR (this command)
 ```
 
 **How it connects:**
 
-- **Previous**: PR created by `/create-pr` with description in Linear
+- **Previous**: PR created by `/awl-dev:create-pr` with description in Linear
 - **Workflow context**: Ticket is used for Linear integration
 
 ## Flags
@@ -686,8 +674,5 @@ Continue anyway? y
 
 This command updates ticket status to "Done" on successful merge. On failure, it should roll back to the appropriate previous state:
 
-```bash
-# Roll back to previous state on failure
-linearis issues update "$CURRENT_TICKET" --state "In Review"
-linearis comments create "$CURRENT_TICKET" --body "Merge failed: ${ERROR_REASON}. Returning to review state."
-```
+On failure, use `mcp__linear__save_issue` to roll back the ticket state to "In Review" and
+`mcp__linear__save_comment` to add a comment explaining the failure.

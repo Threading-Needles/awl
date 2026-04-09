@@ -21,7 +21,6 @@ if [[ -f ".claude/config.json" ]]; then
   # Extract secrets to ~/.config/awl/config-$PROJECT_KEY.json
   jq '{
     linear: .linear,
-    sentry: .sentry,
     posthog: .posthog,
     exa: .exa
   }' .claude/config.json > "$CONFIG_DIR/config-$PROJECT_KEY.json"
@@ -49,11 +48,6 @@ else
     "apiToken": "[NEEDS_SETUP]",
     "teamKey": "[NEEDS_SETUP]",
     "defaultTeam": "[NEEDS_SETUP]"
-  },
-  "sentry": {
-    "org": "[NEEDS_SETUP]",
-    "project": "[NEEDS_SETUP]",
-    "authToken": "[NEEDS_SETUP]"
   },
   "posthog": {
     "apiKey": "[NEEDS_SETUP]",

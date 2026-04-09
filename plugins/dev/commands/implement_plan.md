@@ -1,7 +1,7 @@
 ---
 description: Implement approved technical plans from Linear documents
 category: workflow
-tools: Read, Write, Edit, Grep, Glob, Task, TodoWrite, Bash
+tools: Read, Write, Edit, Grep, Glob, Task, TodoWrite, Bash, mcp__linear__get_issue, mcp__linear__save_issue, mcp__linear__save_comment, mcp__linear__create_document, mcp__linear__update_document, mcp__linear__get_document
 model: inherit
 version: 2.0.0
 ---
@@ -13,30 +13,32 @@ the current ticket.
 
 ## Prerequisites
 
-Before executing, verify Linear integration is available:
+Before executing, verify Linear MCP integration is available by confirming the Linear MCP tools
+(e.g., `mcp__linear__get_issue`) are accessible. If they are not, output:
 
-```bash
-# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
-  "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
-fi
+```
+❌ Linear MCP tools not available
+
+The /awl-dev:implement-plan command requires Linear MCP tools for ticket and document management.
+
+Please ensure the Linear MCP server is connected in your Claude Code configuration.
 ```
 
 ## Plugin Prerequisites
 
-The `/implement-plan` command requires the `pr-review-toolkit` plugin for automated PR review in Phase C.
+The `/awl-dev:implement-plan` command requires the `pr-review-toolkit` plugin for automated PR review in Phase C.
 
 **Before starting implementation**, check if the plugin is available. If the plugin is not installed, output:
 
 ```
 ❌ Required plugin missing: pr-review-toolkit
 
-The /implement-plan command requires pr-review-toolkit for automated PR review.
+The /awl-dev:implement-plan command requires pr-review-toolkit for automated PR review.
 
 Install with:
   /plugin install pr-review-toolkit
 
-Then run /implement-plan again.
+Then run /awl-dev:implement-plan again.
 ```
 
 **Hard fail** - do not proceed with implementation until the plugin is confirmed available.
@@ -59,8 +61,8 @@ CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
 I need a Linear ticket to find the implementation plan.
 
 Please either:
-1. Provide a ticket ID: `/implement-plan PROJ-123`
-2. Run `/create-plan` first (which sets the current ticket)
+1. Provide a ticket ID: `/awl-dev:implement-plan PROJ-123`
+2. Run `/awl-dev:create-plan` first (which sets the current ticket)
 
 Which would you prefer?
 ```
@@ -82,21 +84,16 @@ Let me find the implementation plan...
 
 **This MUST be the first action after confirming ticket**:
 
-```bash
-# Update ticket state immediately - this is THE FIRST thing we do
-linearis issues update "$CURRENT_TICKET" --state "In Dev"
-linearis comments create "$CURRENT_TICKET" --body "Starting implementation of plan"
-```
+Use `mcp__linear__save_issue` to update the ticket state to "In Dev" by passing the
+ticket ID and the new state name.
+
+Then use `mcp__linear__save_comment` to add a comment "Starting implementation of plan"
+to the ticket.
 
 ### Step 3: Find the Plan Document
 
-Use the linear-document-locator agent to find plan documents:
-
-```bash
-linearis attachments list --issue "$CURRENT_TICKET"
-```
-
-Look for documents with title starting with "Plan:".
+Use `mcp__linear__get_issue` with the ticket ID to retrieve the issue and its attached
+documents. Look for documents with title starting with "Plan:".
 
 **If plan found:**
 
@@ -131,7 +128,7 @@ The following questions need answers before implementation can begin:
   → Location: Plan document attached to {CURRENT_TICKET}
 
 Please answer these questions in the Linear document, then run:
-  /implement-plan
+  /awl-dev:implement-plan
 ```
 
 **Hard fail** - do not proceed until all blocking questions have answers.
@@ -146,7 +143,7 @@ Continue to Step 4.
 No implementation plan found for {CURRENT_TICKET}.
 
 Would you like me to:
-1. Create a plan first? Run `/create-plan`
+1. Create a plan first? Run `/awl-dev:create-plan`
 2. Check a different ticket?
 ```
 
@@ -164,8 +161,8 @@ Which plan should I implement?
 
 Once you have the plan document:
 
-1. **Read the plan completely** using `linearis documents read <document-id>`
-2. **Read the original ticket** using `linearis issues read "$CURRENT_TICKET"`
+1. **Read the plan completely** using `mcp__linear__get_document` with the document ID
+2. **Read the original ticket** using `mcp__linear__get_issue` with the ticket ID
 3. **Check for progress markers** - look for checkboxes (- [x]) to see what's done
 4. **Read all files mentioned in the plan** FULLY into context
 5. **Think deeply** about how the pieces fit together
@@ -201,13 +198,11 @@ If you encounter a mismatch:
 
 As you complete phases, update the plan document in Linear:
 
-```bash
-# Update plan document with progress
-linearis documents update "$DOCUMENT_ID" --content "${UPDATED_PLAN_CONTENT}"
+Use `mcp__linear__update_document` with the document ID and the updated plan content
+(with checkboxes toggled to reflect completed work).
 
-# Add progress comment to ticket
-linearis comments create "$CURRENT_TICKET" --body "Completed Phase {N}: {phase name}"
-```
+Then use `mcp__linear__save_comment` to add a progress comment to the ticket, e.g.,
+"Completed Phase {N}: {phase name}".
 
 **Checkbox Convention**: Use `- [x]` for completed items, `- [ ]` for pending items.
 
@@ -249,11 +244,11 @@ Current usage: {X}% ({Y}K/{Z}K tokens)
 
 **Options**:
 1. ✅ Create handoff and clear context (recommended)
-   - Use `/create-handoff` to generate handoff document in Linear
+   - Use `/awl-dev:create-handoff` to generate handoff document in Linear
    - Includes what's done, what's next, key learnings
 2. Continue to next phase (if close to completion)
 
-**To resume**: Start fresh session, run `/implement-plan`
+**To resume**: Start fresh session, run `/awl-dev:implement-plan`
 (The plan document tracks progress with checkboxes - you'll resume automatically)
 
 {If <60%}:
@@ -278,7 +273,7 @@ Current usage: {X}% ({Y}K/{Z}K tokens)
 
 When recommending a handoff, guide the user:
 
-1. Offer to create the handoff using `/create-handoff`
+1. Offer to create the handoff using `/awl-dev:create-handoff`
 2. Handoff will be saved as a Linear document attached to the ticket
 3. Include: completed phases, next steps, key learnings, file references
 4. Update plan document with checkboxes for completed work
@@ -322,17 +317,11 @@ After all plan phases complete successfully, automatically execute the following
    - Re-run until pass or max attempts
 
 3. **Create Validation document**:
-   ```bash
-   TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' .claude/config.json)
 
-   linearis documents create \
-     --title "Validation: ${FEATURE_NAME}" \
-     --team "${TEAM_KEY}" \
-     --content "${VALIDATION_CONTENT}" \
-     --attach-to "${CURRENT_TICKET}" \
-     --icon "CheckCircle" \
-     --color "#27ae60"
-   ```
+   Use `mcp__linear__create_document` to create the validation document with:
+   - Title: "Validation: ${FEATURE_NAME}"
+   - Content: the validation results
+   - Attach it to the current ticket
 
 4. **Check status**:
    - If FAIL: Stop and report to user
@@ -377,7 +366,7 @@ After all plan phases complete successfully, automatically execute the following
 
    Install with: /plugin install pr-review-toolkit
 
-   Then run /implement-plan again to continue from Phase C.
+   Then run /awl-dev:implement-plan again to continue from Phase C.
    ```
 
    Exit with error status - do not continue to Phase D.
@@ -483,7 +472,7 @@ Critical issues could not be resolved:
 The implementation is incomplete. Please:
 1. Review the issues above
 2. Fix manually or adjust the plan
-3. Run `/implement-plan` again to retry
+3. Run `/awl-dev:implement-plan` again to retry
 ```
 
 **PR creation fails**:
@@ -506,11 +495,11 @@ Changes have been committed locally. Please:
 ## Integration with Other Commands
 
 ```
-/research-codebase PROJ-123 → research document
+/awl-dev:research-codebase PROJ-123 → research document
                   ↓
-           /create-plan → implementation plan
+           /awl-dev:create-plan → implementation plan
                   ↓
-          /implement-plan → code changes (this command)
+          /awl-dev:implement-plan → code changes (this command)
                   │
                   ├─→ [Phase A] Self-healing validation
                   │     └─→ Creates: "Validation: ..." document
@@ -541,9 +530,9 @@ Changes have been committed locally. Please:
 Please verify:
 1. The document ID is correct
 2. You have access to this Linear workspace
-3. LINEAR_API_TOKEN is set correctly
+3. The Linear MCP server is connected
 
-Try running `/create-plan` to create a new plan.
+Try running `/awl-dev:create-plan` to create a new plan.
 ```
 
 **If ticket not found:**
@@ -554,7 +543,7 @@ Try running `/create-plan` to create a new plan.
 Please verify:
 1. The ticket ID is correct (e.g., PROJ-123)
 2. You have access to this Linear team
-3. LINEAR_API_TOKEN is set correctly
+3. The Linear MCP server is connected
 ```
 
 ## Status Update Convention
@@ -565,8 +554,7 @@ Please verify:
 - Status transitions to "In Review" via create_pr (which is already correct)
 - On failure, roll back to previous state:
 
-```bash
-# Roll back to previous state on failure
-linearis issues update "$CURRENT_TICKET" --state "Plan in Progress"
-linearis comments create "$CURRENT_TICKET" --body "Implementation failed: ${ERROR_REASON}. Returning to planning state."
-```
+Use `mcp__linear__save_issue` to update the ticket state back to "Plan in Progress".
+
+Then use `mcp__linear__save_comment` to add a comment explaining the failure, e.g.,
+"Implementation failed: ${ERROR_REASON}. Returning to planning state."

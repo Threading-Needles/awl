@@ -28,7 +28,7 @@ Please provide:
 1. Repository name (e.g., wshobson/commands)
 2. Workflow name (e.g., code-review)
 
-Or, if you've already run /discover-workflows:
+Or, if you've already run /awl-meta:discover-workflows:
 - Pick from previously discovered workflows
 ```
 
@@ -248,13 +248,13 @@ Present success summary:
 ### Import with Custom Adaptations
 
 ```
-/import-workflow wshobson/commands code-review --adapt "Use our custom linting rules"
+/awl-meta:import-workflow wshobson/commands code-review --adapt "Use our custom linting rules"
 ```
 
 ### Import Multiple Workflows
 
 ```
-/import-workflow wshobson/commands code-review refactor test-gen
+/awl-meta:import-workflow wshobson/commands code-review refactor test-gen
 ```
 
 Imports all 3 in sequence (with parallel validation for each).
@@ -262,7 +262,7 @@ Imports all 3 in sequence (with parallel validation for each).
 ### Dry Run Mode
 
 ```
-/import-workflow wshobson/commands code-review --dry-run
+/awl-meta:import-workflow wshobson/commands code-review --dry-run
 ```
 
 Shows what would be imported without actually saving files.
@@ -277,16 +277,16 @@ Shows what would be imported without actually saving files.
 
 ## Integration with Other Commands
 
-- **Discover first**: `/discover-workflows` → catalog workflows
-- **Then import**: `/import-workflow` (this command)
-- **Validate**: `/validate-frontmatter` ensures consistency
-- **Create custom**: `/create-workflow` for new workflows
+- **Discover first**: `/awl-meta:discover-workflows` → catalog workflows
+- **Then import**: `/awl-meta:import-workflow` (this command)
+- **Validate**: `/awl-meta:validate-frontmatter` ensures consistency
+- **Create custom**: `/awl-meta:create-workflow` for new workflows
 
 ## Error Handling
 
 ### Workflow Not Found
 
-- Suggest running `/discover-workflows {repo}` first
+- Suggest running `/awl-meta:discover-workflows {repo}` first
 - Check catalog for available workflows
 
 ### Incompatible Tools

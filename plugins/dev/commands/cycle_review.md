@@ -1,7 +1,7 @@
 ---
-description: Review cycle progress and identify blockers using Linearis and GitHub
+description: Review cycle progress and identify blockers using Linear and GitHub
 category: project-task-management
-tools: Bash(linearis *), Bash(gh *), Read, Write, TodoWrite
+tools: mcp__linear__list_issues, mcp__linear__list_cycles, mcp__linear__research, Bash(gh *), Read, Write, TodoWrite
 model: inherit
 version: 2.0.0
 status: placeholder
@@ -23,52 +23,16 @@ This command will help you review cycle progress by:
 
 ## Current Workaround
 
-Use Linearis CLI directly:
+Use the Linear MCP tools directly:
 
-```bash
-# Get active cycle with tickets
-linearis cycles read "Sprint 2025-10" --team TEAM
-
-# List tickets by status (use cycles read to get all issues, then filter)
-linearis cycles read "Sprint 2025-10" --team TEAM | \
-  jq '.issues[] | select(.state.name == "In Progress")'
-linearis cycles read "Sprint 2025-10" --team TEAM | \
-  jq '.issues[] | select(.state.name == "Done")'
-
-# Calculate completion manually (count tickets)
-```
+- **List cycles**: `mcp__linear__list_cycles` with team filter
+- **Get cycle issues**: `mcp__linear__research` with query about cycle issues
+- **List issues by status**: `mcp__linear__list_issues` with status filter
+- **Find blocked tickets**: `mcp__linear__list_issues` with "Blocked" status filter
 
 ### Example Workflow
 
 ```bash
-# 1. Get active cycle info
-CYCLE=$(linearis cycles list --team ENG --active | jq -r '.[0].name')
-echo "Active cycle: $CYCLE"
-
-# 2. Get all tickets in cycle
-linearis issues list --team ENG | \
-  jq --arg cycle "$CYCLE" '.[] | select(.cycle.name == $cycle)'
-
-# 3. Count by status (use cycles read to get issues)
-CYCLE_DATA=$(linearis cycles read "$CYCLE" --team ENG)
-
-echo "Backlog:"
-echo "$CYCLE_DATA" | jq '[.issues[] | select(.state.name == "Backlog")] | length'
-
-echo "In Progress:"
-echo "$CYCLE_DATA" | jq '[.issues[] | select(.state.name == "In Progress")] | length'
-
-echo "Done:"
-echo "$CYCLE_DATA" | jq '[.issues[] | select(.state.name == "Done")] | length'
-
-# 4. Calculate completion percentage
-# total_tickets = backlog + in_progress + done
-# completion = (done / total_tickets) * 100
-
-# 5. Find blocked tickets (use cycles read)
-linearis cycles read "$CYCLE" --team ENG | \
-  jq '.issues[] | select(.state.name == "Blocked") | {id, title, blockedReason}'
-
 # 6. Review PRs merged during cycle
 # Get cycle start date (example: 2 weeks ago)
 CYCLE_START=$(date -v-14d +%Y-%m-%d)

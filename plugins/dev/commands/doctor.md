@@ -20,23 +20,22 @@ Run all checks and output a structured status report:
 
 ## CLI Tools
 
-✅ linearis (Linear CLI)
 ✅ jq (JSON processor)
 ✅ gh (GitHub CLI)
 
 ## Environment Variables
 
-✅ LINEAR_API_TOKEN is set
-❌ SENTRY_AUTH_TOKEN is not set
-   → Get token: https://sentry.io/settings/api-keys/
-   → Set: export SENTRY_AUTH_TOKEN=your_token
+✅ Linear MCP connected
+❌ POSTHOG_AUTH_HEADER is not set
+   → Get key: PostHog → Settings → Personal API Keys
+   → Set: export POSTHOG_AUTH_HEADER="Bearer phx_YOUR_KEY"
 
 ## Required Plugins (Manual Verification Needed)
 
 Claude Code does not expose a plugin list API, so you must verify manually.
 
 ○ pr-review-toolkit
-   Required for: /implement-plan auto-review
+   Required for: /awl-dev:implement-plan auto-review
    → Verify: Run /pr-review-toolkit:review-pr --help
    → Install: /plugin install pr-review-toolkit
 
@@ -86,7 +85,7 @@ echo "## CLI Tools"
 echo ""
 
 # Required tools
-REQUIRED_TOOLS=("linearis:Linear CLI:npm install -g linearis" "jq:JSON processor:brew install jq" "gh:GitHub CLI:brew install gh")
+REQUIRED_TOOLS=("jq:JSON processor:brew install jq" "gh:GitHub CLI:brew install gh")
 
 for tool_spec in "${REQUIRED_TOOLS[@]}"; do
     IFS=: read -r cmd name install <<< "$tool_spec"
@@ -98,16 +97,6 @@ for tool_spec in "${REQUIRED_TOOLS[@]}"; do
     fi
 done
 
-# Optional tools
-OPTIONAL_TOOLS=("sentry-cli:Sentry CLI:curl -sL https://sentry.io/get-cli/ | sh")
-
-for tool_spec in "${OPTIONAL_TOOLS[@]}"; do
-    IFS=: read -r cmd name install <<< "$tool_spec"
-    if ! command -v "$cmd" &>/dev/null; then
-        echo "○ $cmd ($name) - optional"
-        echo "   → Install: $install"
-    fi
-done
 ```
 
 ### Step 3: Check Environment Variables
@@ -117,18 +106,14 @@ echo ""
 echo "## Environment Variables"
 echo ""
 
-if [[ -n "${LINEAR_API_TOKEN:-}" ]]; then
-    echo "✅ LINEAR_API_TOKEN is set"
-else
-    echo "❌ LINEAR_API_TOKEN is not set"
-    echo "   → Get token: https://linear.app/settings/api"
-    echo "   → Set: export LINEAR_API_TOKEN=your_token"
-fi
+echo "ℹ️  Linear integration uses the official Linear MCP server"
+echo "   Verify by running a Linear command (e.g., /awl-dev:linear)"
 
 # Optional env vars
-if [[ -z "${SENTRY_AUTH_TOKEN:-}" ]]; then
-    echo "○ SENTRY_AUTH_TOKEN (optional, for awl-debugging)"
-    echo "   → Get token: https://sentry.io/settings/api-keys/"
+if [[ -z "${POSTHOG_AUTH_HEADER:-}" ]]; then
+    echo "○ POSTHOG_AUTH_HEADER (optional, for awl-debugging and awl-analytics)"
+    echo "   → Get key: PostHog → Settings → Personal API Keys"
+    echo "   → Format: Bearer phx_YOUR_KEY"
 fi
 ```
 
@@ -141,9 +126,9 @@ echo ""
 echo "Claude Code does not expose a plugin list API, so you must verify manually."
 echo ""
 
-# pr-review-toolkit is required for /implement-plan
+# pr-review-toolkit is required for /awl-dev:implement-plan
 echo "○ pr-review-toolkit"
-echo "   Required for: /implement-plan auto-review"
+echo "   Required for: /awl-dev:implement-plan auto-review"
 echo "   → Verify: Run /pr-review-toolkit:review-pr --help"
 echo "   → Install: /plugin install pr-review-toolkit"
 ```
@@ -188,7 +173,7 @@ echo ""
 if [[ $issue_count -eq 0 ]]; then
     echo "✅ All required dependencies are in place!"
     echo ""
-    echo "Recommended: Verify pr-review-toolkit is installed for full /implement-plan automation."
+    echo "Recommended: Verify pr-review-toolkit is installed for full /awl-dev:implement-plan automation."
 else
     echo "$issue_count issue(s) found:"
     # List each issue

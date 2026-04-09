@@ -23,21 +23,21 @@ I can help you navigate the supported workflows in this workspace.
 ## Available Workflows
 
 **1. Development Workflow** (research → plan → implement → validate → PR)
-   - `/research-codebase` → Document existing system
-   - `/create-plan` → Create implementation plan
-   - `/implement-plan` → Execute approved plan
-   - `/validate-plan` → Verify implementation
+   - `/awl-dev:research-codebase` → Document existing system
+   - `/awl-dev:create-plan` → Create implementation plan
+   - `/awl-dev:implement-plan` → Execute approved plan
+   - `/awl-dev:validate-plan` → Verify implementation
    - Handoffs for context management
 
 **2. Workflow Discovery** (discover → import → create → validate)
-   - `/discover-workflows` → Research external repositories
-   - `/import-workflow` → Adapt external workflows
-   - `/create-workflow` → Build new agents/commands
-   - `/validate-frontmatter` → Ensure consistency
+   - `/awl-meta:discover-workflows` → Research external repositories
+   - `/awl-meta:import-workflow` → Adapt external workflows
+   - `/awl-meta:create-workflow` → Build new agents/commands
+   - `/awl-meta:validate-frontmatter` → Ensure consistency
 
 **3. Utilities**
    - `/awl-dev:commit` → Create structured commits
-   - `/describe-pr` → Generate PR descriptions
+   - `/awl-dev:describe-pr` → Generate PR descriptions
    - `/awl-dev:debug` → Investigate issues
    - `/awl-dev:linear` → Linear ticket integration
 
@@ -184,7 +184,7 @@ WAIT for all tasks.
 
 ### Phase 1: Research 🔍
 **When**: Need to understand existing codebase before planning
-**Command**: `/research-codebase`
+**Command**: `/awl-dev:research-codebase`
 
 {Include example from Task 2}
 {Note any existing research docs from Task 3}
@@ -196,7 +196,7 @@ WAIT for all tasks.
 
 ### Phase 2: Planning 📋
 **When**: Ready to create implementation plan
-**Command**: `/create-plan`
+**Command**: `/awl-dev:create-plan`
 
 {Include example}
 
@@ -207,7 +207,7 @@ WAIT for all tasks.
 
 ### Phase 3: Implementation ⚙️
 **When**: Plan approved, ready to implement
-**Command**: `/implement-plan`
+**Command**: `/awl-dev:implement-plan`
 
 {Include example}
 
@@ -218,7 +218,7 @@ WAIT for all tasks.
 
 ### Phase 4: Validation ✅
 **When**: All implementation phases complete
-**Command**: `/validate-plan`
+**Command**: `/awl-dev:validate-plan`
 
 **After**: ✅ **CLEAR CONTEXT**
 
@@ -229,7 +229,7 @@ WAIT for all tasks.
 \`\`\`bash
 /awl-dev:commit
 gh pr create --fill
-/describe-pr
+/awl-dev:describe-pr
 \`\`\`
 
 **Output**: Linear document "PR: #{number} - {title}" attached to ticket
@@ -241,13 +241,13 @@ gh pr create --fill
 
 **Create Handoff** (to pause work):
 \`\`\`bash
-/create-handoff
+/awl-dev:create-handoff
 \`\`\`
 **Output**: Linear document "Handoff: {description}" attached to ticket
 
 **Resume Handoff**:
 \`\`\`bash
-/resume-handoff PROJ-123
+/awl-dev:resume-handoff PROJ-123
 \`\`\`
 
 ---
@@ -282,7 +282,7 @@ You can also check anytime with `/context` command.
 
 **Your Next Step:**
 {If existing files found:} You have {file} - ready to {next-action}?
-{If no files:} Start with: `/research-codebase` or `/create-plan`
+{If no files:} Start with: `/awl-dev:research-codebase` or `/awl-dev:create-plan`
 
 **Need more details on any phase?** Just ask!
 ```
@@ -326,10 +326,10 @@ Present targeted answer with examples.
 ## Ready to Get Started?
 
 **Quick Actions:**
-1. 📝 Start research: `/research-codebase`
-2. 📋 Create plan: `/create-plan`
-3. 🔄 Resume work: `/resume-handoff {ticket}`
-4. 🔍 Discover workflows: `/discover-workflows`
+1. 📝 Start research: `/awl-dev:research-codebase`
+2. 📋 Create plan: `/awl-dev:create-plan`
+3. 🔄 Resume work: `/awl-dev:resume-handoff {ticket}`
+4. 🔍 Discover workflows: `/awl-meta:discover-workflows`
 5. ❓ Ask me anything else!
 
 **Pro Tips:**
@@ -385,7 +385,7 @@ Include links in response.
 ### Example 1: User in Middle of Workflow
 
 ```
-User: /workflow-help
+User: /awl-meta:workflow-help
 
 [Agent spawns 3 parallel detection tasks]
 
@@ -399,8 +399,8 @@ Agent: 🎯 **I see you're currently working on PROJ-123 OAuth implementation**
 **You're in Implementation Phase**
 
 **Suggested Next Steps:**
-1. ✅ Continue implementing Phase 3: `/implement-plan` (will resume from checkboxes)
-2. 🔄 Need to pause? `/create-handoff` before stopping
+1. ✅ Continue implementing Phase 3: `/awl-dev:implement-plan` (will resume from checkboxes)
+2. 🔄 Need to pause? `/awl-dev:create-handoff` before stopping
 3. 📖 Review plan in Linear
 
 **Context Management:**
@@ -429,7 +429,7 @@ I don't see any existing research or plans for this, so let's start from the beg
 First, understand how authentication currently works:
 
 \`\`\`
-/research-codebase
+/awl-dev:research-codebase
 \`\`\`
 
 When prompted, ask: "How does authentication currently work? What patterns exist?"
@@ -444,7 +444,7 @@ When prompted, ask: "How does authentication currently work? What patterns exist
 Create implementation plan:
 
 \`\`\`
-/create-plan
+/awl-dev:create-plan
 \`\`\`
 
 Reference your research doc when planning.
@@ -457,7 +457,7 @@ Reference your research doc when planning.
 
 {Continue with remaining phases...}
 
-**Ready to start research?** Type `/research-codebase` or ask more questions!
+**Ready to start research?** Type `/awl-dev:research-codebase` or ask more questions!
 ```
 
 ### Example 3: Quick Question
@@ -473,7 +473,7 @@ Use the **Handoff System** to pause/resume:
 
 ### To Pause:
 \`\`\`bash
-/create-handoff
+/awl-dev:create-handoff
 \`\`\`
 
 Creates a Linear document "Handoff: {description}" attached to the current ticket.
@@ -490,7 +490,7 @@ The handoff captures:
 
 ### To Resume:
 \`\`\`bash
-/resume-handoff PROJ-123
+/awl-dev:resume-handoff PROJ-123
 \`\`\`
 
 The handoff is automatically discovered from Linear documents attached to the ticket.

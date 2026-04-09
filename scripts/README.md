@@ -23,16 +23,7 @@ scripts/
 
 Awl requires:
 
-1. **Linearis CLI** - For Linear document operations
-2. **LINEAR_API_TOKEN** - Environment variable with your API token
-
-```bash
-# Install Linearis CLI
-npm install -g linearis
-
-# Set Linear API token (get from https://linear.app/settings/api)
-export LINEAR_API_TOKEN="lin_api_..."
-```
+1. **Linear MCP** - The official Linear MCP server for Linear document operations (handles authentication automatically)
 
 ---
 
@@ -99,10 +90,7 @@ source ./scripts/load-awl-config.sh
    /plugin install awl-dev
    ```
 
-2. **Set Linear API token**:
-   ```bash
-   export LINEAR_API_TOKEN="lin_api_..."
-   ```
+2. **Ensure Linear MCP is configured** in your Claude Code settings (handles authentication automatically).
 
 3. **Configure project**:
    Edit `.claude/config.json`:
@@ -122,9 +110,7 @@ source ./scripts/load-awl-config.sh
    ```
 
 4. **Verify setup**:
-   ```bash
-   linearis issues list --limit 5
-   ```
+   Use `mcp__linear__list_issues` to confirm connectivity to Linear.
 
 ---
 
@@ -137,27 +123,15 @@ These scripts are bundled in the Awl plugin:
 
 **Use commands instead**:
 
-- `/validate-frontmatter` - Validates frontmatter
+- `/awl-meta:validate-frontmatter` - Validates frontmatter
 
 ---
 
 ## Troubleshooting
 
-### "linearis command not found"
+### "Linear MCP not available"
 
-```bash
-npm install -g linearis
-```
-
-### "LINEAR_API_TOKEN not set"
-
-```bash
-# Get token from https://linear.app/settings/api
-export LINEAR_API_TOKEN="lin_api_..."
-
-# Or add to shell profile
-echo 'export LINEAR_API_TOKEN="lin_api_..."' >> ~/.zshrc
-```
+Ensure the official Linear MCP server is configured in your Claude Code settings. The MCP server handles authentication automatically via OAuth.
 
 ### "jq not found" warning
 

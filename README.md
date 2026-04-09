@@ -9,10 +9,10 @@ fork it, and contribute ideas back.
 
 ## Tech Stack & Integrations
 
-Awl integrates with your development tools through both **CLI-based** (token-efficient) and **MCP-based** (richer features) approaches:
+Awl integrates with your development tools through MCP servers and CLI tools:
 
 ### Project Management & Issue Tracking
-- **Linear** - Issue tracking, sprint planning, ticket lifecycle (CLI via [Linearis](https://github.com/ryanrozich/linearis))
+- **Linear** - Issue tracking, sprint planning, ticket lifecycle (MCP bundled with `awl-dev`, automatic OAuth)
   - `awl-dev`: Core research agents and workflow commands
   - `awl-pm`: Advanced PM workflows (cycle analysis, milestone tracking, backlog grooming)
 
@@ -21,9 +21,8 @@ Awl integrates with your development tools through both **CLI-based** (token-eff
   - `awl-dev`: PR creation, branch management, worktree workflows
 
 ### Error Monitoring & Debugging
-- **Sentry** - Production error monitoring, stack traces, root cause analysis (MCP + CLI)
-  - `awl-debugging`: Sentry MCP integration (~20k tokens when enabled)
-  - Supports single-project and multi-project configurations
+- **PostHog** - Error tracking, session replay, stack traces, HogQL queries (MCP)
+  - `awl-debugging`: PostHog error tracking MCP integration
 
 ### Deployment & Infrastructure
 - **Railway** - Deployment logs, service health, environment variables (CLI via `railway`)
@@ -62,7 +61,7 @@ and shared memory systems.
 
 - 11 research agents (codebase + infrastructure)
 - 18 commands covering full dev lifecycle
-- Linear integration via Linearis CLI
+- Linear MCP bundled (OAuth, no API tokens needed)
 - Handoff system for context persistence
 - ~3.5k context (lightweight MCPs: DeepWiki, Context7)
 
@@ -84,9 +83,9 @@ and shared memory systems.
 
 **awl-debugging** (Optional - Enable when needed)
 
-- Sentry MCP integration (~20k context)
+- PostHog error tracking, session replay, and HogQL
 - Production error monitoring and debugging
-- Stack trace analysis and root cause detection
+- Stack trace analysis and session replay context
 - 3 specialized debugging commands
 
 **awl-meta** (Optional - For advanced users)
@@ -111,7 +110,7 @@ chmod +x setup-awl.sh
 This script will guide you through:
 - Prerequisites check and installation (jq, etc.)
 - Project configuration (ticket prefix, project name)
-- Integration setup (Linear, Sentry, Railway, PostHog, Exa)
+- Integration setup (Linear, PostHog, Railway, Exa)
 
 **Then install the plugins:**
 
@@ -123,7 +122,7 @@ This script will guide you through:
 # Restart Claude Code
 ```
 
-You're ready! Try `/research-codebase` in your next session.
+You're ready! Try `/awl-dev:research-codebase` in your next session.
 
 **Recommended**: Add the Awl workflow snippet to your project's CLAUDE.md. See
 [CLAUDE.md Setup](QUICKSTART.md#claudemd-setup) for the copy-paste snippet.
@@ -147,7 +146,7 @@ Alternatively, install plugins manually via Claude Code plugin system:
 # Optional: Install analytics plugin (if you use PostHog)
 /plugin install awl-analytics
 
-# Optional: Install debugging plugin (if you use Sentry)
+# Optional: Install debugging plugin (PostHog error tracking)
 /plugin install awl-debugging
 
 # Optional: Install meta plugin (workflow discovery)
@@ -169,7 +168,7 @@ Plugins automatically load/unload MCPs when enabled/disabled:
 /plugin disable awl-analytics  # Unloads PostHog MCP (-40k context)
 
 # Enable debugging for incident response
-/plugin enable awl-debugging  # Loads Sentry MCP (+20k context)
+/plugin enable awl-debugging  # Loads PostHog error tracking MCP
 
 # Can enable multiple plugins simultaneously
 /plugin enable awl-pm awl-analytics awl-debugging
@@ -212,13 +211,13 @@ claude plugin marketplace update awl
 ## Complete Workflow
 
 ```
-/research-codebase → /create-plan → /implement-plan → /validate-plan → /create-pr → /merge-pr
+/awl-dev:research-codebase → /awl-dev:create-plan → /awl-dev:implement-plan → /awl-dev:validate-plan → /awl-dev:create-pr → /awl-dev:merge-pr
 ```
 
 With handoffs for context persistence:
 
 ```
-/create-handoff → /resume-handoff
+/awl-dev:create-handoff → /awl-dev:resume-handoff
 ```
 
 Agents proactively monitor context during implementation and will prompt you to create handoffs
@@ -230,8 +229,8 @@ before running out of context, creating structured handoff documents that add to
   planning, handoff, worktree, implementation, verify, and PR workflows
 - [Context Engineering](docs/CONTEXT_ENGINEERING.md) - Token efficiency strategies and context
   management patterns
-- [Linear Workflow Automation](docs/LINEAR_WORKFLOW_AUTOMATION.md) - Linearis integration for ticket
-  → branch → PR → merge lifecycle ([Linearis GitHub](https://github.com/ryanrozich/linearis))
+- [Linear Workflow Automation](docs/LINEAR_WORKFLOW_AUTOMATION.md) - Linear MCP integration for ticket
+  → branch → PR → merge lifecycle
 
 ## Core Philosophy
 
@@ -242,12 +241,9 @@ before running out of context, creating structured handoff documents that add to
 3. **Focused Planning** - Planning agents work with compressed context
 4. **Persistent Memory** - Handoffs preserve context across sessions
 
-### CLI-First Integration
+### MCP-First Integration
 
-When possible, uses CLIs instead of MCPs for token efficiency:
-
-- Linear: Linearis CLI (1k tokens) vs Linear MCP (13k tokens) = **13x reduction**
-- Infrastructure research via CLIs (Railway, Sentry, GitHub)
+Uses the official Linear MCP server for rich Linear integration with structured tool calls.
 
 ## Key Features
 
@@ -260,7 +256,6 @@ When possible, uses CLIs instead of MCPs for token efficiency:
 **Token Efficiency**
 
 - Parallel agents compress research before synthesis
-- CLI-based tools minimize token overhead
 - Focused agents for specific tasks
 - Context-aware handoff prompts
 
@@ -280,16 +275,12 @@ When possible, uses CLIs instead of MCPs for token efficiency:
 
 **CLI Integrations** (optional but recommended):
 
-- `linearis` - Linear integration ([install](https://github.com/ryanrozich/linearis))
 - `gh` - GitHub CLI
 - `railway` - Railway deployments
-- `sentry-cli` - Error monitoring
-
 **MCP Tools** (bundled with plugins):
 
 - Context7 & DeepWiki - Built into `awl-dev` (~3.5k tokens)
-- PostHog - Built into `awl-analytics` (~40k tokens when enabled)
-- Sentry - Built into `awl-debugging` (~20k tokens when enabled)
+- PostHog - Built into `awl-analytics` and `awl-debugging`
 
 Run the prerequisite check:
 

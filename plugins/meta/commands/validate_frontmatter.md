@@ -281,7 +281,7 @@ If user chose auto-fix:
 
    - {workflow-name}.md: {issue description}
 
-   Re-run validation to verify: `/validate-frontmatter`
+   Re-run validation to verify: `/awl-meta:validate-frontmatter`
    ```
 
 ### Step 6: Generate Standard Document (if requested)
@@ -516,9 +516,9 @@ When adding new categories or patterns:
 
 ## See Also
 
-- `/validate-frontmatter` - Validate workflows against this standard
-- `/create-workflow` - Create new workflows with correct frontmatter
-- `/import-workflow` - Import external workflows and adapt frontmatter
+- `/awl-meta:validate-frontmatter` - Validate workflows against this standard
+- `/awl-meta:create-workflow` - Create new workflows with correct frontmatter
+- `/awl-meta:import-workflow` - Import external workflows and adapt frontmatter
 
 ```
 
@@ -535,7 +535,7 @@ Next steps:
 
 1. Review the standard
 2. Share with team
-3. Use `/validate-frontmatter` to check compliance
+3. Use `/awl-meta:validate-frontmatter` to check compliance
 4. Reference when creating new workflows
 
 ```
@@ -546,7 +546,7 @@ Next steps:
 
 ```
 
-/validate-frontmatter agents/codebase-analyzer.md
+/awl-meta:validate-frontmatter agents/codebase-analyzer.md
 
 ```
 
@@ -556,7 +556,7 @@ Validates just one file.
 
 ```
 
-/validate-frontmatter --fix
+/awl-meta:validate-frontmatter --fix
 
 ```
 
@@ -566,7 +566,7 @@ Automatically fixes all issues without prompting.
 
 ```
 
-/validate-frontmatter --report-only > frontmatter-report.md
+/awl-meta:validate-frontmatter --report-only > frontmatter-report.md
 
 ```
 
@@ -576,7 +576,7 @@ Saves report to file for review.
 
 ```
 
-/validate-frontmatter --category research
+/awl-meta:validate-frontmatter --category research
 
 ```
 
@@ -634,10 +634,10 @@ Only validates workflows in "research" category.
 
 ## Integration with Other Commands
 
-- **Discover**: `/discover-workflows` → uses this for validation
-- **Import**: `/import-workflow` → validates imported workflows
-- **Create**: `/create-workflow` → ensures new workflows are valid
-- **Validate**: `/validate-frontmatter` (this command) → checks everything
+- **Discover**: `/awl-meta:discover-workflows` → uses this for validation
+- **Import**: `/awl-meta:import-workflow` → validates imported workflows
+- **Create**: `/awl-meta:create-workflow` → ensures new workflows are valid
+- **Validate**: `/awl-meta:validate-frontmatter` (this command) → checks everything
 
 ## Error Handling
 

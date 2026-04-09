@@ -16,7 +16,7 @@ Transform raw cycle data into actionable health insights with specific recommend
 ## Agent Contract
 
 **Input**:
-- Cycle data JSON from linearis (cycle metadata + full issues array)
+- Cycle data JSON from Linear MCP (cycle metadata + full issues array)
 - Current date/time for time calculations
 - Team configuration (optional)
 
@@ -33,7 +33,7 @@ Structured markdown with these sections:
 - Capacity Analysis (over/under/available)
 - Specific Recommendations (priority-ordered with owners)
 
-**Returns to**: `/pm:cycle-status` command formats output into user-facing health report
+**Returns to**: `/awl-pm:analyze-cycle` command formats output into user-facing health report
 
 ## Health Scoring Algorithm
 

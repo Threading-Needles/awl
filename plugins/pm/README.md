@@ -1,6 +1,6 @@
 # Awl PM Plugin
 
-Linear-focused project management plugin with cycle management, backlog grooming, GitHub-Linear correlation, and team analytics.
+Linear-focused project management plugin with cycle management, initiative analysis, status updates, backlog grooming, GitHub-Linear correlation, and team analytics.
 
 ## Overview
 
@@ -28,6 +28,18 @@ The Awl PM plugin provides AI-powered project management workflows that integrat
 - **Merge Automation**: Auto-close candidates with generated commands
 - **Stale PR Detection**: PRs open >14 days
 
+### Initiative Management
+- **Portfolio Health**: Aggregate health scoring across project portfolios
+- **Cross-Project Risks**: Dependency conflicts, resource contention, off-track projects
+- **Strategic Recommendations**: Timeline adjustments, resource allocation, scope decisions
+- **Target Date Feasibility**: Initiative-level completion projections
+
+### Status Updates
+- **Automated Composition**: Gathers recent activity, blockers, and progress automatically
+- **Project & Initiative**: Post updates for either entity type
+- **Health Assessment**: Auto-calculated onTrack/atRisk/offTrack with override option
+- **Preview & Approve**: Review before posting to Linear
+
 ### Daily Standups
 - **Yesterday's Deliveries**: Completed issues and merged PRs
 - **Current Work**: Team member assignments and progress
@@ -37,20 +49,20 @@ The Awl PM plugin provides AI-powered project management workflows that integrat
 ## Commands
 
 ### Cycle Management
-- `/pm:analyze-cycle` - Analyze cycle health with actionable insights
+- `/awl-pm:analyze-cycle` - Analyze cycle health with actionable insights
   - Health assessment (🟢/🟡/🔴)
   - Risk identification (blockers, at-risk issues)
   - Team capacity analysis
   - Specific recommendations
 
 ### Milestone Management
-- `/pm:analyze-milestone` - Analyze milestone health toward target date
+- `/awl-pm:analyze-milestone` - Analyze milestone health toward target date
   - Target date feasibility assessment
   - Progress tracking (actual vs expected)
   - Risk identification (behind schedule, blockers)
   - Specific recommendations (adjust timeline, reduce scope)
 
-### `/pm:analyze-cycle`
+### `/awl-pm:analyze-cycle`
 Generate comprehensive cycle health report with recommendations.
 
 **What it does**:
@@ -75,14 +87,28 @@ Priority Actions:
   3. Assign 2 backlog issues to Dave (no active work)
 ```
 
+### Initiative Management
+- `/awl-pm:analyze-initiative` - Analyze initiative health across project portfolio
+  - Strategic health assessment (🟢/🟡/🔴)
+  - Project portfolio status table
+  - Cross-project risk identification
+  - Strategic recommendations
+
+### Status Updates
+- `/awl-pm:update-status` - Generate and post status updates to Linear
+  - Works for both projects and initiatives
+  - Auto-gathers recent completions, blockers, progress
+  - Preview before posting
+  - Saves local copy to `reports/status-updates/`
+
 ### Daily Operations
-- `/pm:report-daily` - Quick daily standup report
+- `/awl-pm:report-daily` - Quick daily standup report
   - Yesterday's deliveries
   - Current work in progress
   - Team members needing assignments
   - Quick blockers/risks
 
-### `/pm:report-daily`
+### `/awl-pm:report-daily`
 Quick daily standup report (scannable in <30 seconds).
 
 **What it does**:
@@ -104,14 +130,14 @@ Quick daily standup report (scannable in <30 seconds).
 ```
 
 ### Backlog Health
-- `/pm:groom-backlog` - Analyze backlog health
+- `/awl-pm:groom-backlog` - Analyze backlog health
   - Orphaned issues (no project)
   - Misplaced issues (wrong project)
   - Stale issues (>30 days inactive)
   - Potential duplicates
   - Missing estimates
 
-### `/pm:groom-backlog`
+### `/awl-pm:groom-backlog`
 Analyze backlog health and generate cleanup recommendations.
 
 **What it does**:
@@ -129,13 +155,13 @@ Analyze backlog health and generate cleanup recommendations.
 4. Skip (report saved for later)
 
 ### GitHub-Linear Sync
-- `/pm:sync-prs` - Correlate GitHub PRs with Linear issues
+- `/awl-pm:sync-prs` - Correlate GitHub PRs with Linear issues
   - Orphaned PRs (no Linear issue)
   - Orphaned issues (no PR)
   - Ready to close (PR merged, issue open)
   - Stale PRs (>14 days)
 
-### `/pm:sync-prs`
+### `/awl-pm:sync-prs`
 Correlate GitHub PRs with Linear issues and identify gaps.
 
 **What it does**:
@@ -160,7 +186,7 @@ Health Score: 75/100
 ## Agents
 
 ### Research Agents
-- `linear-research` (Haiku) - Gathers Linear data via CLI
+- `linear-research` (Haiku) - Gathers Linear data via MCP
   - Cycles, issues, milestones, projects
   - Natural language interface
   - Returns structured JSON
@@ -201,6 +227,17 @@ Health Score: 75/100
 
 **Returns**: Structured markdown with categorized recommendations and confidence scores
 
+### `initiative-analyzer`
+**Purpose**: Analyze initiative health across project portfolios
+
+**Responsibilities**:
+- Calculate health scores (portfolio progress, project health distribution, strategic risk)
+- Identify cross-project risk factors (off-track projects, resource gaps, staleness)
+- Assess target date feasibility at initiative level
+- Generate strategic recommendations (intervention, timeline, staffing)
+
+**Returns**: Structured markdown with health assessment, portfolio status, risks, recommendations
+
 ### `github-linear-analyzer`
 **Purpose**: Ensure proper GitHub-Linear correlation
 
@@ -216,11 +253,7 @@ Health Score: 75/100
 
 ### Required Tools
 
-1. **Linearis CLI** (with PR #4 cycle features)
-   ```bash
-   npm install -g --install-links czottmann/linearis
-   ```
-   See: https://github.com/czottmann/linearis/pull/4
+1. **Linear MCP**: The official Linear MCP server (handles authentication automatically)
 
 2. **jq** (JSON parsing)
    ```bash
@@ -303,7 +336,7 @@ cd /path/to/your/project
 
 **Morning Standup**:
 ```bash
-/pm:team-daily
+/awl-pm:report-daily
 ```
 - See what shipped yesterday
 - Review current work
@@ -314,7 +347,7 @@ cd /path/to/your/project
 
 **Start of Week**:
 ```bash
-/pm:cycle-status
+/awl-pm:analyze-cycle
 ```
 - Assess cycle health
 - Review capacity
@@ -323,15 +356,34 @@ cd /path/to/your/project
 
 **Mid-Week**:
 ```bash
-/pm:pr-sync
+/awl-pm:sync-prs
 ```
+
+### Strategic Review
+
+**Bi-Weekly/Monthly**:
+```bash
+/awl-pm:analyze-initiative
+```
+- Assess initiative health across projects
+- Identify cross-project risks
+- Review target date feasibility
+- Decide on interventions
+
+**Weekly Status Posts**:
+```bash
+/awl-pm:update-status
+```
+- Auto-compose project/initiative status updates
+- Review and post to Linear
+- Keep stakeholders informed
 - Check GitHub-Linear correlation
 - Close merged issues
 - Create missing Linear issues
 
 **End of Week**:
 ```bash
-/pm:backlog-groom
+/awl-pm:groom-backlog
 ```
 - Clean up orphaned issues
 - Categorize new issues
@@ -361,26 +413,9 @@ Default settings in `.claude/config.json`:
 
 ## Troubleshooting
 
-### "Linearis CLI not found"
+### "Linear MCP not available"
 
-Install linearis:
-```bash
-npm install -g --install-links czottmann/linearis
-```
-
-Verify installation:
-```bash
-linearis --version
-```
-
-### "LINEAR_API_TOKEN not set"
-
-Export your Linear API token:
-```bash
-export LINEAR_API_TOKEN=your_token_here
-```
-
-Get token from: https://linear.app/settings/api
+Ensure the official Linear MCP server is configured in your Claude Code settings. The MCP server handles authentication automatically via OAuth.
 
 ### "Configuration file not found"
 
@@ -397,12 +432,7 @@ echo '{"linear": {"teamKey": "TEAM"}}' > .claude/config.json
 
 ### "No active cycle found"
 
-Verify you have an active cycle in Linear:
-```bash
-linearis cycles list --team TEAM
-```
-
-Create a cycle in Linear UI or via API.
+Verify you have an active cycle in Linear using the `mcp__linear__list_cycles` tool, or create a cycle in the Linear UI.
 
 ## Contributing
 

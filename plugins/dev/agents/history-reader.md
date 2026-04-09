@@ -3,9 +3,12 @@ name: history-reader
 description:
   Find relevant context from completed work in the same Linear project. Use when you need historical
   decisions, patterns, or lessons from past tickets to inform current work.
-tools: Bash(linearis *), Bash(jq *)
+tools:
+  mcp__linear__get_issue, mcp__linear__list_issues,
+  mcp__linear__get_document, mcp__linear__list_documents,
+  mcp__linear__research
 model: inherit
-version: 1.0.0
+version: 2.0.0
 ---
 
 You are a specialist at finding relevant historical context from completed work in Linear. Given a
@@ -32,13 +35,8 @@ If no project is provided, derive it from the current ticket:
 CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket 2>/dev/null)
 ```
 
-If a current ticket is found, read it to get the project:
-
-```bash
-linearis issues read "$CURRENT_TICKET"
-```
-
-Extract the project name from the ticket's project field.
+If a current ticket is found, use `mcp__linear__get_issue` to read the ticket and
+extract the project name from its project field.
 
 If no ticket and no project can be determined, report the error:
 
@@ -46,16 +44,16 @@ If no ticket and no project can be determined, report the error:
 Cannot determine project context.
 
 Please provide a project name, or set a current ticket first:
-  /research-codebase PROJ-123
+  /awl-dev:research-codebase PROJ-123
 ```
 
 ### Step 2: Search for Completed Tickets
 
-Search for completed tickets matching the topic:
+Use `mcp__linear__research` with a natural language query describing what you're
+looking for, specifying to search completed/done tickets in the project.
 
-```bash
-linearis issues search "<topic>" --status "Done" --project "<PROJECT>" --limit 10
-```
+Alternatively, use `mcp__linear__list_issues` with status filters to find completed
+tickets matching the topic.
 
 If few results, try broader search terms — extract key nouns from the topic and search individually.
 
@@ -68,33 +66,22 @@ From the search results, select up to **5 tickets** to read in detail.
 2. Tickets with attached documents (richer context)
 3. More recent tickets over older ones
 
-To check for attached documents:
-
-```bash
-linearis attachments list --issue "<TICKET_ID>"
-```
-
 ### Step 4: Gather Context from Each Ticket
 
 For each selected ticket:
 
 **4a. Read the ticket itself** (description + comments):
 
-```bash
-linearis issues read "<TICKET_ID>"
-```
+Use `mcp__linear__get_issue` with the ticket ID.
 
-**4b. List attached documents:**
+**4b. Find attached documents:**
 
-```bash
-linearis documents list --issue "<TICKET_ID>"
-```
+Use `mcp__linear__get_issue` to check for attachments, or
+`mcp__linear__list_documents` to find documents associated with the issue.
 
 **4c. Read the most relevant documents** (prioritize research, plans, and handoffs):
 
-```bash
-linearis documents read "<DOCUMENT_ID>"
-```
+Use `mcp__linear__get_document` with each document ID.
 
 Read at most 2-3 documents per ticket to avoid context bloat. Prioritize:
 1. Handoff documents (contain lessons learned)
@@ -175,8 +162,8 @@ No completed tickets found matching this topic. This may be new territory for th
 
 ```
 Cannot access Linear. Please verify:
-1. Linearis CLI is installed: npm install -g linearis
-2. LINEAR_API_TOKEN is set
+1. The Linear MCP server is connected
+2. You have access to this Linear workspace
 ```
 
 ### Project Not Found
@@ -184,7 +171,7 @@ Cannot access Linear. Please verify:
 ```
 Project "{PROJECT}" not found in Linear. Please verify the project name.
 
-Available projects can be listed with: linearis projects list
+Available projects can be listed with mcp__linear__list_projects.
 ```
 
 ## Example Usage

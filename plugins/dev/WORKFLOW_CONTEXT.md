@@ -9,11 +9,11 @@ Complete guide to automatic document tracking and discovery in Awl.
 **After**: System automatically tracks the current ticket and discovers documents from Linear:
 ```bash
 # User researches the codebase
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
 # ✅ Sets current ticket, saves research to Linear
 
 # Later, user wants to create a plan...
-/create-plan
+/awl-dev:create-plan
 # ✅ Queries Linear for research attached to PROJ-123
 ```
 
@@ -26,7 +26,7 @@ Complete guide to automatic document tracking and discovery in Awl.
 When a workflow command is invoked with a ticket ID:
 
 ```
-You → /research-codebase PROJ-123
+You → /awl-dev:research-codebase PROJ-123
       ↓
 workflow-context.sh set-ticket PROJ-123
       ↓
@@ -50,11 +50,11 @@ Research is saved as a Linear document "Research: ..." attached to PROJ-123.
 When user invokes a downstream workflow command:
 
 ```
-You → /create-plan
+You → /awl-dev:create-plan
       ↓
 Command reads current ticket from workflow-context.json
       ↓
-Queries Linear: linearis attachments list --issue PROJ-123
+Queries Linear: mcp__linear__get_issue for PROJ-123
       ↓
 Finds "Research: OAuth Implementation" document
       ↓
@@ -64,7 +64,7 @@ Claude reads research and creates plan
 **Key Components:**
 
 1. **Workflow Context** - Provides current ticket ID
-2. **Linear API** (via linearis CLI) - Query documents attached to ticket
+2. **Linear MCP** - Query documents attached to ticket
 3. **Command Instructions** - Auto-discover documents from Linear
 
 ---
@@ -75,19 +75,19 @@ Claude reads research and creates plan
 
 ```bash
 # 1. Research the codebase
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
 # → Sets current ticket to PROJ-123
 # → Creates Linear document "Research: Auth System" attached to PROJ-123 ✅
 
 # 2. Create implementation plan
-/create-plan
+/awl-dev:create-plan
 # → Reads current ticket (PROJ-123) from workflow context
 # → Queries Linear for research document
 # → Claude reads research and creates plan
 # → Creates Linear document "Plan: OAuth Support" attached to PROJ-123 ✅
 
 # 3. Implement the plan
-/implement-plan
+/awl-dev:implement-plan
 # → Reads current ticket (PROJ-123) from workflow context
 # → Queries Linear for plan document
 # → Claude reads plan and implements ✅
@@ -103,16 +103,16 @@ Claude reads research and creates plan
 
 | Command | Auto-Discovers | Behavior |
 |---------|---------------|----------|
-| `/resume-handoff` | Recent handoff | Finds last handoff, asks to proceed |
-| `/implement-plan` | Recent plan | Finds last plan, asks to proceed |
-| `/create-plan` | Recent research | **Suggests** research as context |
+| `/awl-dev:resume-handoff` | Recent handoff | Finds last handoff, asks to proceed |
+| `/awl-dev:implement-plan` | Recent plan | Finds last plan, asks to proceed |
+| `/awl-dev:create-plan` | Recent research | **Suggests** research as context |
 
 ### 🚧 Fallback if Not Found
 
 All commands gracefully fall back to asking for input:
 
 ```bash
-/resume-handoff
+/awl-dev:resume-handoff
 # No recent handoff found
 → "I'll help you resume work. Which handoff would you like to use?"
 → Lists available handoffs
@@ -182,9 +182,7 @@ TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
 
 **STEP 2: Query Linear for documents**
 
-```bash
-linearis attachments list --issue "$TICKET"
-```
+Use `mcp__linear__get_issue` with the ticket identifier to retrieve issue details and attached documents.
 
 **STEP 3: Determine which document to use**
 
@@ -203,7 +201,7 @@ Users don't need to remember ticket IDs between commands
 ### 2. Natural Workflow
 Commands chain together seamlessly:
 ```bash
-/research-codebase PROJ-123 → /create-plan → /implement-plan
+/awl-dev:research-codebase PROJ-123 → /awl-dev:create-plan → /awl-dev:implement-plan
 ```
 
 ### 3. Context Awareness
@@ -225,8 +223,8 @@ Can always provide explicit ticket ID to override auto-discovery
 
 **Solutions**:
 1. Check current ticket is set: `workflow-context.sh get-ticket`
-2. Verify Linear documents exist: `linearis attachments list --issue PROJ-123`
-3. Ensure `LINEAR_API_TOKEN` is set
+2. Verify Linear documents exist using `mcp__linear__get_issue` for the ticket
+3. Ensure the Linear MCP server is configured and connected
 
 ### Workflow Context Empty
 
@@ -234,7 +232,7 @@ Can always provide explicit ticket ID to override auto-discovery
 
 **Solutions**:
 1. Set ticket manually: `workflow-context.sh set-ticket PROJ-123`
-2. Re-run the initial command with a ticket ID: `/research-codebase PROJ-123`
+2. Re-run the initial command with a ticket ID: `/awl-dev:research-codebase PROJ-123`
 
 ### Wrong Ticket in Context
 
@@ -242,7 +240,7 @@ Can always provide explicit ticket ID to override auto-discovery
 
 **Solution**: Override by providing the ticket ID explicitly:
 ```bash
-/research-codebase PROJ-456
+/awl-dev:research-codebase PROJ-456
 ```
 
 ---

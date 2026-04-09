@@ -30,7 +30,7 @@ chmod +x setup-awl.sh
 **What this does:**
 - Checks/installs prerequisites (jq)
 - Creates project configuration
-- Prompts for API tokens (Linear, Sentry, etc.)
+- Prompts for API tokens (Linear, PostHog, etc.)
 
 **Then:**
 ```bash
@@ -41,7 +41,7 @@ chmod +x setup-awl.sh
 # Restart Claude Code
 ```
 
-You're ready! Try `/research-codebase` in your next session.
+You're ready! Try `/awl-dev:research-codebase` in your next session.
 
 ---
 
@@ -68,7 +68,7 @@ Awl is distributed as a 5-plugin system. Install what you need:
 # Optional: Analytics (PostHog integration)
 /plugin install awl-analytics
 
-# Optional: Debugging (Sentry integration)
+# Optional: Debugging (PostHog error tracking)
 /plugin install awl-debugging
 
 # Optional: Workflow discovery
@@ -84,7 +84,7 @@ Run `/awl-dev:doctor` to check what's installed and get guidance on missing depe
 For the best experience, install these complementary plugins from the Claude Code marketplace:
 
 ```bash
-# Required for full /implement-plan automation
+# Required for full /awl-dev:implement-plan automation
 /plugin install pr-review-toolkit
 
 # Recommended for enhanced development
@@ -114,8 +114,8 @@ For the best experience, install these complementary plugins from the Claude Cod
 - ~40k context when enabled
 
 **awl-debugging** (Enable for incident response):
-- Sentry MCP integration
-- ~20k context when enabled
+- PostHog error tracking, session replay, and HogQL
+- Shares PostHog MCP with awl-analytics
 
 **awl-meta** (Advanced users):
 - Discover and import workflows from community
@@ -191,13 +191,8 @@ This file contains **API tokens and secrets** and is **never committed** to git.
       "teamKey": "ACME",
       "defaultTeam": "ACME"
     },
-    "sentry": {
-      "org": "acme-corp",
-      "project": "acme-web",
-      "authToken": "sntrys_..."
-    },
     "posthog": {
-      "apiKey": "...",
+      "apiKey": "phx_...",
       "projectId": "..."
     },
     "exa": {
@@ -293,10 +288,11 @@ Run `/awl-dev:doctor` to verify your setup - it will show the CLAUDE.md status.
 
 ### Linear (Project Management)
 
-**Installation**:
-```bash
-npm install -g --install-links ryanrozich/linearis#feat/cycles-cli
-```
+The Linear MCP server (`https://mcp.linear.app/mcp`) is **bundled with the `awl-dev` plugin**.
+No separate installation needed.
+
+**First-time setup**: OAuth authentication happens automatically when you first use a Linear
+command - Claude Code opens your browser for consent. No API tokens needed.
 
 **Configuration**:
 
@@ -306,51 +302,15 @@ Project config (`.claude/config.json`):
   "awl": {
     "project": {
       "ticketPrefix": "ENG"
-    }
-  }
-}
-```
-
-Secrets config (`~/.config/awl/config-{projectKey}.json`):
-```json
-{
-  "awl": {
+    },
     "linear": {
-      "apiToken": "lin_api_...",
-      "teamKey": "ENG",
-      "defaultTeam": "Engineering"
+      "teamKey": "ENG"
     }
   }
 }
 ```
 
-**Authentication**: Set `LINEAR_API_TOKEN` environment variable or store in `~/.linear_api_token`
-
-### Sentry (Error Monitoring)
-
-**Installation**:
-```bash
-curl -sL https://sentry.io/get-cli/ | sh
-```
-
-**Configuration**:
-
-Secrets config:
-```json
-{
-  "awl": {
-    "sentry": {
-      "org": "your-org",
-      "project": "your-project",
-      "authToken": "sntrys_..."
-    }
-  }
-}
-```
-
-**Authentication**: Set `SENTRY_AUTH_TOKEN` or configure `~/.sentryclirc`
-
-### PostHog (Analytics)
+### PostHog (Analytics & Error Tracking)
 
 Secrets config:
 ```json
@@ -386,7 +346,7 @@ Awl provides a research → plan → implement → validate → ship workflow.
 ### 1. Research Phase
 
 ```
-/research-codebase
+/awl-dev:research-codebase
 ```
 
 Follow prompts to research your codebase. This:
@@ -397,7 +357,7 @@ Follow prompts to research your codebase. This:
 ### 2. Planning Phase
 
 ```
-/create-plan
+/awl-dev:create-plan
 ```
 
 This:
@@ -408,7 +368,7 @@ This:
 ### 3. Implementation Phase
 
 ```
-/implement-plan
+/awl-dev:implement-plan
 ```
 
 **Note**: If you just created a plan, omit the path - it auto-finds your most recent plan!
@@ -422,7 +382,7 @@ This:
 ### 4. Validation Phase
 
 ```
-/validate-plan
+/awl-dev:validate-plan
 ```
 
 This:
@@ -434,7 +394,7 @@ This:
 ### 5. Create PR
 
 ```
-/create-pr
+/awl-dev:create-pr
 ```
 
 Automatically creates a PR with comprehensive description from your research and plan.
@@ -445,19 +405,19 @@ Automatically creates a PR with comprehensive description from your research and
 
 ```bash
 # Save context
-/create-handoff
+/awl-dev:create-handoff
 
 # Resume later
-/resume-handoff
+/awl-dev:resume-handoff
 ```
 
 ### Workflow Context Auto-Discovery
 
 Awl tracks your workflow via `.claude/.workflow-context.json`:
 
-- `/research-codebase` → `/create-plan` references it
-- `/create-plan` → `/implement-plan` auto-finds it
-- `/create-handoff` → `/resume-handoff` auto-finds it
+- `/awl-dev:research-codebase` → `/awl-dev:create-plan` references it
+- `/awl-dev:create-plan` → `/awl-dev:implement-plan` auto-finds it
+- `/awl-dev:create-handoff` → `/awl-dev:resume-handoff` auto-finds it
 
 **You don't need to specify file paths** - commands remember your work!
 
@@ -469,24 +429,24 @@ Awl tracks your workflow via `.claude/.workflow-context.json`:
 
 | Command | Purpose |
 |---------|---------|
-| `/research-codebase` | Research codebase and save findings |
-| `/create-plan` | Interactive planning with research |
-| `/implement-plan` | Execute a plan (auto-finds recent) |
-| `/validate-plan` | Verify implementation |
-| `/create-pr` | Create PR with rich description |
-| `/merge-pr` | Merge PR and update Linear |
-| `/create-handoff` | Save context for later |
-| `/resume-handoff` | Restore previous context |
+| `/awl-dev:research-codebase` | Research codebase and save findings |
+| `/awl-dev:create-plan` | Interactive planning with research |
+| `/awl-dev:implement-plan` | Execute a plan (auto-finds recent) |
+| `/awl-dev:validate-plan` | Verify implementation |
+| `/awl-dev:create-pr` | Create PR with rich description |
+| `/awl-dev:merge-pr` | Merge PR and update Linear |
+| `/awl-dev:create-handoff` | Save context for later |
+| `/awl-dev:resume-handoff` | Restore previous context |
 
 ### PM Commands (awl-pm plugin)
 
 | Command | Purpose |
 |---------|---------|
-| `/pm:analyze-cycle` | Cycle health report |
-| `/pm:analyze-milestone` | Milestone progress |
-| `/pm:report-daily` | Daily standup summary |
-| `/pm:groom-backlog` | Backlog analysis |
-| `/pm:sync-prs` | GitHub-Linear sync |
+| `/awl-pm:analyze-cycle` | Cycle health report |
+| `/awl-pm:analyze-milestone` | Milestone progress |
+| `/awl-pm:report-daily` | Daily standup summary |
+| `/awl-pm:groom-backlog` | Backlog analysis |
+| `/awl-pm:sync-prs` | GitHub-Linear sync |
 
 ### Research Agents
 
@@ -546,7 +506,7 @@ Check that you've enabled the plugin:
 
 ## Next Steps
 
-**You're ready!** Start with `/research-codebase` or `/create-plan` in your next Claude Code session.
+**You're ready!** Start with `/awl-dev:research-codebase` or `/awl-dev:create-plan` in your next Claude Code session.
 
 **Learn more**:
 - [USAGE.md](docs/USAGE.md) - Detailed usage guide

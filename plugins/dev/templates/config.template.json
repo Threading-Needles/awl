@@ -16,11 +16,6 @@
       "projectId": "[NEEDS_SETUP]",
       "defaultService": "[NEEDS_SETUP]"
     },
-    "sentry": {
-      "org": "[NEEDS_SETUP]",
-      "project": "[NEEDS_SETUP]",
-      "authToken": "[NEEDS_SETUP]"
-    },
     "exa": {
       "apiKey": "[NEEDS_SETUP]"
     },
