@@ -12,9 +12,8 @@ The setup script automatically checks standard locations for existing API tokens
 1. **Environment variable**: `LINEAR_API_TOKEN`
 2. **File**: `~/.linear_api_token`
 
-#### Sentry
-1. **Environment variable**: `SENTRY_AUTH_TOKEN`
-2. **File**: `~/.sentryclirc` (looks for `token=` line)
+#### PostHog
+1. **Environment variable**: `POSTHOG_AUTH_HEADER` (format: `Bearer phx_...`)
 
 ### Token Validation
 
@@ -83,7 +82,7 @@ Enter team number [1-3]: 1
 ### 4. Time Savings
 If you already have:
 - Linear token configured → Zero manual input
-- Sentry CLI configured → Zero manual input
+- PostHog auth header configured → Zero manual input
 
 ## Setting Up for Auto-Discovery
 
@@ -103,23 +102,15 @@ chmod 600 ~/.linear_api_token
 
 Then Awl setup scripts auto-discover it.
 
-### Sentry
+### PostHog
 
-**Option 1: Environment variable**
+**Environment variable**
 ```bash
-export SENTRY_AUTH_TOKEN="sntrys_..."
+export POSTHOG_AUTH_HEADER="Bearer phx_..."
+# Add to ~/.bashrc or ~/.zshrc
 ```
 
-**Option 2: File (recommended)**
-```bash
-cat > ~/.sentryclirc << 'EOF'
-[auth]
-token=sntrys_...
-EOF
-chmod 600 ~/.sentryclirc
-```
-
-Then `sentry-cli` and Awl both auto-discover it.
+Then Awl setup scripts auto-discover it.
 
 ## API Validation Details
 
@@ -160,21 +151,6 @@ Then `sentry-cli` and Awl both auto-discover it.
 - Team name (from team list)
 - Organization context
 
-### Sentry API
-
-**Endpoint**: `https://sentry.io/api/0/`
-
-**Requests**:
-1. `GET /organizations/` - List orgs
-2. `GET /organizations/{org}/projects/` - List projects
-
-**Returns**:
-- All organizations you have access to
-- All projects in each org
-
-**Auto-populated**:
-- Organization slug
-- Project slug
 
 ## Fallback Behavior
 
@@ -209,11 +185,9 @@ The smart discovery is powered by `scripts/awl-integration-helpers.sh`:
 ```bash
 # Discover existing tokens
 ./scripts/awl-integration-helpers.sh discover-linear
-./scripts/awl-integration-helpers.sh discover-sentry
 
 # Validate tokens
 ./scripts/awl-integration-helpers.sh validate-linear "lin_api_..."
-./scripts/awl-integration-helpers.sh validate-sentry "sntrys_..."
 ```
 
 These can be used standalone or sourced by other scripts.
@@ -233,7 +207,6 @@ These can be used standalone or sourced by other scripts.
 ## Future Enhancements
 
 Potential additions:
-- PostHog API validation
 - Exa API validation
 - GitHub token discovery (from `gh` CLI)
 - Team/project suggestions based on git remote

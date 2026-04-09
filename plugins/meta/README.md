@@ -72,4 +72,4 @@ From the same marketplace:
 | awl-dev | Core development workflow |
 | awl-pm | Project management |
 | awl-analytics | PostHog integration |
-| awl-debugging | Sentry integration |
+| awl-debugging | PostHog error tracking |

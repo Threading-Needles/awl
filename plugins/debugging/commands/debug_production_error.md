@@ -1,108 +1,91 @@
 ---
-description: Debug production errors using Sentry error tracking and analysis
+description: Debug production errors using PostHog error tracking, session replay, and HogQL
 category: debugging
 tools: Task, TodoWrite
 model: inherit
-version: 1.0.0
+version: 2.0.0
 ---
 
 # Debug Production Error
 
-Investigate production errors using Sentry's error tracking, stack traces, and context.
+Investigate production errors using PostHog's error tracking, stack traces, session replay, and
+HogQL queries.
 
 ## Prerequisites
 
-- Sentry MCP must be enabled (this plugin should be enabled)
-- Environment variables configured:
-  - `SENTRY_AUTH_TOKEN`
-  - `SENTRY_ORG`
-  - `SENTRY_PROJECT`
+- PostHog MCP must be enabled (this plugin should be enabled)
+- Environment variable configured:
+  - `POSTHOG_AUTH_HEADER`
 
 ## Usage
 
 ```bash
-/awl-dev:debug-production-error <error-description-or-id>
+/awl-debugging:debug-production-error <error-description-or-query>
 
 Examples:
-  /awl-dev:debug-production-error "TypeError in checkout flow"
-  /awl-dev:debug-production-error "ISSUE-123"
-  /awl-dev:debug-production-error "errors from last deployment"
-  /awl-dev:debug-production-error "unhandled exceptions this week"
+  /awl-debugging:debug-production-error "TypeError in checkout flow"
+  /awl-debugging:debug-production-error "errors from last deployment"
+  /awl-debugging:debug-production-error "unhandled exceptions this week"
+  /awl-debugging:debug-production-error "payment failures affecting users"
 ```
 
 ## What This Command Does
 
-Uses Sentry MCP tools to:
+Uses PostHog MCP tools to:
 
-1. Search for relevant errors
-2. Retrieve stack traces and context
-3. Analyze error patterns and frequency
-4. Identify affected users and environments
-5. Suggest root causes and fixes
+1. Search for relevant errors via `get_error_tracking_issues`
+2. Retrieve error details with stack traces via `get_error_tracking_issue`
+3. Get individual error events with context via `get_error_tracking_issue_events`
+4. View session replay of affected users via `get_session_replay`
+5. Run HogQL queries to find patterns via `run_hogql_query`
 
-## Available Sentry Capabilities
-
-When this plugin is enabled, you have access to ~19 Sentry tools:
+## Available PostHog Error Tracking Tools
 
 **Error Search & Analysis**:
 
-- Search issues by query
-- Filter by status, assignment, date
-- View error trends and patterns
-- Identify new vs recurring errors
+- `get_error_tracking_issues` - List issues filtered by status, assignee, date range, search text
+- `get_error_tracking_issue` - Get details for a specific issue (stack trace, occurrences, users)
+- `get_error_tracking_issue_events` - Get individual error events with full context
 
-**Stack Trace Analysis**:
+**Session Replay**:
 
-- Full stack traces with source context
-- Source map resolution
-- Frame-by-frame analysis
-- Variable inspection
+- `get_session_replay` - View what the user was doing before, during, and after the error
+- Includes console logs, network requests, and user actions
 
-**Context & Metadata**:
+**Custom Queries**:
 
-- User context (who was affected)
-- Environment details
-- Release/deployment information
-- Breadcrumb trail (user actions leading to error)
+- `run_hogql_query` - Run arbitrary HogQL (SQL-like) queries across all PostHog data
+- Correlate errors with feature flags, user segments, pages, etc.
 
-**Issue Management**:
+**Context**:
 
-- Update issue status
-- Assign to team members
-- Link to tickets/PRs
-- Add comments and notes
-
-**Root Cause Analysis** (Seer AI):
-
-- AI-powered root cause identification
-- Code-level explanations
-- Specific fix recommendations
-- Related error patterns
+- `get_feature_flags` - Check which flags were active during errors
+- `get_annotations` - View deployment markers relative to error timing
 
 ## Example Debugging Sessions
 
 ### Investigate Specific Error
 
 ```bash
-/awl-dev:debug-production-error "Show me details for MYAPP-456 including stack trace and user context"
+/awl-debugging:debug-production-error "Show me the most recent TypeError with its stack trace and session replay"
 ```
 
 ### Search by Error Type
 
 ```bash
-/awl-dev:debug-production-error "Find all TypeError exceptions in the last 24 hours"
+/awl-debugging:debug-production-error "Find all unhandled promise rejections in the last 24 hours"
 ```
 
 ### Deployment Issues
 
 ```bash
-/awl-dev:debug-production-error "What new errors appeared after release v2.3.0?"
+/awl-debugging:debug-production-error "What new errors appeared after today's deployment?"
 ```
 
 ### High-Impact Errors
 
 ```bash
-/awl-dev:debug-production-error "Show unresolved errors affecting more than 100 users"
+/awl-debugging:debug-production-error "Show active errors affecting the most users"
 ```
 
 ## Output Format
@@ -112,87 +95,65 @@ Analysis typically includes:
 **Error Overview**:
 
 - Error message and type
-- Frequency and trend
+- Occurrence count and trend
 - First seen / last seen
-- Number of users affected
+- Number of users and sessions affected
 
 **Stack Trace**:
 
-- Full call stack
-- Source code context
+- Full call stack with source context
 - File paths and line numbers
-- Variable values (if available)
+- Source map resolution (when configured)
 
-**User Context**:
+**Session Replay Context**:
 
-- User ID and properties
-- Browser/device information
-- URL and user actions (breadcrumbs)
+- User actions leading to the error
+- Console log output
+- Network requests and responses
+- Page navigations
 
-**Root Cause** (when Seer analysis available):
+**HogQL Pattern Analysis** (when relevant):
 
-- Likely cause explanation
-- Relevant code snippets
-- Specific fix recommendations
-- Related issues
+- Error correlation with feature flags
+- Breakdown by page, browser, or user segment
+- Time-series trends
 
 ## Advanced Queries
 
-### Filter by Environment
+### Correlate with Feature Flags
 
 ```bash
-/awl-dev:debug-production-error "production errors in payment service"
-```
-
-### Time-Based Analysis
-
-```bash
-/awl-dev:debug-production-error "spike in errors between 2pm-3pm today"
+/awl-debugging:debug-production-error "Are any errors correlated with the new-checkout feature flag?"
 ```
 
 ### User-Specific
 
 ```bash
-/awl-dev:debug-production-error "errors for user@example.com"
+/awl-debugging:debug-production-error "Show all errors for users on the enterprise plan"
 ```
 
-### Integration with Analytics
-
-If you have both plugins enabled:
+### HogQL Investigation
 
 ```bash
-# Enable both
-/plugin enable awl-debugging
-/plugin enable awl-analytics
-
-# Combined analysis
-> "Show me errors in checkout AND how many users abandoned checkout today"
+/awl-debugging:debug-production-error "Run a HogQL query: count exceptions by type in the last 24 hours"
 ```
 
 ## Workflow Integration
 
-### With Issue Tracking
+### With Session Replay
 
-After identifying root cause:
+After finding an error:
 
 ```bash
-> "Create a GitHub issue for this error with the stack trace and fix recommendations"
+> "Show me the session replay for the most recent occurrence of this error"
 ```
 
 ### With Code Changes
 
-After finding the bug:
+After identifying root cause:
 
 ```bash
-/awl-dev:create-plan "Fix the TypeError in checkout.ts based on Sentry analysis"
-```
-
-## Context Cost
-
-**This plugin adds ~20,670 tokens** to your context window. Disable when debugging is complete:
-
-```bash
-/plugin disable awl-debugging
+/awl-dev:create-plan "Fix the TypeError in checkout.ts based on PostHog error analysis"
 ```
 
 ---

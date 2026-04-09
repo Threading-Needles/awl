@@ -93,5 +93,5 @@ From the same marketplace:
 |--------|---------|
 | awl-pm | Project management (cycles, milestones) |
 | awl-analytics | PostHog integration |
-| awl-debugging | Sentry integration |
+| awl-debugging | PostHog error tracking |
 | awl-meta | Workflow discovery and creation |

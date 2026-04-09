@@ -97,95 +97,6 @@ format_linear_teams() {
 }
 
 #
-# Sentry API helpers
-#
-
-# Discover existing Sentry auth token
-discover_sentry_token() {
-  local token=""
-
-  # Check environment variable
-  if [[ -n "${SENTRY_AUTH_TOKEN:-}" ]]; then
-    echo "env" >&2
-    echo "$SENTRY_AUTH_TOKEN"
-    return 0
-  fi
-
-  # Check ~/.sentryclirc file
-  if [[ -f ~/.sentryclirc ]]; then
-    token=$(grep -E '^token\s*=' ~/.sentryclirc 2>/dev/null | cut -d'=' -f2 | tr -d '[:space:]' || echo "")
-    if [[ -n "$token" ]]; then
-      echo "file" >&2
-      echo "$token"
-      return 0
-    fi
-  fi
-
-  return 1
-}
-
-# Validate Sentry auth token and get org/projects
-validate_sentry_token() {
-  local token="$1"
-
-  # Get organizations
-  local orgs_response
-  orgs_response=$(curl -s -X GET \
-    -H "Authorization: Bearer $token" \
-    https://sentry.io/api/0/organizations/ 2>&1)
-
-  # Check if valid JSON and has data
-  if ! echo "$orgs_response" | jq -e '.' >/dev/null 2>&1; then
-    echo '{"valid": false, "error": "Invalid response from API"}' >&2
-    return 1
-  fi
-
-  if echo "$orgs_response" | jq -e '.detail' >/dev/null 2>&1; then
-    local error=$(echo "$orgs_response" | jq -r '.detail')
-    echo "{\"valid\": false, \"error\": \"$error\"}" >&2
-    return 1
-  fi
-
-  # Get first org slug
-  local org_slug=$(echo "$orgs_response" | jq -r '.[0].slug // empty')
-
-  if [[ -z "$org_slug" ]]; then
-    echo '{"valid": false, "error": "No organizations found"}' >&2
-    return 1
-  fi
-
-  # Get projects for first org
-  local projects_response
-  projects_response=$(curl -s -X GET \
-    -H "Authorization: Bearer $token" \
-    "https://sentry.io/api/0/organizations/$org_slug/projects/" 2>&1)
-
-  # Return validation result
-  jq -n \
-    --argjson orgs "$orgs_response" \
-    --argjson projects "$projects_response" \
-    '{
-      valid: true,
-      organizations: $orgs,
-      projects: $projects
-    }'
-}
-
-# Format Sentry organizations for user selection
-format_sentry_orgs() {
-  local orgs_json="$1"
-
-  echo "$orgs_json" | jq -r '.[] | "\(.slug): \(.name)"'
-}
-
-# Format Sentry projects for user selection
-format_sentry_projects() {
-  local projects_json="$1"
-
-  echo "$projects_json" | jq -r '.[] | "\(.slug): \(.name)"'
-}
-
-#
 # PostHog API helpers
 #
 
@@ -241,14 +152,8 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     validate-linear)
       validate_linear_token "${2:-}"
       ;;
-    discover-sentry)
-      discover_sentry_token
-      ;;
-    validate-sentry)
-      validate_sentry_token "${2:-}"
-      ;;
     *)
-      echo "Usage: $0 {discover-linear|validate-linear|discover-sentry|validate-sentry}"
+      echo "Usage: $0 {discover-linear|validate-linear}"
       exit 1
       ;;
   esac

@@ -30,7 +30,7 @@ chmod +x setup-awl.sh
 **What this does:**
 - Checks/installs prerequisites (jq)
 - Creates project configuration
-- Prompts for API tokens (Linear, Sentry, etc.)
+- Prompts for API tokens (Linear, PostHog, etc.)
 
 **Then:**
 ```bash
@@ -68,7 +68,7 @@ Awl is distributed as a 5-plugin system. Install what you need:
 # Optional: Analytics (PostHog integration)
 /plugin install awl-analytics
 
-# Optional: Debugging (Sentry integration)
+# Optional: Debugging (PostHog error tracking)
 /plugin install awl-debugging
 
 # Optional: Workflow discovery
@@ -114,8 +114,8 @@ For the best experience, install these complementary plugins from the Claude Cod
 - ~40k context when enabled
 
 **awl-debugging** (Enable for incident response):
-- Sentry MCP integration
-- ~20k context when enabled
+- PostHog error tracking, session replay, and HogQL
+- Shares PostHog MCP with awl-analytics
 
 **awl-meta** (Advanced users):
 - Discover and import workflows from community
@@ -191,13 +191,8 @@ This file contains **API tokens and secrets** and is **never committed** to git.
       "teamKey": "ACME",
       "defaultTeam": "ACME"
     },
-    "sentry": {
-      "org": "acme-corp",
-      "project": "acme-web",
-      "authToken": "sntrys_..."
-    },
     "posthog": {
-      "apiKey": "...",
+      "apiKey": "phx_...",
       "projectId": "..."
     },
     "exa": {
@@ -315,31 +310,7 @@ Project config (`.claude/config.json`):
 }
 ```
 
-### Sentry (Error Monitoring)
-
-**Installation**:
-```bash
-curl -sL https://sentry.io/get-cli/ | sh
-```
-
-**Configuration**:
-
-Secrets config:
-```json
-{
-  "awl": {
-    "sentry": {
-      "org": "your-org",
-      "project": "your-project",
-      "authToken": "sntrys_..."
-    }
-  }
-}
-```
-
-**Authentication**: Set `SENTRY_AUTH_TOKEN` or configure `~/.sentryclirc`
-
-### PostHog (Analytics)
+### PostHog (Analytics & Error Tracking)
 
 Secrets config:
 ```json

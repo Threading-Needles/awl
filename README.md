@@ -21,9 +21,8 @@ Awl integrates with your development tools through MCP servers and CLI tools:
   - `awl-dev`: PR creation, branch management, worktree workflows
 
 ### Error Monitoring & Debugging
-- **Sentry** - Production error monitoring, stack traces, root cause analysis (MCP + CLI)
-  - `awl-debugging`: Sentry MCP integration (~20k tokens when enabled)
-  - Supports single-project and multi-project configurations
+- **PostHog** - Error tracking, session replay, stack traces, HogQL queries (MCP)
+  - `awl-debugging`: PostHog error tracking MCP integration
 
 ### Deployment & Infrastructure
 - **Railway** - Deployment logs, service health, environment variables (CLI via `railway`)
@@ -84,9 +83,9 @@ and shared memory systems.
 
 **awl-debugging** (Optional - Enable when needed)
 
-- Sentry MCP integration (~20k context)
+- PostHog error tracking, session replay, and HogQL
 - Production error monitoring and debugging
-- Stack trace analysis and root cause detection
+- Stack trace analysis and session replay context
 - 3 specialized debugging commands
 
 **awl-meta** (Optional - For advanced users)
@@ -111,7 +110,7 @@ chmod +x setup-awl.sh
 This script will guide you through:
 - Prerequisites check and installation (jq, etc.)
 - Project configuration (ticket prefix, project name)
-- Integration setup (Linear, Sentry, Railway, PostHog, Exa)
+- Integration setup (Linear, PostHog, Railway, Exa)
 
 **Then install the plugins:**
 
@@ -147,7 +146,7 @@ Alternatively, install plugins manually via Claude Code plugin system:
 # Optional: Install analytics plugin (if you use PostHog)
 /plugin install awl-analytics
 
-# Optional: Install debugging plugin (if you use Sentry)
+# Optional: Install debugging plugin (PostHog error tracking)
 /plugin install awl-debugging
 
 # Optional: Install meta plugin (workflow discovery)
@@ -169,7 +168,7 @@ Plugins automatically load/unload MCPs when enabled/disabled:
 /plugin disable awl-analytics  # Unloads PostHog MCP (-40k context)
 
 # Enable debugging for incident response
-/plugin enable awl-debugging  # Loads Sentry MCP (+20k context)
+/plugin enable awl-debugging  # Loads PostHog error tracking MCP
 
 # Can enable multiple plugins simultaneously
 /plugin enable awl-pm awl-analytics awl-debugging
@@ -278,13 +277,10 @@ Uses the official Linear MCP server for rich Linear integration with structured 
 
 - `gh` - GitHub CLI
 - `railway` - Railway deployments
-- `sentry-cli` - Error monitoring
-
 **MCP Tools** (bundled with plugins):
 
 - Context7 & DeepWiki - Built into `awl-dev` (~3.5k tokens)
-- PostHog - Built into `awl-analytics` (~40k tokens when enabled)
-- Sentry - Built into `awl-debugging` (~20k tokens when enabled)
+- PostHog - Built into `awl-analytics` and `awl-debugging`
 
 Run the prerequisite check:
 

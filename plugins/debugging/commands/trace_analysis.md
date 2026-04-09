@@ -1,131 +1,133 @@
 ---
-description: Analyze distributed traces and performance issues with Sentry
+description: Analyze session replays and error context using PostHog
 category: debugging
 tools: Task, TodoWrite
 model: inherit
-version: 1.0.0
+version: 2.0.0
 ---
 
 # Trace Analysis
 
-Investigate distributed traces, transaction performance, and slow requests using Sentry.
+Investigate user sessions, error context, and performance using PostHog session replay and HogQL.
 
 ## Usage
 
 ```bash
-/awl-debugging:trace-analysis <trace-id-or-query>
+/awl-debugging:trace-analysis <session-id-or-query>
 
 Examples:
-  /awl-debugging:trace-analysis "a4d1aae7216b47ff8117cf4e09ce9d0a"
-  /awl-debugging:trace-analysis "slow API requests to /checkout"
-  /awl-debugging:trace-analysis "traces with >5 second response time"
-  /awl-debugging:trace-analysis "performance issues in payment service"
+  /awl-debugging:trace-analysis "session for error issue abc123"
+  /awl-debugging:trace-analysis "slow page loads on checkout"
+  /awl-debugging:trace-analysis "user journey before crash"
+  /awl-debugging:trace-analysis "network errors in payment flow"
 ```
 
 ## What This Analyzes
 
-### Trace Components
+### Session Replay
 
-- Transaction spans (API calls, DB queries, external services)
-- Timing breakdown per span
-- Parent-child span relationships
-- Span operations and descriptions
+- User actions (clicks, navigation, scrolling)
+- Console log output during the session
+- Network requests and responses
+- Page load performance
+- Error events within the session
 
-### Performance Metrics
+### HogQL Performance Queries
 
-- Total transaction duration
-- Time spent in each service
-- Database query performance
-- External API latency
-- Network overhead
+- Page load times across routes
+- Slow network requests
+- Error rates by page or feature
+- User flow bottlenecks
 
-### Bottleneck Identification
+### Error-Session Correlation
 
-- Slowest spans in trace
-- Sequential vs parallel operations
-- N+1 query detection
-- Inefficient operations
+- Which sessions had errors
+- What happened before each error
+- Common patterns across error sessions
+- User behavior post-error (did they retry, leave, etc.)
 
 ## Example Analyses
 
-### Specific Trace Investigation
+### Session Replay for an Error
 
 ```bash
-/awl-debugging:trace-analysis "Analyze trace abc123def456: where's the bottleneck?"
+/awl-debugging:trace-analysis "Show session replay for the most recent checkout error"
 ```
 
-### Performance Pattern
+### Performance Investigation
 
 ```bash
-/awl-debugging:trace-analysis "Why are checkout API requests slow today?"
+/awl-debugging:trace-analysis "Which pages have the slowest load times this week?"
 ```
 
-### Service Comparison
+### User Flow Analysis
 
 ```bash
-/awl-debugging:trace-analysis "Compare performance of payment service vs order service"
+/awl-debugging:trace-analysis "What are users doing before they hit the payment error?"
 ```
 
-### Database Performance
+### Network Issues
 
 ```bash
-/awl-debugging:trace-analysis "Find traces with slow database queries in user service"
+/awl-debugging:trace-analysis "Find sessions with failed API calls to /api/checkout"
 ```
 
 ## Output Format
 
 Analysis includes:
 
-**Trace Overview**:
+**Session Overview**:
 
-- Transaction name and operation
-- Total duration
-- Timestamp
-- Environment and release
+- Session ID and duration
+- User properties
+- Pages visited
+- Events triggered
 
-**Span Breakdown**:
+**Console & Network**:
 
 ```
-Transaction: POST /api/checkout (2.4s)
-├─ Authentication (45ms)
-├─ Database Query: SELECT users (120ms)
-├─ External API: Payment Gateway (1.8s) ⚠️ SLOW
-├─ Database Query: INSERT orders (230ms)
-└─ Email Service (180ms)
+Console Log:
+  [10:45:12] Fetching user profile...
+  [10:45:13] Profile loaded
+  [10:45:15] Submitting payment...
+  [10:45:18] ERROR: PaymentError: Card declined
+
+Network Requests:
+  GET /api/user/profile → 200 (120ms)
+  POST /api/payment → 402 (2.4s) ⚠️
+  GET /api/retry-options → 200 (80ms)
 ```
 
-**Performance Insights**:
+**Error Context**:
 
-- Slowest operations
-- Time distribution (pie chart/percentages)
-- Parallel vs sequential execution
-- Optimization opportunities
+- What happened in the 30 seconds before the error
+- User actions leading to the error
+- Any related console warnings
 
-**Recommendations**:
+**HogQL Insights**:
 
-- Cache frequently accessed data
-- Optimize specific queries
-- Implement async processing
-- Add timeouts for external calls
+- Aggregate patterns across sessions
+- Time distribution of issues
+- Affected user segments
 
 ## Advanced Analysis
 
-### Multi-Trace Patterns
+### Cross-Session Patterns
 
 ```bash
-/awl-debugging:trace-analysis "Find common bottlenecks across all slow checkout traces today"
+/awl-debugging:trace-analysis "Common user actions before TypeError across all sessions this week"
 ```
 
-### Service Dependencies
+### Feature Flag Correlation
 
 ```bash
-/awl-debugging:trace-analysis "Map service call chain for failed transactions"
+/awl-debugging:trace-analysis "Compare session error rates between feature flag variants"
 ```
 
-### Error Correlation
+### Performance Regression
 
 ```bash
-/awl-debugging:trace-analysis "Traces that resulted in errors: what went wrong before?"
+/awl-debugging:trace-analysis "HogQL: average page load time by day for the last 14 days"
 ```
 
 ## Integration Opportunities
@@ -133,11 +135,11 @@ Transaction: POST /api/checkout (2.4s)
 ### With Error Debugging
 
 ```bash
-# Enable debugging plugin (if not already)
+# Enable debugging plugin
 /plugin enable awl-debugging
 
-# Combine trace and error analysis
-> "Show me the trace for the transaction that caused error ISSUE-456"
+# Find the error, then trace the session
+> "Get error details for the top checkout error, then show its session replay"
 ```
 
 ### With Code Changes
@@ -145,56 +147,16 @@ Transaction: POST /api/checkout (2.4s)
 After identifying bottleneck:
 
 ```bash
-/awl-dev:create-plan "Optimize the slow payment gateway call identified in trace analysis"
-```
-
-## Performance Optimization Workflow
-
-### 1. Identify Slow Transactions
-
-```bash
-/awl-debugging:trace-analysis "transactions with >2s response time in last hour"
-```
-
-### 2. Analyze Bottlenecks
-
-```bash
-> "Drill into the slowest trace: which span is the problem?"
-```
-
-### 3. Root Cause
-
-```bash
-> "Why is the database query taking 800ms?"
-```
-
-### 4. Implement Fix
-
-```bash
-/awl-dev:create-plan "Add database index for user lookups based on trace analysis"
-```
-
-### 5. Verify Improvement
-
-```bash
-> "After deploy, compare trace durations before and after"
+/awl-dev:create-plan "Optimize the slow payment API call identified in session analysis"
 ```
 
 ## Tips
 
-1. **Start with aggregates** - "slow checkouts" before diving into specific traces
-2. **Look for patterns** - One slow trace might be an outlier, many indicate systemic issue
-3. **Check external dependencies** - Third-party APIs often cause slowdowns
-4. **Consider concurrency** - Sequential operations that could be parallel
-5. **Database queries** - N+1 queries, missing indexes, inefficient queries
-
-## Context Cost
-
-Plugin uses ~20k tokens. Disable after analysis:
-
-```bash
-/plugin disable awl-debugging
-```
+1. **Start with errors** - Find error issues first, then trace their sessions
+2. **Check console logs** - Often reveal the root cause faster than stack traces
+3. **Look at network requests** - Failed or slow API calls cause many user-facing errors
+4. **Use HogQL for aggregates** - Individual sessions show specifics, HogQL shows patterns
+5. **Check feature flags** - Session behavior may differ by flag variant
 
 ---
 

@@ -26,9 +26,9 @@ Run all checks and output a structured status report:
 ## Environment Variables
 
 ✅ Linear MCP connected
-❌ SENTRY_AUTH_TOKEN is not set
-   → Get token: https://sentry.io/settings/api-keys/
-   → Set: export SENTRY_AUTH_TOKEN=your_token
+❌ POSTHOG_AUTH_HEADER is not set
+   → Get key: PostHog → Settings → Personal API Keys
+   → Set: export POSTHOG_AUTH_HEADER="Bearer phx_YOUR_KEY"
 
 ## Required Plugins (Manual Verification Needed)
 
@@ -97,16 +97,6 @@ for tool_spec in "${REQUIRED_TOOLS[@]}"; do
     fi
 done
 
-# Optional tools
-OPTIONAL_TOOLS=("sentry-cli:Sentry CLI:curl -sL https://sentry.io/get-cli/ | sh")
-
-for tool_spec in "${OPTIONAL_TOOLS[@]}"; do
-    IFS=: read -r cmd name install <<< "$tool_spec"
-    if ! command -v "$cmd" &>/dev/null; then
-        echo "○ $cmd ($name) - optional"
-        echo "   → Install: $install"
-    fi
-done
 ```
 
 ### Step 3: Check Environment Variables
@@ -120,9 +110,10 @@ echo "ℹ️  Linear integration uses the official Linear MCP server"
 echo "   Verify by running a Linear command (e.g., /awl-dev:linear)"
 
 # Optional env vars
-if [[ -z "${SENTRY_AUTH_TOKEN:-}" ]]; then
-    echo "○ SENTRY_AUTH_TOKEN (optional, for awl-debugging)"
-    echo "   → Get token: https://sentry.io/settings/api-keys/"
+if [[ -z "${POSTHOG_AUTH_HEADER:-}" ]]; then
+    echo "○ POSTHOG_AUTH_HEADER (optional, for awl-debugging and awl-analytics)"
+    echo "   → Get key: PostHog → Settings → Personal API Keys"
+    echo "   → Format: Bearer phx_YOUR_KEY"
 fi
 ```
 

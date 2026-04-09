@@ -8,7 +8,6 @@ This guide explains how to integrate the smart configuration functions into `set
 
 1. **`scripts/awl-integration-helpers.sh`** - API discovery and validation functions
 2. **`scripts/smart-linear-config.sh`** - Smart Linear configuration prompt
-3. **`scripts/smart-sentry-config.sh`** - Smart Sentry configuration prompt
 
 ---
 
@@ -33,12 +32,6 @@ else
   USE_SMART_LINEAR=false
 fi
 
-if [[ -f "${SCRIPT_DIR}/scripts/smart-sentry-config.sh" ]]; then
-  source "${SCRIPT_DIR}/scripts/smart-sentry-config.sh"
-  USE_SMART_SENTRY=true
-else
-  USE_SMART_SENTRY=false
-fi
 ```
 
 ### Step 2: Update setup_awl_secrets Function
@@ -51,8 +44,6 @@ Replace the prompt calls in `setup_awl_secrets()` (around line 649):
 prompt_linear_config "$existing_config" > /tmp/awl-config-temp.json
 existing_config=$(cat /tmp/awl-config-temp.json)
 
-prompt_sentry_config "$existing_config" > /tmp/awl-config-temp.json
-existing_config=$(cat /tmp/awl-config-temp.json)
 ```
 
 **After:**
@@ -62,13 +53,6 @@ if [[ "$USE_SMART_LINEAR" == "true" ]]; then
   prompt_linear_config_smart "$existing_config" > /tmp/awl-config-temp.json
 else
   prompt_linear_config "$existing_config" > /tmp/awl-config-temp.json
-fi
-existing_config=$(cat /tmp/awl-config-temp.json)
-
-if [[ "$USE_SMART_SENTRY" == "true" ]]; then
-  prompt_sentry_config_smart "$existing_config" > /tmp/awl-config-temp.json
-else
-  prompt_sentry_config "$existing_config" > /tmp/awl-config-temp.json
 fi
 existing_config=$(cat /tmp/awl-config-temp.json)
 ```
@@ -90,9 +74,6 @@ chmod +x scripts/awl-integration-helpers.sh
 ```bash
 # Test Linear discovery
 ./scripts/awl-integration-helpers.sh discover-linear
-
-# Test Sentry discovery
-./scripts/awl-integration-helpers.sh discover-sentry
 ```
 
 ### Test Token Validation
@@ -100,9 +81,6 @@ chmod +x scripts/awl-integration-helpers.sh
 ```bash
 # Test Linear validation (replace with real token)
 ./scripts/awl-integration-helpers.sh validate-linear "lin_api_..."
-
-# Test Sentry validation (replace with real token)
-./scripts/awl-integration-helpers.sh validate-sentry "sntrys_..."
 ```
 
 ### Test Full Setup Flow
@@ -110,12 +88,11 @@ chmod +x scripts/awl-integration-helpers.sh
 ```bash
 # Set up test tokens
 echo "lin_api_test..." > ~/.linear_api_token
-echo -e "[auth]\ntoken=sntrys_test..." > ~/.sentryclirc
 
 # Run setup
 ./setup-awl.sh
 
-# Should auto-discover both tokens and validate them
+# Should auto-discover Linear token and validate it
 ```
 
 ---
@@ -181,14 +158,6 @@ The integration is **fully backward compatible**:
 - **Method**: POST (GraphQL)
 - **Auth**: Header `Authorization: TOKEN`
 - **Scopes needed**: Read user, organization, teams
-
-### Sentry
-- **Endpoints**:
-  - `https://sentry.io/api/0/organizations/`
-  - `https://sentry.io/api/0/organizations/{org}/projects/`
-- **Method**: GET
-- **Auth**: Header `Authorization: Bearer TOKEN`
-- **Scopes needed**: `org:read`, `project:read`
 
 ---
 
@@ -261,14 +230,12 @@ If issues arise, rollback is simple:
 ```bash
 # Comment out or remove these lines
 # source "${SCRIPT_DIR}/scripts/smart-linear-config.sh"
-# source "${SCRIPT_DIR}/scripts/smart-sentry-config.sh"
 ```
 
 2. Remove conditional calls:
 ```bash
 # Revert to original
 prompt_linear_config "$existing_config" > /tmp/awl-config-temp.json
-prompt_sentry_config "$existing_config" > /tmp/awl-config-temp.json
 ```
 
 3. Keep files for future use
@@ -293,7 +260,6 @@ Example addition to README:
 The setup script automatically discovers and validates existing API tokens:
 
 - **Linear**: Checks `LINEAR_API_TOKEN` env or `~/.linear_api_token`
-- **Sentry**: Checks `SENTRY_AUTH_TOKEN` env or `~/.sentryclirc`
 
 If found, it validates the token and auto-populates organization and team information.
 No more manual copying of org slugs and team keys!
@@ -317,13 +283,12 @@ For issues or questions:
 
 3. Check file permissions:
    ```bash
-   ls -la ~/.linear_api_token ~/.sentryclirc
+   ls -la ~/.linear_api_token
    ```
 
 4. Verify environment variables:
    ```bash
    echo $LINEAR_API_TOKEN
-   echo $SENTRY_AUTH_TOKEN
    ```
 
 ---

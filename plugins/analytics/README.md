@@ -170,7 +170,7 @@ When enabled, this plugin provides access to:
 ## Related Plugins
 
 - **awl-dev** - Core development workflow (always enabled)
-- **awl-debugging** - Sentry error monitoring (enable for debugging)
+- **awl-debugging** - PostHog error tracking and session replay (enable for debugging)
 - **awl-meta** - Workflow discovery and creation
 
 ## Version

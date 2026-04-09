@@ -18,7 +18,6 @@ REQUIRED_TOOLS=(
 
 # Optional tools (command:name:install-instruction)
 OPTIONAL_TOOLS=(
-	"sentry-cli:Sentry CLI:curl -sL https://sentry.io/get-cli/ | sh"
 )
 
 # Required environment variables
