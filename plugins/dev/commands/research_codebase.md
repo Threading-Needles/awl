@@ -75,12 +75,7 @@ Use `mcp__linear__get_issue` with the ticket ID to retrieve the issue details. E
 
 5. **Read the ticket details** (both modes):
 
-```bash
-linearis issues read "$TICKET_ID"
-```
-
-Read the ticket title, description, labels, priority, and estimate. You need this context to assess
-whether the ticket is clear enough to start research.
+Use `mcp__linear__get_issue` with the ticket ID to retrieve the full ticket details including title, description, labels, priority, and estimate. You need this context to assess whether the ticket is clear enough to start research.
 
 6. **Branch based on mode**:
 
@@ -100,10 +95,9 @@ Signs that a ticket needs clarification:
 After getting answers, **update the ticket description** in Linear with the clarified intent so the
 context is preserved for the team:
 
-```bash
-linearis issues update "$TICKET_ID" --description "${UPDATED_DESCRIPTION}"
-linearis comments create "$TICKET_ID" --body "Clarified ticket scope before research:\n${SUMMARY_OF_CLARIFICATIONS}"
-```
+Use `mcp__linear__save_issue` with the ticket ID and the updated description.
+
+Then use `mcp__linear__save_comment` with the ticket ID and body "Clarified ticket scope before research:\n{SUMMARY_OF_CLARIFICATIONS}".
 
 If the ticket is clear, just confirm the research focus:
 

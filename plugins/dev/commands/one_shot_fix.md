@@ -1,7 +1,7 @@
 ---
 description: Apply a quick fix for simple tickets without formal research or planning
 category: workflow
-tools: Read, Write, Edit, Grep, Glob, Task, TodoWrite, Bash
+tools: Read, Write, Edit, Grep, Glob, Task, TodoWrite, Bash, mcp__linear__get_issue, mcp__linear__save_issue, mcp__linear__save_comment
 model: inherit
 version: 1.0.0
 argument-hint: "[TICKET-ID]"
@@ -57,19 +57,13 @@ CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
 
 Skip "Research in Progress" and "Plan in Progress" — go straight to "In Dev":
 
-```bash
-linearis issues update "$TICKET_ID" --state "In Dev"
-linearis comments create "$TICKET_ID" --body "Starting one-shot fix"
-```
+Use `mcp__linear__save_issue` with the ticket ID to update the state to "In Dev".
+
+Then use `mcp__linear__save_comment` with the ticket ID and body "Starting one-shot fix".
 
 ## Step 3: Read the Ticket
 
-```bash
-linearis issues read "$TICKET_ID"
-```
-
-Read and fully understand the ticket title, description, labels, and any mentioned files or
-components.
+Use `mcp__linear__get_issue` with the ticket ID to retrieve the full ticket details. Read and fully understand the ticket title, description, labels, and any mentioned files or components.
 
 ## Step 4: Quick Codebase Assessment
 
@@ -155,10 +149,9 @@ Any changes made so far are preserved on the current branch.
 
 Update the ticket status back:
 
-```bash
-linearis issues update "$TICKET_ID" --state "Backlog"
-linearis comments create "$TICKET_ID" --body "One-shot fix escalated to full workflow: ${REASON}"
-```
+Use `mcp__linear__save_issue` with the ticket ID to update the state back to "Backlog".
+
+Then use `mcp__linear__save_comment` with the ticket ID and body "One-shot fix escalated to full workflow: {REASON}".
 
 Then stop execution.
 
@@ -217,10 +210,9 @@ Automatically invoke `/awl-dev:create_pr` to create the pull request.
 
 On any unrecoverable failure:
 
-```bash
-linearis issues update "$TICKET_ID" --state "Backlog"
-linearis comments create "$TICKET_ID" --body "One-shot fix failed: ${ERROR_REASON}. Consider using full research workflow."
-```
+Use `mcp__linear__save_issue` with the ticket ID to update the state back to "Backlog".
+
+Then use `mcp__linear__save_comment` with the ticket ID and body "One-shot fix failed: {ERROR_REASON}. Consider using full research workflow."
 
 ### Ticket Not Found
 
@@ -230,7 +222,6 @@ Ticket {TICKET_ID} not found in Linear.
 Please verify:
 1. The ticket ID is correct (e.g., PROJ-123)
 2. You have access to this Linear team
-3. LINEAR_API_TOKEN is set correctly
 ```
 
 ## Important Notes
