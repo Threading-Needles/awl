@@ -33,7 +33,7 @@ MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
 ```
 
 **Mode behavior:**
-- **Interactive**: Discuss options with user, ask clarifying questions
+- **Interactive**: Discuss options with user, ask clarifying questions using **AskUserQuestion** tool
 - **Headless**: Use research context to make decisions, embed questions in plan document
 
 ## Initial Response
@@ -307,21 +307,18 @@ After Step 4b, continue to Step 5 (Save Plan to Linear) with the iteration path.
 
 4. **Read all files identified by research tasks** FULLY into main context
 
-5. **Present informed understanding and focused questions**:
+5. **Present informed understanding and ask focused questions**:
 
-   ```
-   Based on the ticket and my research of the codebase, I understand we need to [accurate summary].
+   Present a brief summary of your understanding, then use the **AskUserQuestion** tool for any
+   questions that your research couldn't answer. Examples:
+   - Technical decisions that require human judgment
+   - Business logic clarifications
+   - Design preferences that affect implementation
 
-   I've found that:
-   - [Current implementation detail with file:line reference]
-   - [Relevant pattern or constraint discovered]
-   - [Potential complexity or edge case identified]
+   **In interactive mode**: Always use AskUserQuestion — do NOT just print questions as text.
+   Wait for answers before proceeding.
 
-   Questions that my research couldn't answer:
-   - [Specific technical question that requires human judgment]
-   - [Business logic clarification]
-   - [Design preference that affects implementation]
-   ```
+   **In headless mode**: Note questions for embedding in the plan document later.
 
 ### Step 2: Research & Discovery
 
@@ -349,25 +346,20 @@ After getting initial clarifications:
 
 2. **Wait for ALL sub-tasks to complete** before proceeding
 
-3. **Present findings and design options**:
+3. **Present findings and ask design questions**:
 
-   ```
-   Based on my research, here's what I found:
+   Present a brief summary of your findings and the design options you've identified.
 
-   **Current State:**
-   - [Key discovery about existing code]
-   - [Pattern or convention to follow]
+   **In interactive mode**: Use the **AskUserQuestion** tool to ask about design choices and open
+   questions. Frame options clearly so the user can choose. Examples:
+   - "Which approach should we use?" with concrete options
+   - "Should we prioritize X or Y?"
+   - Technical uncertainties that affect the plan
 
-   **Design Options:**
-   1. [Option A] - [pros/cons]
-   2. [Option B] - [pros/cons]
+   Wait for the user's answers before proceeding to plan structure.
 
-   **Open Questions:**
-   - [Technical uncertainty]
-   - [Design decision needed]
-
-   Which approach aligns best with your vision?
-   ```
+   **In headless mode**: Make reasonable decisions based on research findings and note any
+   questions for the document.
 
 ### Step 3: Plan Structure Development
 
@@ -471,7 +463,8 @@ After structure approval, create the plan document content:
 
 ## Questions for User
 
-{ONLY include this section in headless mode when questions arise during planning}
+{HEADLESS MODE ONLY — In interactive mode, all questions were already asked and answered via
+AskUserQuestion during the planning process. Do NOT include this section in interactive mode.}
 
 {If ASSIGNEE is set:}
 @{ASSIGNEE} - Please answer before proceeding to /awl-dev:implement-plan:
