@@ -128,7 +128,7 @@ The workflow context file (`.claude/.workflow-context.json`) stores only the cur
 
 ## Embedded Questions
 
-When running in headless mode (`CLAUDE_MODE=headless claude -p`), workflow commands cannot use the
+When running in headless mode (`claude -p`), workflow commands cannot use the
 interactive `AskUserQuestion` tool. Instead, questions are embedded directly in Research and Plan
 documents for async answering via the Linear UI.
 

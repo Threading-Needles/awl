@@ -664,16 +664,10 @@ When running Claude Code with `claude -p` (headless/print mode), interactive que
 `AskUserQuestion` is not available. The mode-aware workflow commands adapt by embedding questions
 directly in Linear documents.
 
-**Important:** Set `CLAUDE_MODE=headless` when using `claude -p` so commands detect headless mode:
-
-```bash
-CLAUDE_MODE=headless claude -p "/awl-dev:research-codebase TN-123"
-```
-
 ### How It Works
 
 ```
-Headless: CLAUDE_MODE=headless claude -p "/awl-dev:research-codebase TN-123"
+Headless: claude -p "/awl-dev:research-codebase TN-123"
                      ↓
          Research executes autonomously
                      ↓
@@ -683,7 +677,7 @@ Headless: CLAUDE_MODE=headless claude -p "/awl-dev:research-codebase TN-123"
                      ↓
          User answers in Linear UI
                      ↓
-Headless: CLAUDE_MODE=headless claude -p "/awl-dev:create-plan"
+Headless: claude -p "/awl-dev:create-plan"
                      ↓
          Validates Research answers
                      ↓
@@ -703,7 +697,8 @@ MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
 **Detection priority:**
 1. `CLAUDE_MODE` env var (explicit override, always wins)
 2. `CLAUDE_NON_INTERACTIVE=1` (set by piped input, CI/CD)
-3. Default: `interactive`
+3. `CLAUDE_CODE_ENTRYPOINT=sdk-cli` (set by `claude -p`)
+4. Default: `interactive`
 
 **Interactive mode:**
 - Uses `AskUserQuestion` tool for clarifications
@@ -759,7 +754,7 @@ When a document contains unanswered questions:
 
 ```bash
 # 1. Start research in headless mode
-CLAUDE_MODE=headless claude -p "/awl-dev:research-codebase TN-123"
+claude -p "/awl-dev:research-codebase TN-123"
 # → Creates Research doc with embedded questions
 # → Sets ticket to "Spec Needed"
 
@@ -767,14 +762,14 @@ CLAUDE_MODE=headless claude -p "/awl-dev:research-codebase TN-123"
 # → Opens Research doc, fills in answers
 
 # 3. Continue with planning
-CLAUDE_MODE=headless claude -p "/awl-dev:create-plan"
+claude -p "/awl-dev:create-plan"
 # → Validates Research answers
 # → Creates Plan doc (may have its own questions)
 
 # 4. If Plan has questions, answer them in Linear
 
 # 5. Continue with implementation
-CLAUDE_MODE=headless claude -p "/awl-dev:implement-plan"
+claude -p "/awl-dev:implement-plan"
 # → Validates Plan answers
 # → Implements phases
 # → Auto-validates, creates PR, runs review

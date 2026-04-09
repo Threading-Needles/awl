@@ -102,16 +102,16 @@ detect-mode)
 	# Priority order:
 	#   1. CLAUDE_MODE env var (explicit override, always wins)
 	#   2. CLAUDE_NON_INTERACTIVE=1 (set by piped input, CI/CD, scheduled tasks)
-	#   3. Default: interactive
-	#
-	# For claude -p usage, set CLAUDE_MODE=headless:
-	#   CLAUDE_MODE=headless claude -p "prompt"
+	#   3. CLAUDE_CODE_ENTRYPOINT=sdk-cli (set by claude -p)
+	#   4. Default: interactive
 	#
 	# Note: TTY checks ([ -t 0 ]) don't work because Claude Code runs bash
 	# commands in subprocesses without a real TTY even in interactive mode.
 	if [[ -n "${CLAUDE_MODE:-}" ]]; then
 		echo "$CLAUDE_MODE"
 	elif [[ "${CLAUDE_NON_INTERACTIVE:-}" == "1" ]]; then
+		echo "headless"
+	elif [[ "${CLAUDE_CODE_ENTRYPOINT:-}" == "sdk-cli" ]]; then
 		echo "headless"
 	else
 		echo "interactive"
