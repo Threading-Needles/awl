@@ -268,6 +268,9 @@ awl/
 │   │   │   ├── external-research.md
 │   │   │   └── README.md
 │   │   ├── commands/        # Core workflow commands
+│   │   │   ├── route.md             # Smart entry point (routes to one-shot or full workflow)
+│   │   │   ├── one_shot_fix.md      # Quick fix for simple tickets
+│   │   │   ├── babysit_pr.md        # Monitor PR through CI and run test plan
 │   │   │   ├── commit.md
 │   │   │   ├── debug.md
 │   │   │   ├── describe_pr.md
@@ -335,7 +338,36 @@ awl/
 
 ## Core Workflows
 
-### Research → Plan → Implement (Full Automation)
+### Route (Smart Entry Point)
+
+```
+/route PROJ-123
+```
+
+The router reads the ticket, assesses complexity, and delegates to the right path:
+
+- **One-shot fix**: Simple tickets (small bugs, config changes, typos) → `/one-shot-fix`
+- **Full research**: Complex tickets (features, refactors, multi-system changes) → `/research-codebase`
+
+High confidence decisions auto-route immediately. Uncertain decisions ask the user to choose.
+Users can always bypass the router by invoking either command directly.
+
+### One-Shot Fix (Quick Path)
+
+```
+/one-shot-fix PROJ-123
+```
+
+For simple tickets that don't need formal research or planning:
+
+- Reads ticket, quickly assesses what needs to change
+- Proposes fix and waits for confirmation (interactive mode)
+- Implements fix with validation (build, lint, tests)
+- Creates branch, commit, and offers PR creation
+- Skips "Research in Progress" and "Plan in Progress" — goes straight to "In Dev"
+- Escalates to full workflow if unexpected complexity is found
+
+### Research → Plan → Implement (Full Workflow)
 
 **1. Research Phase:**
 

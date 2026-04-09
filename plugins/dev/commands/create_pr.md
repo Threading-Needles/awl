@@ -224,7 +224,23 @@ Update the ticket state to "In Review" using `mcp__linear__save_issue` with the 
 Add a comment using `mcp__linear__save_comment` with the body:
 "PR created and ready for review!\n\n**PR**: $prUrl\n\nDescription has been auto-generated with verification checks."
 
-### 13. Report success
+### 13. Auto-call /awl-dev:babysit_pr
+
+After PR creation and description generation, automatically invoke `/awl-dev:babysit_pr` with the
+PR number to:
+
+- Monitor CI checks until they pass or fail
+- Auto-fix CI failures when possible (lint, type errors, etc.)
+- Extract the deployment preview URL
+- Run visual checks from the test plan against the preview
+- Update the PR description with verified test plan items
+
+Use the Skill tool to invoke `/awl-dev:babysit_pr ${PR_NUMBER}`.
+
+If babysit completes with all checks passing, the PR is ready for human review. If issues are
+found, they'll be reported in the babysit summary.
+
+### 14. Report success
 
 ```
 ✅ Pull request created successfully!
@@ -236,6 +252,7 @@ Add a comment using `mcp__linear__save_comment` with the body:
 **Linear Document**: PR: #{number} - {title}
 
 Description has been generated and verification checks have been run.
+CI has been monitored and test plan items verified.
 Review the PR on GitHub!
 ```
 
@@ -253,6 +270,8 @@ Review the PR on GitHub!
               /awl-dev:describe-pr → PR description
                   ↓
               /awl-dev:create-pr → creates PR on GitHub (this command)
+                  ↓
+            /awl-dev:babysit-pr → monitors CI, runs test plan
                   ↓
               /awl-dev:merge-pr → merges PR
 ```

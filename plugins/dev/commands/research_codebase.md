@@ -73,18 +73,45 @@ Which would you prefer?
 
 Use `mcp__linear__get_issue` with the ticket ID to retrieve the issue details. Extract the assignee name from the response to use for `@mentions` in document sections like "Questions for User".
 
-5. **Branch based on mode**:
+5. **Read the ticket details** (both modes):
+
+```bash
+linearis issues read "$TICKET_ID"
+```
+
+Read the ticket title, description, labels, priority, and estimate. You need this context to assess
+whether the ticket is clear enough to start research.
+
+6. **Branch based on mode**:
 
 **If MODE is "interactive":**
 
-```
-I'm ready to research the codebase for ticket {TICKET_ID}.
+Assess the ticket for ambiguity. If the ticket is clear and well-scoped, proceed directly — no need
+to ask questions. But if the ticket is ambiguous, under-specified, or could be interpreted multiple
+ways, use the **AskUserQuestion** tool to clarify intent BEFORE starting research.
 
-Please provide your research question or area of interest, and I'll analyze it thoroughly
-by exploring relevant components and connections.
+Signs that a ticket needs clarification:
+- Vague title or description (e.g., "Fix the login issue" — which issue?)
+- Multiple possible interpretations of the scope
+- Missing acceptance criteria or expected behavior
+- Unclear which component or system is involved
+- Could be a small fix or a large change depending on interpretation
+
+After getting answers, **update the ticket description** in Linear with the clarified intent so the
+context is preserved for the team:
+
+```bash
+linearis issues update "$TICKET_ID" --description "${UPDATED_DESCRIPTION}"
+linearis comments create "$TICKET_ID" --body "Clarified ticket scope before research:\n${SUMMARY_OF_CLARIFICATIONS}"
 ```
 
-Then wait for the user's research query.
+If the ticket is clear, just confirm the research focus:
+
+```
+I'll research ticket {TICKET_ID}: {title}
+
+{Brief restatement of what you'll investigate}
+```
 
 **If MODE is "headless":**
 
@@ -195,7 +222,29 @@ Task 4 - Find historical context:
 - Include temporal context where relevant (e.g., "This was added in commit abc123")
 - Mark all research tasks as complete in TodoWrite
 
-### Step 5: Gather Metadata for the Research Document
+### Step 5: Ask Clarifying Questions (Interactive Mode Only)
+
+**If MODE is "interactive":**
+
+Before finalizing the research document, review your findings for any questions or ambiguities that
+would affect the planning phase. If you have questions, ask them NOW using the **AskUserQuestion**
+tool — do NOT embed them in the Linear document.
+
+Examples of questions to ask:
+- Ambiguous requirements discovered during research
+- Design decisions that could go multiple ways
+- Scope clarifications (e.g., "Should this cover X as well?")
+- Business logic that can't be determined from code alone
+
+Wait for the user's answers before proceeding. Incorporate their answers into your findings so the
+research document is complete and self-contained — no unanswered questions.
+
+**If MODE is "headless":**
+
+Skip this step. Questions will be embedded in the "Questions for User" section of the document
+(see Step 6).
+
+### Step 6: Gather Metadata for the Research Document
 
 Collect metadata for the research document:
 
@@ -204,7 +253,7 @@ Collect metadata for the research document:
 - Get current branch: `git branch --show-current`
 - Get repository name from working directory
 
-### Step 6: Generate Research Document Content
+### Step 7: Generate Research Document Content
 
 Create a structured research document with the following format:
 
@@ -253,7 +302,8 @@ system in this area. Focus on WHAT EXISTS, not what should exist.}
 
 ## Questions for User
 
-{ONLY include this section in headless mode when questions arise during research}
+{HEADLESS MODE ONLY — In interactive mode, questions were already asked and answered via
+AskUserQuestion in Step 5. Do NOT include this section in interactive mode.}
 
 {If ASSIGNEE is set:}
 @{ASSIGNEE} - Please answer before proceeding to /awl-dev:create-plan:
@@ -310,7 +360,7 @@ understanding could be deepened}
 - {Question 2}
 ```
 
-### Step 7: Save Research Document to Linear
+### Step 8: Save Research Document to Linear
 
 Create the research document in Linear attached to the ticket:
 
@@ -342,7 +392,7 @@ Please answer the questions in the Linear document, then run:
   claude -p "/awl-dev:create-plan"
 ```
 
-### Step 8: Present Findings to User
+### Step 9: Present Findings to User
 
 **Present to user:**
 
@@ -393,7 +443,7 @@ Would you like me to:
 3. Explore related topics?
 ```
 
-### Step 9: Handle Follow-Up Questions
+### Step 10: Handle Follow-Up Questions
 
 If the user has follow-up questions:
 

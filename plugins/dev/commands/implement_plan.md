@@ -422,6 +422,29 @@ After all plan phases complete successfully, automatically execute the following
 4. **Update PR description** (if needed):
    - Call `/awl-dev:describe_pr` to refresh description
 
+### Phase E: Babysit PR
+
+After finalizing the PR, automatically monitor CI and run the test plan:
+
+1. **Call /babysit_pr**:
+   ```
+   Babysitting PR...
+   ```
+
+   Use SlashCommand tool to invoke `/awl-dev:babysit_pr ${PR_NUMBER}`
+
+   This will:
+   - Monitor CI checks until completion
+   - Auto-fix CI failures when possible (max 3 attempts)
+   - Extract deployment preview URL
+   - Run visual checks from the test plan
+   - Update PR description with verified items
+
+2. **Handle results**:
+   - If all checks pass: PR is ready for human review
+   - If CI fails and can't be fixed: Report in final summary
+   - If visual checks fail: Report which items need manual verification
+
 ### Final Report
 
 Present completion summary:
@@ -437,6 +460,7 @@ Present completion summary:
 - ✅ Validation: All checks pass (fixed {X} issues)
 - ✅ PR Created: #{number}
 - ✅ Review: Addressed {Y} items
+- ✅ CI: All checks pass / {status}
 
 ## Linear Documents
 - Research: {link}
