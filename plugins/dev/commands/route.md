@@ -1,7 +1,7 @@
 ---
 description: Route a ticket to the appropriate workflow based on complexity analysis
 category: workflow
-tools: Read, Grep, Glob, Task, Bash
+tools: Read, Grep, Glob, Task, Bash, mcp__linear__get_issue, mcp__linear__save_comment, mcp__linear__list_documents
 model: inherit
 version: 1.0.0
 argument-hint: "[TICKET-ID]"
@@ -52,9 +52,7 @@ Usage: /route PROJ-123
 
 Fetch full ticket details:
 
-```bash
-linearis issues read "$TICKET_ID"
-```
+Use `mcp__linear__get_issue` with the ticket ID to retrieve the full ticket details.
 
 Extract and note these routing-relevant fields:
 
@@ -69,7 +67,7 @@ Extract and note these routing-relevant fields:
 
 Before routing, check for edge cases:
 
-1. **Ticket already has research documents**: Run `linearis attachments list --issue "$TICKET_ID"`
+1. **Ticket already has research documents**: Use `mcp__linear__list_documents` with the issue ID
    and check for documents with title starting with "Research:". If found, inform the user and
    suggest skipping to `/create-plan` instead of re-routing.
 
@@ -171,17 +169,13 @@ Wait for user input before proceeding to delegation.
 
 Route automatically. Log the decision as a Linear comment:
 
-```bash
-linearis comments create "$TICKET_ID" --body "Routing decision: ${DECISION} (confidence: High)\n\nReasoning: ${REASONING}"
-```
+Use `mcp__linear__save_comment` with the ticket ID and body "Routing decision: {DECISION} (confidence: High)\n\nReasoning: {REASONING}".
 
 ### Headless Mode + Medium/Low Confidence
 
 Default to full research (the safer path). Log the decision:
 
-```bash
-linearis comments create "$TICKET_ID" --body "Routing decision: FULL_RESEARCH (confidence: ${CONFIDENCE}, defaulting to safer path)\n\nReasoning: ${REASONING}"
-```
+Use `mcp__linear__save_comment` with the ticket ID and body "Routing decision: FULL_RESEARCH (confidence: {CONFIDENCE}, defaulting to safer path)\n\nReasoning: {REASONING}".
 
 ## Step 6: Delegate
 
@@ -227,10 +221,9 @@ Ticket {TICKET_ID} not found in Linear.
 Please verify:
 1. The ticket ID is correct (e.g., PROJ-123)
 2. You have access to this Linear team
-3. LINEAR_API_TOKEN is set correctly
 ```
 
-**If linearis command fails:**
+**If Linear MCP call fails:**
 
 - Log the error
 - Suggest the user run the desired command directly
