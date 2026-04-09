@@ -366,7 +366,7 @@ You are a specialist at [specific research task].
 
 ```bash
 # In Claude Code (workspace only)
-/validate-frontmatter
+/awl-meta:validate-frontmatter
 ```
 
 ## Common Patterns

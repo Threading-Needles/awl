@@ -56,7 +56,7 @@ When this command is invoked:
 I need a Linear ticket to attach this research to.
 
 Please either:
-1. Provide a ticket ID: `/research-codebase PROJ-123`
+1. Provide a ticket ID: `/awl-dev:research-codebase PROJ-123`
 2. Let me create a new ticket for this research
 
 Which would you prefer?
@@ -256,10 +256,10 @@ system in this area. Focus on WHAT EXISTS, not what should exist.}
 {ONLY include this section in headless mode when questions arise during research}
 
 {If ASSIGNEE is set:}
-@{ASSIGNEE} - Please answer before proceeding to /create-plan:
+@{ASSIGNEE} - Please answer before proceeding to /awl-dev:create-plan:
 
 {If no ASSIGNEE:}
-Please answer before proceeding to /create-plan:
+Please answer before proceeding to /awl-dev:create-plan:
 
 > **Q1 (blocking)**: {Question that must be answered before planning}
 > **Context**: {Why this matters for the plan}
@@ -336,10 +336,10 @@ Then output a clear message:
 **Status**: Spec Needed
 
 The research document has been attached to the ticket with {N} questions
-that need answers before proceeding to /create-plan.
+that need answers before proceeding to /awl-dev:create-plan.
 
 Please answer the questions in the Linear document, then run:
-  claude -p "/create-plan"
+  claude -p "/awl-dev:create-plan"
 ```
 
 ### Step 8: Present Findings to User
@@ -474,13 +474,13 @@ If the user has follow-up questions:
 This command integrates with the complete development workflow:
 
 ```
-/research-codebase PROJ-123 → research document (+ Linear: Research)
+/awl-dev:research-codebase PROJ-123 → research document (+ Linear: Research)
                   ↓
-           /create-plan → implementation plan (+ Linear: Planning)
+           /awl-dev:create-plan → implementation plan (+ Linear: Planning)
                   ↓
-          /implement-plan → code changes (+ Linear: In Progress)
+          /awl-dev:implement-plan → code changes (+ Linear: In Progress)
                   ↓
-              /describe-pr → PR created (+ Linear: In Review)
+              /awl-dev:describe-pr → PR created (+ Linear: In Review)
 ```
 
 **How it connects:**
@@ -493,7 +493,7 @@ This command integrates with the complete development workflow:
 
 ```bash
 # User starts research with ticket
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
 
 # You:
 # 1. Set current ticket in workflow context

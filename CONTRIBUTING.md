@@ -99,7 +99,7 @@ Before committing changes:
 
 3. Write command logic following existing patterns
 4. Test with `/your-command-name` in Claude Code (restart to reload)
-5. Run `/validate-frontmatter` to check formatting
+5. Run `/awl-meta:validate-frontmatter` to check formatting
 
 ### Adding a New Agent
 
@@ -117,7 +117,7 @@ Before committing changes:
 
 3. Write agent logic as documentarian (not critic)
 4. Test by invoking agent in a command (restart Claude Code to reload)
-5. Run `/validate-frontmatter` to check formatting
+5. Run `/awl-meta:validate-frontmatter` to check formatting
 
 ### Frontmatter Validation
 

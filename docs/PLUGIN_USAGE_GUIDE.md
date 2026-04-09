@@ -35,11 +35,11 @@ Awl now uses a **use case-based** plugin architecture:
 claude
 
 # Work with full workflow
-/research-codebase "authentication system"
-/create-plan "Add OAuth support"
-/implement-plan
+/awl-dev:research-codebase "authentication system"
+/awl-dev:create-plan "Add OAuth support"
+/awl-dev:implement-plan
 /awl-dev:commit
-/describe-pr
+/awl-dev:describe-pr
 
 # Context stays light (~3.5k MCP tokens)
 ```
@@ -78,8 +78,8 @@ user behavior
 
 # Now Sentry MCP is available
 /awl-dev:debug-production-error "TypeError in checkout"
-/error-impact-analysis "errors from last deployment"
-/trace-analysis "slow API requests"
+/awl-debugging:error-impact-analysis "errors from last deployment"
+/awl-debugging:trace-analysis "slow API requests"
 
 # Disable when incident resolved
 /plugin disable awl-debugging

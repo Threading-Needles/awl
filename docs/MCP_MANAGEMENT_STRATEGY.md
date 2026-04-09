@@ -378,7 +378,7 @@ Potential future features:
 > Claude: "This requires PostHog. Enable? [y/n]"
 
 # Phase-based auto-suggestions
-> /create-plan starts
+> /awl-dev:create-plan starts
 > Claude: "Planning phase - enable Linear + GitHub? [y/n]"
 ```
 

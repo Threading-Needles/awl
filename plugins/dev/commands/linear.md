@@ -89,11 +89,11 @@ This workflow ensures alignment through planning before implementation:
 
 These commands automatically update ticket status:
 
-- `/research-codebase PROJ-123` → Moves ticket to "Research"
-- `/create-plan` → Moves ticket to "Planning"
-- `/implement-plan` → Moves to "In Progress"
-- `/create-pr` → Moves to "In Review"
-- `/merge-pr` → Moves to "Done"
+- `/awl-dev:research-codebase PROJ-123` → Moves ticket to "Research"
+- `/awl-dev:create-plan` → Moves ticket to "Planning"
+- `/awl-dev:implement-plan` → Moves to "In Progress"
+- `/awl-dev:create-pr` → Moves to "In Review"
+- `/awl-dev:merge-pr` → Moves to "Done"
 
 ---
 
@@ -151,9 +151,9 @@ When moving tickets to a new status:
 2. **Suggest next status based on workflow:**
    ```
    Backlog → Research (needs investigation)
-   Research → Planning (starting plan with /create-plan)
+   Research → Planning (starting plan with /awl-dev:create-plan)
    Planning → Ready for Dev (plan approved)
-   Ready for Dev → In Progress (starting work with /implement-plan)
+   Ready for Dev → In Progress (starting work with /awl-dev:implement-plan)
    In Progress → In Review (PR created)
    In Review → Done (PR merged)
    ```
@@ -202,24 +202,24 @@ To read a specific document, use `mcp__linear__get_document` with the document I
 
 When workflow commands are run, they automatically update the associated ticket:
 
-**During `/research-codebase PROJ-123`:**
+**During `/awl-dev:research-codebase PROJ-123`:**
 1. Sets ticket in workflow context
 2. Moves to "Research" status
 3. Creates "Research: ..." document attached to ticket
 
-**During `/create-plan`:**
+**During `/awl-dev:create-plan`:**
 1. Moves to "Planning" status
 2. Creates "Plan: ..." document attached to ticket
 
-**During `/implement-plan`:**
+**During `/awl-dev:implement-plan`:**
 1. Moves to "In Progress" status
 2. Adds progress comments as phases complete
 
-**During `/create-pr`:**
+**During `/awl-dev:create-pr`:**
 1. Moves to "In Review" status
 2. Creates "PR: ..." document attached to ticket
 
-**During `/merge-pr`:**
+**During `/awl-dev:merge-pr`:**
 1. Moves to "Done" status
 2. Adds merge completion comment
 
@@ -231,28 +231,28 @@ When workflow commands are run, they automatically update the associated ticket:
 
 ```bash
 # 1. Start research with ticket
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
 # Creates "Research: ..." document in Linear
 # Ticket moves to "Research"
 
 # 2. Create plan
-/create-plan
+/awl-dev:create-plan
 # Reads research from Linear
 # Creates "Plan: ..." document in Linear
 # Ticket moves to "Planning"
 
 # 3. Implement
-/implement-plan
+/awl-dev:implement-plan
 # Reads plan from Linear
 # Ticket moves to "In Progress"
 
 # 4. Create PR
-/create-pr
+/awl-dev:create-pr
 # Creates "PR: ..." document in Linear
 # Ticket moves to "In Review"
 
 # 5. Merge PR
-/merge-pr
+/awl-dev:merge-pr
 # Ticket moves to "Done"
 ```
 

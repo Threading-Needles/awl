@@ -90,8 +90,8 @@ Parallel development, feature branches, documentation patterns, testing workflow
 
 #### [WORKFLOW_DISCOVERY_SYSTEM.md](WORKFLOW_DISCOVERY_SYSTEM.md)
 
-Discovering and importing workflows from external repositories using `/discover-workflows`,
-`/import-workflow`, `/create-workflow`.
+Discovering and importing workflows from external repositories using `/awl-meta:discover-workflows`,
+`/awl-meta:import-workflow`, `/awl-meta:create-workflow`.
 
 **Read this when**: Extending Awl with new workflows.
 
@@ -201,5 +201,5 @@ YAML frontmatter validation, required fields, valid categories/tools, validation
 **Found an issue?**
 
 - Update the relevant document
-- Run `/validate-frontmatter` for agent/command changes
+- Run `/awl-meta:validate-frontmatter` for agent/command changes
 - Create Linear ticket with `/awl-dev:linear` for larger tasks

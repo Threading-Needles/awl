@@ -242,25 +242,25 @@ Review the PR on GitHub!
 ## Integration with Other Commands
 
 ```
-/research-codebase PROJ-123 → research document
+/awl-dev:research-codebase PROJ-123 → research document
                   ↓
-           /create-plan → implementation plan
+           /awl-dev:create-plan → implementation plan
                   ↓
-          /implement-plan → code changes
+          /awl-dev:implement-plan → code changes
                   ↓
-           /validate-plan → verification
+           /awl-dev:validate-plan → verification
                   ↓
-              /describe-pr → PR description
+              /awl-dev:describe-pr → PR description
                   ↓
-              /create-pr → creates PR on GitHub (this command)
+              /awl-dev:create-pr → creates PR on GitHub (this command)
                   ↓
-              /merge-pr → merges PR
+              /awl-dev:merge-pr → merges PR
 ```
 
 **How it connects:**
 
-- **Previous**: Work is done via `/implement-plan`
-- **Next**: `/merge-pr` will merge the PR and update Linear
+- **Previous**: Work is done via `/awl-dev:implement-plan`
+- **Next**: `/awl-dev:merge-pr` will merge the PR and update Linear
 - **Workflow context**: Ticket is used for Linear linking
 
 ## Error Handling
@@ -361,12 +361,12 @@ Calling /awl-dev:describe_pr...
 - **Save to Linear** - PR description stored as Linear document
 - **Fail fast** - stop on conflicts or errors with clear messages
 
-**Note**: This command is typically called automatically by `/implement-plan` after validation passes.
+**Note**: This command is typically called automatically by `/awl-dev:implement-plan` after validation passes.
 You can also run it standalone to create a PR for existing changes.
 
 ## Status Update Convention
 
-This command is a downstream command (typically called by `/implement-plan`) and does NOT update status on start - it updates to "In Review" on successful PR creation. However, on failure, it should roll back to the appropriate previous state:
+This command is a downstream command (typically called by `/awl-dev:implement-plan`) and does NOT update status on start - it updates to "In Review" on successful PR creation. However, on failure, it should roll back to the appropriate previous state:
 
 On failure, use `mcp__linear__save_issue` to roll back the ticket state to "In Dev" and
 `mcp__linear__save_comment` to add a comment explaining the failure.

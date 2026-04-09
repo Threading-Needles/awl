@@ -440,24 +440,24 @@ Next steps:
 ## Integration with Other Commands
 
 ```
-/research-codebase PROJ-123 → research document
+/awl-dev:research-codebase PROJ-123 → research document
                   ↓
-           /create-plan → implementation plan
+           /awl-dev:create-plan → implementation plan
                   ↓
-          /implement-plan → code changes
+          /awl-dev:implement-plan → code changes
                   ↓
-           /validate-plan → verification
+           /awl-dev:validate-plan → verification
                   ↓
-              /describe-pr → PR description
+              /awl-dev:describe-pr → PR description
                   ↓
-              /create-pr → creates PR on GitHub
+              /awl-dev:create-pr → creates PR on GitHub
                   ↓
-              /merge-pr → merges PR (this command)
+              /awl-dev:merge-pr → merges PR (this command)
 ```
 
 **How it connects:**
 
-- **Previous**: PR created by `/create-pr` with description in Linear
+- **Previous**: PR created by `/awl-dev:create-pr` with description in Linear
 - **Workflow context**: Ticket is used for Linear integration
 
 ## Flags

@@ -425,30 +425,30 @@ without manual specification.
 
 **Automatic document discovery via Linear**:
 
-1. `/research-codebase PROJ-123` → Sets ticket, saves research to Linear
-2. `/create-plan` → Finds research from Linear (attached to current ticket)
-3. `/implement-plan` → Finds plan from Linear (attached to current ticket)
-4. `/create-handoff` → Saves handoff to Linear
-5. `/resume-handoff PROJ-123` → Finds handoff from Linear
+1. `/awl-dev:research-codebase PROJ-123` → Sets ticket, saves research to Linear
+2. `/awl-dev:create-plan` → Finds research from Linear (attached to current ticket)
+3. `/awl-dev:implement-plan` → Finds plan from Linear (attached to current ticket)
+4. `/awl-dev:create-handoff` → Saves handoff to Linear
+5. `/awl-dev:resume-handoff PROJ-123` → Finds handoff from Linear
 
 **Example workflow**:
 
 ```bash
 # Step 1: Research (sets ticket, saves to Linear)
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
 > How does authentication work?
 
 # Step 2: Create plan (auto-finds research from Linear)
-/create-plan
+/awl-dev:create-plan
 
 # Step 3: Implement (auto-finds plan from Linear)
-/implement-plan
+/awl-dev:implement-plan
 
 # Step 4: Create handoff (saves to Linear)
-/create-handoff
+/awl-dev:create-handoff
 
 # Later: Resume work (finds handoff from Linear)
-/resume-handoff PROJ-123
+/awl-dev:resume-handoff PROJ-123
 ```
 
 ### Manual Management

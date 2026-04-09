@@ -33,10 +33,10 @@ The workspace uses a plugin-based architecture where agents and commands are org
 Workflow documents (research, plans, handoffs, PR descriptions) are stored as **Linear documents**
 attached to tickets:
 
-- **Research**: Created by `/research-codebase`, titled "Research: ..."
-- **Plans**: Created by `/create-plan`, titled "Plan: ..."
-- **Handoffs**: Created by `/create-handoff`, titled "Handoff: ..."
-- **PR Descriptions**: Created by `/describe-pr`, titled "PR: ..."
+- **Research**: Created by `/awl-dev:research-codebase`, titled "Research: ..."
+- **Plans**: Created by `/awl-dev:create-plan`, titled "Plan: ..."
+- **Handoffs**: Created by `/awl-dev:create-handoff`, titled "Handoff: ..."
+- **PR Descriptions**: Created by `/awl-dev:describe-pr`, titled "PR: ..."
 
 Documents are discovered by querying Linear via `mcp__linear__get_issue` with the ticket ID.
 
@@ -48,11 +48,11 @@ Commands track the current ticket via `.claude/.workflow-context.json`:
 
 **How it works**:
 
-- `/research-codebase PROJ-123` sets ticket → saves research to Linear
-- `/create-plan` reads research from Linear → saves plan to Linear
-- `/implement-plan` reads plan from Linear → implements phases
-- `/create-handoff` saves handoff to Linear
-- `/resume-handoff PROJ-123` finds handoff from Linear
+- `/awl-dev:research-codebase PROJ-123` sets ticket → saves research to Linear
+- `/awl-dev:create-plan` reads research from Linear → saves plan to Linear
+- `/awl-dev:implement-plan` reads plan from Linear → implements phases
+- `/awl-dev:create-handoff` saves handoff to Linear
+- `/awl-dev:resume-handoff PROJ-123` finds handoff from Linear
 
 **Structure**:
 
@@ -78,10 +78,10 @@ Awl uses Linear documents attached to tickets for persistent workflow context:
 ```
 ┌─────────────────────────────────────┐
 │  Linear Ticket: PROJ-123            │
-│  ├─ Research: OAuth Implementation  │ ← From /research-codebase
-│  ├─ Plan: OAuth Implementation      │ ← From /create-plan
-│  ├─ Handoff: Session 2025-01-08     │ ← From /create-handoff
-│  └─ PR: #456 - Add OAuth Support    │ ← From /describe-pr
+│  ├─ Research: OAuth Implementation  │ ← From /awl-dev:research-codebase
+│  ├─ Plan: OAuth Implementation      │ ← From /awl-dev:create-plan
+│  ├─ Handoff: Session 2025-01-08     │ ← From /awl-dev:create-handoff
+│  └─ PR: #456 - Add OAuth Support    │ ← From /awl-dev:describe-pr
 └─────────────────────────────────────┘
           │
           ├──→ Queried via: mcp__linear__get_issue(id: PROJ-123)
@@ -105,11 +105,11 @@ Awl uses Linear documents attached to tickets for persistent workflow context:
 
 **Example Flow:**
 
-1. `/research-codebase PROJ-123` sets ticket, creates "Research: ..." document
-2. `/create-plan` queries PROJ-123 for research, creates "Plan: ..." document
-3. `/implement-plan` queries PROJ-123 for plan, implements phases
-4. `/describe-pr` creates "PR: ..." document
-5. `/create-handoff` creates "Handoff: ..." document if pausing work
+1. `/awl-dev:research-codebase PROJ-123` sets ticket, creates "Research: ..." document
+2. `/awl-dev:create-plan` queries PROJ-123 for research, creates "Plan: ..." document
+3. `/awl-dev:implement-plan` queries PROJ-123 for plan, implements phases
+4. `/awl-dev:describe-pr` creates "PR: ..." document
+5. `/awl-dev:create-handoff` creates "Handoff: ..." document if pausing work
 
 All documents attached to the same ticket for easy discovery.
 
@@ -340,7 +340,7 @@ awl/
 **1. Research Phase:**
 
 ```
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
 > "How does authentication work in the API?"
 ```
 
@@ -352,7 +352,7 @@ awl/
 **2. Planning Phase:**
 
 ```
-/create-plan
+/awl-dev:create-plan
 ```
 
 - Auto-finds research from Linear (attached to current ticket)
@@ -363,7 +363,7 @@ awl/
 **3. Implementation Phase (AUTOMATED):**
 
 ```
-/implement-plan
+/awl-dev:implement-plan
 ```
 
 - Reads plan from Linear (attached to current ticket)
@@ -400,13 +400,13 @@ Worktrees are auto-cleaned if no changes are made. Claude prompts to keep/remove
 Discover and import workflows from external repos:
 
 ```
-/discover-workflows
+/awl-meta:discover-workflows
 > Research Claude Code repositories for workflow patterns
 
-/import-workflow
+/awl-meta:import-workflow
 > Import workflow from repository X and adapt it
 
-/create-workflow
+/awl-meta:create-workflow
 > Create new agent/command based on discovered patterns
 ```
 
@@ -448,7 +448,7 @@ version: 1.0.0
 ---
 ```
 
-Use `/validate-frontmatter` to check consistency.
+Use `/awl-meta:validate-frontmatter` to check consistency.
 
 ## Dependencies
 
@@ -489,7 +489,7 @@ a browser for OAuth authentication. No API tokens or CLI tools needed.
 
 ### Linear Integration
 
-- `/linear` command for ticket management
+- `/awl-dev:linear` command for ticket management
 - Auto-configures on first use
 - Saves config to `.claude/config.json`
 - See `docs/LINEAR_WORKFLOW_AUTOMATION.md`
@@ -573,7 +573,7 @@ to tickets instead of filesystem-based storage.
 **Rationale**:
 
 - Users shouldn't remember ticket IDs between commands
-- `/research-codebase PROJ-123` → `/create-plan` → `/implement-plan` should flow naturally
+- `/awl-dev:research-codebase PROJ-123` → `/awl-dev:create-plan` → `/awl-dev:implement-plan` should flow naturally
 - Context must be local to each worktree
 - Must not contain secrets or be committed to git
 
@@ -663,7 +663,7 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 **Validating frontmatter:**
 
 ```
-/validate-frontmatter
+/awl-meta:validate-frontmatter
 ```
 
 **Testing plugin installation:**
@@ -673,7 +673,7 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 # Should show awl-dev and optionally awl-meta
 
 # Test a command
-/research-codebase
+/awl-dev:research-codebase
 ```
 
 ## Deployment and Distribution
@@ -774,7 +774,7 @@ instructions.
 - Check `docs/` for comprehensive guides
 - Review `README.md` for philosophy
 - Read `QUICKSTART.md` for setup
-- Use `/workflow-help` for interactive guidance
+- Use `/awl-dev:workflow-help` for interactive guidance
 - Examine plugin source in `plugins/dev/` and `plugins/meta/`
 
 ## Version Control

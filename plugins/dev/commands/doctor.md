@@ -35,7 +35,7 @@ Run all checks and output a structured status report:
 Claude Code does not expose a plugin list API, so you must verify manually.
 
 ○ pr-review-toolkit
-   Required for: /implement-plan auto-review
+   Required for: /awl-dev:implement-plan auto-review
    → Verify: Run /pr-review-toolkit:review-pr --help
    → Install: /plugin install pr-review-toolkit
 
@@ -135,9 +135,9 @@ echo ""
 echo "Claude Code does not expose a plugin list API, so you must verify manually."
 echo ""
 
-# pr-review-toolkit is required for /implement-plan
+# pr-review-toolkit is required for /awl-dev:implement-plan
 echo "○ pr-review-toolkit"
-echo "   Required for: /implement-plan auto-review"
+echo "   Required for: /awl-dev:implement-plan auto-review"
 echo "   → Verify: Run /pr-review-toolkit:review-pr --help"
 echo "   → Install: /plugin install pr-review-toolkit"
 ```
@@ -182,7 +182,7 @@ echo ""
 if [[ $issue_count -eq 0 ]]; then
     echo "✅ All required dependencies are in place!"
     echo ""
-    echo "Recommended: Verify pr-review-toolkit is installed for full /implement-plan automation."
+    echo "Recommended: Verify pr-review-toolkit is installed for full /awl-dev:implement-plan automation."
 else
     echo "$issue_count issue(s) found:"
     # List each issue

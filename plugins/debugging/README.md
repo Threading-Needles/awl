@@ -8,9 +8,9 @@ Production error monitoring and debugging powered by Sentry MCP integration.
 
 **Commands**:
 
-- `/debug-production-error` - Investigate errors with stack traces
-- `/error-impact-analysis` - Assess error severity and scope
-- `/trace-analysis` - Distributed tracing and performance debugging
+- `/awl-debugging:debug-production-error` - Investigate errors with stack traces
+- `/awl-debugging:error-impact-analysis` - Assess error severity and scope
+- `/awl-debugging:trace-analysis` - Distributed tracing and performance debugging
 
 ## When to Enable This Plugin
 
@@ -89,7 +89,7 @@ To get these values:
 ```bash
 /plugin enable awl-debugging
 
-/error-impact-analysis "payment gateway errors last 7 days"
+/awl-debugging:error-impact-analysis "payment gateway errors last 7 days"
 
 /plugin disable awl-debugging
 ```
@@ -99,7 +99,7 @@ To get these values:
 ```bash
 /plugin enable awl-debugging
 
-/trace-analysis "slow API requests in checkout service"
+/awl-debugging:trace-analysis "slow API requests in checkout service"
 
 /plugin disable awl-debugging
 ```

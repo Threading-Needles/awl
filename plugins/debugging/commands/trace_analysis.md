@@ -13,13 +13,13 @@ Investigate distributed traces, transaction performance, and slow requests using
 ## Usage
 
 ```bash
-/trace-analysis <trace-id-or-query>
+/awl-debugging:trace-analysis <trace-id-or-query>
 
 Examples:
-  /trace-analysis "a4d1aae7216b47ff8117cf4e09ce9d0a"
-  /trace-analysis "slow API requests to /checkout"
-  /trace-analysis "traces with >5 second response time"
-  /trace-analysis "performance issues in payment service"
+  /awl-debugging:trace-analysis "a4d1aae7216b47ff8117cf4e09ce9d0a"
+  /awl-debugging:trace-analysis "slow API requests to /checkout"
+  /awl-debugging:trace-analysis "traces with >5 second response time"
+  /awl-debugging:trace-analysis "performance issues in payment service"
 ```
 
 ## What This Analyzes
@@ -51,25 +51,25 @@ Examples:
 ### Specific Trace Investigation
 
 ```bash
-/trace-analysis "Analyze trace abc123def456: where's the bottleneck?"
+/awl-debugging:trace-analysis "Analyze trace abc123def456: where's the bottleneck?"
 ```
 
 ### Performance Pattern
 
 ```bash
-/trace-analysis "Why are checkout API requests slow today?"
+/awl-debugging:trace-analysis "Why are checkout API requests slow today?"
 ```
 
 ### Service Comparison
 
 ```bash
-/trace-analysis "Compare performance of payment service vs order service"
+/awl-debugging:trace-analysis "Compare performance of payment service vs order service"
 ```
 
 ### Database Performance
 
 ```bash
-/trace-analysis "Find traces with slow database queries in user service"
+/awl-debugging:trace-analysis "Find traces with slow database queries in user service"
 ```
 
 ## Output Format
@@ -113,19 +113,19 @@ Transaction: POST /api/checkout (2.4s)
 ### Multi-Trace Patterns
 
 ```bash
-/trace-analysis "Find common bottlenecks across all slow checkout traces today"
+/awl-debugging:trace-analysis "Find common bottlenecks across all slow checkout traces today"
 ```
 
 ### Service Dependencies
 
 ```bash
-/trace-analysis "Map service call chain for failed transactions"
+/awl-debugging:trace-analysis "Map service call chain for failed transactions"
 ```
 
 ### Error Correlation
 
 ```bash
-/trace-analysis "Traces that resulted in errors: what went wrong before?"
+/awl-debugging:trace-analysis "Traces that resulted in errors: what went wrong before?"
 ```
 
 ## Integration Opportunities
@@ -145,7 +145,7 @@ Transaction: POST /api/checkout (2.4s)
 After identifying bottleneck:
 
 ```bash
-/create-plan "Optimize the slow payment gateway call identified in trace analysis"
+/awl-dev:create-plan "Optimize the slow payment gateway call identified in trace analysis"
 ```
 
 ## Performance Optimization Workflow
@@ -153,7 +153,7 @@ After identifying bottleneck:
 ### 1. Identify Slow Transactions
 
 ```bash
-/trace-analysis "transactions with >2s response time in last hour"
+/awl-debugging:trace-analysis "transactions with >2s response time in last hour"
 ```
 
 ### 2. Analyze Bottlenecks
@@ -171,7 +171,7 @@ After identifying bottleneck:
 ### 4. Implement Fix
 
 ```bash
-/create-plan "Add database index for user lookups based on trace analysis"
+/awl-dev:create-plan "Add database index for user lookups based on trace analysis"
 ```
 
 ### 5. Verify Improvement
@@ -198,4 +198,4 @@ Plugin uses ~20k tokens. Disable after analysis:
 
 ---
 
-**See also**: `/debug-production-error`, `/error-impact-analysis`
+**See also**: `/awl-debugging:debug-production-error`, `/awl-debugging:error-impact-analysis`

@@ -13,13 +13,13 @@ Assess the severity, reach, and business impact of production errors.
 ## Usage
 
 ```bash
-/error-impact-analysis <error-or-timeframe>
+/awl-debugging:error-impact-analysis <error-or-timeframe>
 
 Examples:
-  /error-impact-analysis "ISSUE-789"
-  /error-impact-analysis "checkout errors last 7 days"
-  /error-impact-analysis "critical errors this week"
-  /error-impact-analysis "impact of recent deployment"
+  /awl-debugging:error-impact-analysis "ISSUE-789"
+  /awl-debugging:error-impact-analysis "checkout errors last 7 days"
+  /awl-debugging:error-impact-analysis "critical errors this week"
+  /awl-debugging:error-impact-analysis "impact of recent deployment"
 ```
 
 ## What This Analyzes
@@ -50,25 +50,25 @@ Examples:
 ### Single Issue Impact
 
 ```bash
-/error-impact-analysis "What's the impact of MYAPP-123? How many users, revenue impact?"
+/awl-debugging:error-impact-analysis "What's the impact of MYAPP-123? How many users, revenue impact?"
 ```
 
 ### Category Impact
 
 ```bash
-/error-impact-analysis "Overall impact of all payment-related errors this month"
+/awl-debugging:error-impact-analysis "Overall impact of all payment-related errors this month"
 ```
 
 ### Release Health
 
 ```bash
-/error-impact-analysis "Error impact comparison: current release vs previous release"
+/awl-debugging:error-impact-analysis "Error impact comparison: current release vs previous release"
 ```
 
 ### Critical Errors
 
 ```bash
-/error-impact-analysis "Show all critical errors and their combined user impact"
+/awl-debugging:error-impact-analysis "Show all critical errors and their combined user impact"
 ```
 
 ## Output Format
@@ -117,7 +117,7 @@ Enable both plugins for deeper impact analysis:
 /plugin enable awl-debugging
 /plugin enable awl-analytics
 
-/error-impact-analysis "How many users who hit error X churned vs users who didn't?"
+/awl-debugging:error-impact-analysis "How many users who hit error X churned vs users who didn't?"
 ```
 
 This combines:
@@ -130,7 +130,7 @@ This combines:
 ### 1. Assess Impact
 
 ```bash
-/error-impact-analysis "new spike in errors at 3pm"
+/awl-debugging:error-impact-analysis "new spike in errors at 3pm"
 ```
 
 ### 2. Determine Severity
@@ -172,4 +172,4 @@ Plugin uses ~20k tokens. Disable after analysis:
 
 ---
 
-**See also**: `/debug-production-error`, `/trace-analysis`
+**See also**: `/awl-debugging:debug-production-error`, `/awl-debugging:trace-analysis`

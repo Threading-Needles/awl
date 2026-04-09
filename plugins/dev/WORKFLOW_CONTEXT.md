@@ -9,11 +9,11 @@ Complete guide to automatic document tracking and discovery in Awl.
 **After**: System automatically tracks the current ticket and discovers documents from Linear:
 ```bash
 # User researches the codebase
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
 # ✅ Sets current ticket, saves research to Linear
 
 # Later, user wants to create a plan...
-/create-plan
+/awl-dev:create-plan
 # ✅ Queries Linear for research attached to PROJ-123
 ```
 
@@ -26,7 +26,7 @@ Complete guide to automatic document tracking and discovery in Awl.
 When a workflow command is invoked with a ticket ID:
 
 ```
-You → /research-codebase PROJ-123
+You → /awl-dev:research-codebase PROJ-123
       ↓
 workflow-context.sh set-ticket PROJ-123
       ↓
@@ -50,7 +50,7 @@ Research is saved as a Linear document "Research: ..." attached to PROJ-123.
 When user invokes a downstream workflow command:
 
 ```
-You → /create-plan
+You → /awl-dev:create-plan
       ↓
 Command reads current ticket from workflow-context.json
       ↓
@@ -75,19 +75,19 @@ Claude reads research and creates plan
 
 ```bash
 # 1. Research the codebase
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
 # → Sets current ticket to PROJ-123
 # → Creates Linear document "Research: Auth System" attached to PROJ-123 ✅
 
 # 2. Create implementation plan
-/create-plan
+/awl-dev:create-plan
 # → Reads current ticket (PROJ-123) from workflow context
 # → Queries Linear for research document
 # → Claude reads research and creates plan
 # → Creates Linear document "Plan: OAuth Support" attached to PROJ-123 ✅
 
 # 3. Implement the plan
-/implement-plan
+/awl-dev:implement-plan
 # → Reads current ticket (PROJ-123) from workflow context
 # → Queries Linear for plan document
 # → Claude reads plan and implements ✅
@@ -103,16 +103,16 @@ Claude reads research and creates plan
 
 | Command | Auto-Discovers | Behavior |
 |---------|---------------|----------|
-| `/resume-handoff` | Recent handoff | Finds last handoff, asks to proceed |
-| `/implement-plan` | Recent plan | Finds last plan, asks to proceed |
-| `/create-plan` | Recent research | **Suggests** research as context |
+| `/awl-dev:resume-handoff` | Recent handoff | Finds last handoff, asks to proceed |
+| `/awl-dev:implement-plan` | Recent plan | Finds last plan, asks to proceed |
+| `/awl-dev:create-plan` | Recent research | **Suggests** research as context |
 
 ### 🚧 Fallback if Not Found
 
 All commands gracefully fall back to asking for input:
 
 ```bash
-/resume-handoff
+/awl-dev:resume-handoff
 # No recent handoff found
 → "I'll help you resume work. Which handoff would you like to use?"
 → Lists available handoffs
@@ -201,7 +201,7 @@ Users don't need to remember ticket IDs between commands
 ### 2. Natural Workflow
 Commands chain together seamlessly:
 ```bash
-/research-codebase PROJ-123 → /create-plan → /implement-plan
+/awl-dev:research-codebase PROJ-123 → /awl-dev:create-plan → /awl-dev:implement-plan
 ```
 
 ### 3. Context Awareness
@@ -232,7 +232,7 @@ Can always provide explicit ticket ID to override auto-discovery
 
 **Solutions**:
 1. Set ticket manually: `workflow-context.sh set-ticket PROJ-123`
-2. Re-run the initial command with a ticket ID: `/research-codebase PROJ-123`
+2. Re-run the initial command with a ticket ID: `/awl-dev:research-codebase PROJ-123`
 
 ### Wrong Ticket in Context
 
@@ -240,7 +240,7 @@ Can always provide explicit ticket ID to override auto-discovery
 
 **Solution**: Override by providing the ticket ID explicitly:
 ```bash
-/research-codebase PROJ-456
+/awl-dev:research-codebase PROJ-456
 ```
 
 ---

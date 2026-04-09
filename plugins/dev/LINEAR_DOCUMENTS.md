@@ -87,23 +87,23 @@ Use `mcp__linear__get_document` with the document ID to read its full content.
 
 ### Entry Point
 
-All workflows start with a ticket ID. The first command (`/research-codebase PROJ-123`) sets the current ticket in workflow context.
+All workflows start with a ticket ID. The first command (`/awl-dev:research-codebase PROJ-123`) sets the current ticket in workflow context.
 
 ### Document Discovery
 
 Subsequent commands query Linear for documents on the current ticket:
 
 ```
-/research-codebase PROJ-123
+/awl-dev:research-codebase PROJ-123
   └─→ Creates: Research document attached to PROJ-123
   └─→ Sets: currentTicket = PROJ-123
 
-/create-plan (no args needed)
+/awl-dev:create-plan (no args needed)
   └─→ Reads: currentTicket from workflow-context
   └─→ Queries: Linear for Research documents on PROJ-123
   └─→ Creates: Plan document attached to PROJ-123
 
-/implement-plan (no args needed)
+/awl-dev:implement-plan (no args needed)
   └─→ Reads: currentTicket from workflow-context
   └─→ Queries: Linear for Plan documents on PROJ-123
   └─→ Implements the plan
@@ -174,17 +174,17 @@ When a user answers, they replace the placeholder:
 
 ### Workflow Integration
 
-1. **Research Phase** (`/research-codebase` in headless mode):
+1. **Research Phase** (`/awl-dev:research-codebase` in headless mode):
    - Embeds questions in "Questions for User" section
    - Sets ticket status to "Spec Needed"
    - Mentions assignee for notification
 
-2. **Plan Phase** (`/create-plan`):
+2. **Plan Phase** (`/awl-dev:create-plan`):
    - Validates Research document for unanswered questions
    - Hard-fails with list if blocking questions remain unanswered
    - Embeds its own questions with same pattern
 
-3. **Implementation Phase** (`/implement-plan`):
+3. **Implementation Phase** (`/awl-dev:implement-plan`):
    - Validates Plan document for unanswered questions
    - Hard-fails with list and document link if found
 
@@ -199,13 +199,13 @@ When a document contains unanswered questions:
 If the ticket has an assignee, mention them in the questions section:
 
 ```markdown
-@John Smith - Please answer before proceeding to /create-plan:
+@John Smith - Please answer before proceeding to /awl-dev:create-plan:
 ```
 
 If no assignee, omit the mention:
 
 ```markdown
-Please answer before proceeding to /create-plan:
+Please answer before proceeding to /awl-dev:create-plan:
 ```
 
 ## Icon Reference

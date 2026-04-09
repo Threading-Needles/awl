@@ -72,7 +72,7 @@ Uses `.claude/config.json`:
 
 ## Related Commands
 
-- `/cycle-plan` - Plan work within cycles for a project
-- `/cycle-review` - Review cycle progress
+- `/awl-dev:cycle-plan` - Plan work within cycles for a project
+- `/awl-dev:cycle-review` - Review cycle progress
 - `/awl-dev:linear` - Manage individual tickets
-- `/create-plan` - Create implementation plans for tickets
+- `/awl-dev:create-plan` - Create implementation plans for tickets

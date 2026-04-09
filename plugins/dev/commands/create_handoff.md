@@ -141,7 +141,7 @@ After saving:
 To resume from this handoff in a new session:
 
 1. Clear context (start fresh session)
-2. Run `/resume-handoff {CURRENT_TICKET}`
+2. Run `/awl-dev:resume-handoff {CURRENT_TICKET}`
 
 The handoff document is attached to the ticket and will be automatically discovered.
 ```
@@ -160,21 +160,21 @@ The handoff document is attached to the ticket and will be automatically discove
 ## Integration with Other Commands
 
 ```
-/research-codebase PROJ-123 → research document
+/awl-dev:research-codebase PROJ-123 → research document
                   ↓
-           /create-plan → implementation plan
+           /awl-dev:create-plan → implementation plan
                   ↓
-          /implement-plan → code changes
+          /awl-dev:implement-plan → code changes
                   ↓
-          /create-handoff → handoff document (this command)
+          /awl-dev:create-handoff → handoff document (this command)
                   ↓
-         /resume-handoff → continues work
+         /awl-dev:resume-handoff → continues work
 ```
 
 **How it connects:**
 
 - **Previous**: Can be invoked at any point during implementation
-- **Next**: `/resume-handoff` finds the handoff via linear-document-locator
+- **Next**: `/awl-dev:resume-handoff` finds the handoff via linear-document-locator
 - **Workflow context**: Current ticket is used to attach the handoff
 
 ## Error Handling

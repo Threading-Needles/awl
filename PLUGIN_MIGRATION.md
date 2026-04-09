@@ -85,9 +85,9 @@ This means:
 claude
 
 # Work with core tools (~3.5k MCP context)
-/research-codebase
-/create-plan
-/implement-plan
+/awl-dev:research-codebase
+/awl-dev:create-plan
+/awl-dev:implement-plan
 ```
 
 ### Analytics Session
@@ -112,7 +112,7 @@ claude
 /plugin enable awl-debugging
 
 # Sentry now available (+20k context)
-/debug-production-error "TypeError in production"
+/awl-debugging:debug-production-error "TypeError in production"
 
 # Optionally combine with analytics
 /plugin enable awl-analytics
@@ -141,9 +141,9 @@ claude
 
 ### Added to awl-debugging
 
-- ✅ `/debug-production-error` - Error investigation
-- ✅ `/error-impact-analysis` - Assess severity
-- ✅ `/trace-analysis` - Performance debugging
+- ✅ `/awl-debugging:debug-production-error` - Error investigation
+- ✅ `/awl-debugging:error-impact-analysis` - Assess severity
+- ✅ `/awl-debugging:trace-analysis` - Performance debugging
 
 ### Updated marketplace.json
 
@@ -290,7 +290,7 @@ Before publishing:
 2. **Phase-based workflows**: Auto-suggest plugins for workflow phases
 
    ```
-   > /create-plan
+   > /awl-dev:create-plan
    > Claude: "Planning phase - enable awl-analytics for data? [y/n]"
    ```
 

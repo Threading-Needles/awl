@@ -16,7 +16,7 @@ and continued.
 
 ### Step 1: Determine Ticket
 
-**If user provided a ticket ID as parameter** (e.g., `/resume-handoff PROJ-123`):
+**If user provided a ticket ID as parameter** (e.g., `/awl-dev:resume-handoff PROJ-123`):
 - Set the ticket in workflow context:
   ```bash
   "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
@@ -34,7 +34,7 @@ and continued.
 ```
 I need a Linear ticket to find handoff documents.
 
-Please provide a ticket ID: `/resume-handoff PROJ-123`
+Please provide a ticket ID: `/awl-dev:resume-handoff PROJ-123`
 ```
 
 ### Step 1a: Update Linear Ticket Status (FIRST)
@@ -247,21 +247,21 @@ Shall I proceed with [recommended action 1], or would you like to adjust the app
 ## Integration with Other Commands
 
 ```
-/research-codebase PROJ-123 → research document
+/awl-dev:research-codebase PROJ-123 → research document
                   ↓
-           /create-plan → implementation plan
+           /awl-dev:create-plan → implementation plan
                   ↓
-          /implement-plan → code changes
+          /awl-dev:implement-plan → code changes
                   ↓
-          /create-handoff → handoff document
+          /awl-dev:create-handoff → handoff document
                   ↓
-         /resume-handoff → continues work (this command)
+         /awl-dev:resume-handoff → continues work (this command)
 ```
 
 **How it connects:**
 
-- **Previous**: Handoff created by `/create-handoff` as Linear document
-- **Next**: Continues implementation, may use `/implement-plan`, `/describe-pr`
+- **Previous**: Handoff created by `/awl-dev:create-handoff` as Linear document
+- **Next**: Continues implementation, may use `/awl-dev:implement-plan`, `/awl-dev:describe-pr`
 - **Workflow context**: Sets current ticket for subsequent commands
 
 ## Error Handling
@@ -289,7 +289,7 @@ Please verify:
 ## Example Interaction Flow
 
 ```
-User: /resume-handoff PROJ-123
+User: /awl-dev:resume-handoff PROJ-123
 Assistant: Let me find and analyze handoff documents for PROJ-123...
 
 [Sets ticket in workflow context]

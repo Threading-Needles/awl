@@ -19,26 +19,26 @@ Before executing, verify Linear MCP integration is available by confirming the L
 ```
 ❌ Linear MCP tools not available
 
-The /implement-plan command requires Linear MCP tools for ticket and document management.
+The /awl-dev:implement-plan command requires Linear MCP tools for ticket and document management.
 
 Please ensure the Linear MCP server is connected in your Claude Code configuration.
 ```
 
 ## Plugin Prerequisites
 
-The `/implement-plan` command requires the `pr-review-toolkit` plugin for automated PR review in Phase C.
+The `/awl-dev:implement-plan` command requires the `pr-review-toolkit` plugin for automated PR review in Phase C.
 
 **Before starting implementation**, check if the plugin is available. If the plugin is not installed, output:
 
 ```
 ❌ Required plugin missing: pr-review-toolkit
 
-The /implement-plan command requires pr-review-toolkit for automated PR review.
+The /awl-dev:implement-plan command requires pr-review-toolkit for automated PR review.
 
 Install with:
   /plugin install pr-review-toolkit
 
-Then run /implement-plan again.
+Then run /awl-dev:implement-plan again.
 ```
 
 **Hard fail** - do not proceed with implementation until the plugin is confirmed available.
@@ -61,8 +61,8 @@ CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
 I need a Linear ticket to find the implementation plan.
 
 Please either:
-1. Provide a ticket ID: `/implement-plan PROJ-123`
-2. Run `/create-plan` first (which sets the current ticket)
+1. Provide a ticket ID: `/awl-dev:implement-plan PROJ-123`
+2. Run `/awl-dev:create-plan` first (which sets the current ticket)
 
 Which would you prefer?
 ```
@@ -128,7 +128,7 @@ The following questions need answers before implementation can begin:
   → Location: Plan document attached to {CURRENT_TICKET}
 
 Please answer these questions in the Linear document, then run:
-  /implement-plan
+  /awl-dev:implement-plan
 ```
 
 **Hard fail** - do not proceed until all blocking questions have answers.
@@ -143,7 +143,7 @@ Continue to Step 4.
 No implementation plan found for {CURRENT_TICKET}.
 
 Would you like me to:
-1. Create a plan first? Run `/create-plan`
+1. Create a plan first? Run `/awl-dev:create-plan`
 2. Check a different ticket?
 ```
 
@@ -244,11 +244,11 @@ Current usage: {X}% ({Y}K/{Z}K tokens)
 
 **Options**:
 1. ✅ Create handoff and clear context (recommended)
-   - Use `/create-handoff` to generate handoff document in Linear
+   - Use `/awl-dev:create-handoff` to generate handoff document in Linear
    - Includes what's done, what's next, key learnings
 2. Continue to next phase (if close to completion)
 
-**To resume**: Start fresh session, run `/implement-plan`
+**To resume**: Start fresh session, run `/awl-dev:implement-plan`
 (The plan document tracks progress with checkboxes - you'll resume automatically)
 
 {If <60%}:
@@ -273,7 +273,7 @@ Current usage: {X}% ({Y}K/{Z}K tokens)
 
 When recommending a handoff, guide the user:
 
-1. Offer to create the handoff using `/create-handoff`
+1. Offer to create the handoff using `/awl-dev:create-handoff`
 2. Handoff will be saved as a Linear document attached to the ticket
 3. Include: completed phases, next steps, key learnings, file references
 4. Update plan document with checkboxes for completed work
@@ -366,7 +366,7 @@ After all plan phases complete successfully, automatically execute the following
 
    Install with: /plugin install pr-review-toolkit
 
-   Then run /implement-plan again to continue from Phase C.
+   Then run /awl-dev:implement-plan again to continue from Phase C.
    ```
 
    Exit with error status - do not continue to Phase D.
@@ -472,7 +472,7 @@ Critical issues could not be resolved:
 The implementation is incomplete. Please:
 1. Review the issues above
 2. Fix manually or adjust the plan
-3. Run `/implement-plan` again to retry
+3. Run `/awl-dev:implement-plan` again to retry
 ```
 
 **PR creation fails**:
@@ -495,11 +495,11 @@ Changes have been committed locally. Please:
 ## Integration with Other Commands
 
 ```
-/research-codebase PROJ-123 → research document
+/awl-dev:research-codebase PROJ-123 → research document
                   ↓
-           /create-plan → implementation plan
+           /awl-dev:create-plan → implementation plan
                   ↓
-          /implement-plan → code changes (this command)
+          /awl-dev:implement-plan → code changes (this command)
                   │
                   ├─→ [Phase A] Self-healing validation
                   │     └─→ Creates: "Validation: ..." document
@@ -532,7 +532,7 @@ Please verify:
 2. You have access to this Linear workspace
 3. The Linear MCP server is connected
 
-Try running `/create-plan` to create a new plan.
+Try running `/awl-dev:create-plan` to create a new plan.
 ```
 
 **If ticket not found:**

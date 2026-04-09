@@ -44,7 +44,7 @@ If no ticket and no project can be determined, report the error:
 Cannot determine project context.
 
 Please provide a project name, or set a current ticket first:
-  /research-codebase PROJ-123
+  /awl-dev:research-codebase PROJ-123
 ```
 
 ### Step 2: Search for Completed Tickets

@@ -123,7 +123,7 @@ These scripts are bundled in the Awl plugin:
 
 **Use commands instead**:
 
-- `/validate-frontmatter` - Validates frontmatter
+- `/awl-meta:validate-frontmatter` - Validates frontmatter
 
 ---
 

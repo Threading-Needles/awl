@@ -427,7 +427,7 @@ Present success summary:
 ### Create from Catalog Entry
 
 ```
-/create-workflow from catalog wshobson/commands/code-review
+/awl-meta:create-workflow from catalog wshobson/commands/code-review
 ```
 
 Creates a new workflow based on a specific catalog entry.
@@ -435,7 +435,7 @@ Creates a new workflow based on a specific catalog entry.
 ### Create with Custom Template
 
 ```
-/create-workflow agent data-analyzer --template minimal
+/awl-meta:create-workflow agent data-analyzer --template minimal
 ```
 
 Uses predefined templates:
@@ -447,7 +447,7 @@ Uses predefined templates:
 ### Quick Create
 
 ```
-/create-workflow command quick-commit "Create conventional commits"
+/awl-meta:create-workflow command quick-commit "Create conventional commits"
 ```
 
 Skips interactive steps, uses defaults.
@@ -561,10 +561,10 @@ Standard categories found in workspace:
 
 ## Integration with Other Commands
 
-- **Discover**: `/discover-workflows` → find examples to model after
-- **Import**: `/import-workflow` → import external workflow as starting point
-- **Create**: `/create-workflow` (this command) → create new workflow
-- **Validate**: `/validate-frontmatter` → ensure consistency
+- **Discover**: `/awl-meta:discover-workflows` → find examples to model after
+- **Import**: `/awl-meta:import-workflow` → import external workflow as starting point
+- **Create**: `/awl-meta:create-workflow` (this command) → create new workflow
+- **Validate**: `/awl-meta:validate-frontmatter` → ensure consistency
 
 ## Error Handling
 

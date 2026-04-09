@@ -31,9 +31,9 @@ Organize by **use case** rather than **feature type**:
 
 **Includes**:
 
-- Core workflow commands: `/research-codebase`, `/create-plan`, `/implement-plan`
-- Development commands: `/awl-dev:commit`, `/describe-pr`
-- Handoff system: `/create-handoff`, `/resume-handoff`
+- Core workflow commands: `/awl-dev:research-codebase`, `/awl-dev:create-plan`, `/awl-dev:implement-plan`
+- Development commands: `/awl-dev:commit`, `/awl-dev:describe-pr`
+- Handoff system: `/awl-dev:create-handoff`, `/awl-dev:resume-handoff`
 - All research agents (codebase-locator, analyzer, pattern-finder, etc.)
 - Lightweight MCPs: DeepWiki (~1.9k), Context7 (~1.7k)
 
@@ -76,9 +76,9 @@ Organize by **use case** rather than **feature type**:
 **Includes**:
 
 - Sentry MCP (~20,670 tokens, 19 tools)
-- `/debug-production-error` - Search and analyze Sentry issues
-- `/error-impact-analysis` - Assess error severity and user impact
-- `/trace-analysis` - Distributed tracing investigation
+- `/awl-debugging:debug-production-error` - Search and analyze Sentry issues
+- `/awl-debugging:error-impact-analysis` - Assess error severity and user impact
+- `/awl-debugging:trace-analysis` - Distributed tracing investigation
 - `@agent-error-root-cause` - Root cause analysis with Seer
 
 **Context cost**: ~20k tokens when enabled
@@ -120,9 +120,9 @@ Organize by **use case** rather than **feature type**:
 # Only awl-dev installed
 # Context: ~3.5k MCP tokens
 
-/research-codebase "authentication flow"
-/create-plan "Add OAuth support"
-/implement-plan
+/awl-dev:research-codebase "authentication flow"
+/awl-dev:create-plan "Add OAuth support"
+/awl-dev:implement-plan
 /awl-dev:commit
 ```
 
@@ -156,7 +156,7 @@ Organize by **use case** rather than **feature type**:
 
 # Now Sentry MCP available
 /awl-dev:debug-production-error "TypeError in checkout"
-/error-impact-analysis
+/awl-debugging:error-impact-analysis
 
 # Optional: Also enable analytics for user impact
 /plugin enable awl-analytics

@@ -123,7 +123,7 @@ This script will guide you through:
 # Restart Claude Code
 ```
 
-You're ready! Try `/research-codebase` in your next session.
+You're ready! Try `/awl-dev:research-codebase` in your next session.
 
 **Recommended**: Add the Awl workflow snippet to your project's CLAUDE.md. See
 [CLAUDE.md Setup](QUICKSTART.md#claudemd-setup) for the copy-paste snippet.
@@ -212,13 +212,13 @@ claude plugin marketplace update awl
 ## Complete Workflow
 
 ```
-/research-codebase → /create-plan → /implement-plan → /validate-plan → /create-pr → /merge-pr
+/awl-dev:research-codebase → /awl-dev:create-plan → /awl-dev:implement-plan → /awl-dev:validate-plan → /awl-dev:create-pr → /awl-dev:merge-pr
 ```
 
 With handoffs for context persistence:
 
 ```
-/create-handoff → /resume-handoff
+/awl-dev:create-handoff → /awl-dev:resume-handoff
 ```
 
 Agents proactively monitor context during implementation and will prompt you to create handoffs

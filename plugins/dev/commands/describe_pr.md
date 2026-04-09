@@ -311,23 +311,23 @@ Review updated PR: {url}
 ## Integration with Other Commands
 
 ```
-/research-codebase PROJ-123 → research document
+/awl-dev:research-codebase PROJ-123 → research document
                   ↓
-           /create-plan → implementation plan
+           /awl-dev:create-plan → implementation plan
                   ↓
-          /implement-plan → code changes
+          /awl-dev:implement-plan → code changes
                   ↓
-           /validate-plan → verification
+           /awl-dev:validate-plan → verification
                   ↓
-              /describe-pr → PR description (this command)
+              /awl-dev:describe-pr → PR description (this command)
                   ↓
-              /create-pr → creates PR on GitHub
+              /awl-dev:create-pr → creates PR on GitHub
 ```
 
 **How it connects:**
 
 - **Previous**: Gets context from research/plan documents in Linear
-- **Next**: `/create-pr` uses the description, also links to ticket
+- **Next**: `/awl-dev:create-pr` uses the description, also links to ticket
 - **Workflow context**: Ticket is used throughout
 
 ## Error Handling
@@ -405,7 +405,7 @@ Uses `.claude/config.json`:
 
 ## Status Update Convention
 
-This command is a downstream command (typically called by `/create-pr`) and does NOT update status on start - it updates to "In Review" on success. However, on failure, it should roll back to the appropriate previous state:
+This command is a downstream command (typically called by `/awl-dev:create-pr`) and does NOT update status on start - it updates to "In Review" on success. However, on failure, it should roll back to the appropriate previous state:
 
 Use `mcp__linear__save_issue` to set the ticket status back to "In Dev".
 

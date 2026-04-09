@@ -466,7 +466,7 @@ This command uses configuration from \`.claude/config.json\`:
 When adding new categories, tools, or patterns:
 
 1. **Update this document** with the new standard
-2. **Run validation**: `/validate-frontmatter` to check all existing workflows
+2. **Run validation**: `/awl-meta:validate-frontmatter` to check all existing workflows
 3. **Fix inconsistencies**: Update workflows to match new standard
 4. **Document changes**: Include clear commit message explaining the update
 5. **Notify team**: If working in a team, communicate the change
@@ -542,22 +542,22 @@ See `plugins/dev/LINEAR_DOCUMENTS.md` for the embedded questions format.
 
 ## Validation
 
-Use the `/validate-frontmatter` command to check compliance:
+Use the `/awl-meta:validate-frontmatter` command to check compliance:
 
 ```bash
 # Validate all workflows
-/validate-frontmatter
+/awl-meta:validate-frontmatter
 
 # Validate and auto-fix
-/validate-frontmatter --fix
+/awl-meta:validate-frontmatter --fix
 
 # Validate specific file
-/validate-frontmatter plugins/dev/agents/codebase-analyzer.md
+/awl-meta:validate-frontmatter plugins/dev/agents/codebase-analyzer.md
 ```
 
 ## See Also
 
-- `/validate-frontmatter` - Validate workflows against this standard
-- `/create-workflow` - Create new workflows with correct frontmatter
-- `/import-workflow` - Import external workflows and adapt frontmatter
-- `/discover-workflows` - Discover workflows from external repositories
+- `/awl-meta:validate-frontmatter` - Validate workflows against this standard
+- `/awl-meta:create-workflow` - Create new workflows with correct frontmatter
+- `/awl-meta:import-workflow` - Import external workflows and adapt frontmatter
+- `/awl-meta:discover-workflows` - Discover workflows from external repositories

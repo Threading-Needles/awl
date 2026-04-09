@@ -41,7 +41,7 @@ chmod +x setup-awl.sh
 # Restart Claude Code
 ```
 
-You're ready! Try `/research-codebase` in your next session.
+You're ready! Try `/awl-dev:research-codebase` in your next session.
 
 ---
 
@@ -84,7 +84,7 @@ Run `/awl-dev:doctor` to check what's installed and get guidance on missing depe
 For the best experience, install these complementary plugins from the Claude Code marketplace:
 
 ```bash
-# Required for full /implement-plan automation
+# Required for full /awl-dev:implement-plan automation
 /plugin install pr-review-toolkit
 
 # Recommended for enhanced development
@@ -375,7 +375,7 @@ Awl provides a research → plan → implement → validate → ship workflow.
 ### 1. Research Phase
 
 ```
-/research-codebase
+/awl-dev:research-codebase
 ```
 
 Follow prompts to research your codebase. This:
@@ -386,7 +386,7 @@ Follow prompts to research your codebase. This:
 ### 2. Planning Phase
 
 ```
-/create-plan
+/awl-dev:create-plan
 ```
 
 This:
@@ -397,7 +397,7 @@ This:
 ### 3. Implementation Phase
 
 ```
-/implement-plan
+/awl-dev:implement-plan
 ```
 
 **Note**: If you just created a plan, omit the path - it auto-finds your most recent plan!
@@ -411,7 +411,7 @@ This:
 ### 4. Validation Phase
 
 ```
-/validate-plan
+/awl-dev:validate-plan
 ```
 
 This:
@@ -423,7 +423,7 @@ This:
 ### 5. Create PR
 
 ```
-/create-pr
+/awl-dev:create-pr
 ```
 
 Automatically creates a PR with comprehensive description from your research and plan.
@@ -434,19 +434,19 @@ Automatically creates a PR with comprehensive description from your research and
 
 ```bash
 # Save context
-/create-handoff
+/awl-dev:create-handoff
 
 # Resume later
-/resume-handoff
+/awl-dev:resume-handoff
 ```
 
 ### Workflow Context Auto-Discovery
 
 Awl tracks your workflow via `.claude/.workflow-context.json`:
 
-- `/research-codebase` → `/create-plan` references it
-- `/create-plan` → `/implement-plan` auto-finds it
-- `/create-handoff` → `/resume-handoff` auto-finds it
+- `/awl-dev:research-codebase` → `/awl-dev:create-plan` references it
+- `/awl-dev:create-plan` → `/awl-dev:implement-plan` auto-finds it
+- `/awl-dev:create-handoff` → `/awl-dev:resume-handoff` auto-finds it
 
 **You don't need to specify file paths** - commands remember your work!
 
@@ -458,14 +458,14 @@ Awl tracks your workflow via `.claude/.workflow-context.json`:
 
 | Command | Purpose |
 |---------|---------|
-| `/research-codebase` | Research codebase and save findings |
-| `/create-plan` | Interactive planning with research |
-| `/implement-plan` | Execute a plan (auto-finds recent) |
-| `/validate-plan` | Verify implementation |
-| `/create-pr` | Create PR with rich description |
-| `/merge-pr` | Merge PR and update Linear |
-| `/create-handoff` | Save context for later |
-| `/resume-handoff` | Restore previous context |
+| `/awl-dev:research-codebase` | Research codebase and save findings |
+| `/awl-dev:create-plan` | Interactive planning with research |
+| `/awl-dev:implement-plan` | Execute a plan (auto-finds recent) |
+| `/awl-dev:validate-plan` | Verify implementation |
+| `/awl-dev:create-pr` | Create PR with rich description |
+| `/awl-dev:merge-pr` | Merge PR and update Linear |
+| `/awl-dev:create-handoff` | Save context for later |
+| `/awl-dev:resume-handoff` | Restore previous context |
 
 ### PM Commands (awl-pm plugin)
 
@@ -535,7 +535,7 @@ Check that you've enabled the plugin:
 
 ## Next Steps
 
-**You're ready!** Start with `/research-codebase` or `/create-plan` in your next Claude Code session.
+**You're ready!** Start with `/awl-dev:research-codebase` or `/awl-dev:create-plan` in your next Claude Code session.
 
 **Learn more**:
 - [USAGE.md](docs/USAGE.md) - Detailed usage guide

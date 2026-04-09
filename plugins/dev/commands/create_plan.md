@@ -54,7 +54,7 @@ CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
 I need a Linear ticket to attach this plan to.
 
 Please either:
-1. Run `/research-codebase PROJ-123` first (recommended - includes research phase)
+1. Run `/awl-dev:research-codebase PROJ-123` first (recommended - includes research phase)
 2. Provide a ticket ID now: I'll set it and continue
 
 Which would you prefer?
@@ -117,7 +117,7 @@ The following questions need answers before planning can begin:
   → Location: Research document attached to {CURRENT_TICKET}
 
 Please answer these questions in the Linear document, then run:
-  /create-plan
+  /awl-dev:create-plan
 ```
 
 **Hard fail** - do not proceed until all blocking questions have answers.
@@ -133,7 +133,7 @@ No research document found for {CURRENT_TICKET}.
 
 Would you like me to:
 1. Create a plan without research (you'll provide context)
-2. Run /research-codebase first (recommended)
+2. Run /awl-dev:research-codebase first (recommended)
 ```
 
 ### Step 3b: Check for Existing Plan
@@ -474,10 +474,10 @@ After structure approval, create the plan document content:
 {ONLY include this section in headless mode when questions arise during planning}
 
 {If ASSIGNEE is set:}
-@{ASSIGNEE} - Please answer before proceeding to /implement-plan:
+@{ASSIGNEE} - Please answer before proceeding to /awl-dev:implement-plan:
 
 {If no ASSIGNEE:}
-Please answer before proceeding to /implement-plan:
+Please answer before proceeding to /awl-dev:implement-plan:
 
 > **Q1 (blocking)**: {Question that must be answered before implementation}
 > **Context**: {Why this matters for implementation}
@@ -546,10 +546,10 @@ Then output a clear message:
 **Status**: Spec Needed
 
 The plan document has been attached to the ticket with {N} questions
-that need answers before proceeding to /implement-plan.
+that need answers before proceeding to /awl-dev:implement-plan.
 
 Please answer the questions in the Linear document, then run:
-  claude -p "/implement-plan"
+  claude -p "/awl-dev:implement-plan"
 ```
 
 ### Step 6: Present Plan and Check Context
@@ -575,7 +575,7 @@ Current usage: {X}% ({Y}K/{Z}K tokens)
 1. ✅ Review the plan in Linear
 2. ✅ Close this session (clear context)
 3. ✅ Start fresh session
-4. ✅ Run `/implement-plan`
+4. ✅ Run `/awl-dev:implement-plan`
 
 {If <60%}:
 ✅ Context healthy ({X}%).
@@ -613,7 +613,7 @@ Current usage: {X}% ({Y}K/{Z}K tokens)
 1. ✅ Review the updated plan in Linear
 2. ✅ Close this session (clear context)
 3. ✅ Start fresh session
-4. ✅ Run `/implement-plan`
+4. ✅ Run `/awl-dev:implement-plan`
 
 {If <60%}:
 ✅ Context healthy ({X}%).
@@ -708,27 +708,27 @@ Please review the updated plan and let me know:
 ## Integration with Other Commands
 
 ```
-/research-codebase PROJ-123 → research document
+/awl-dev:research-codebase PROJ-123 → research document
                   ↓
-           /create-plan → implementation plan (this command)
+           /awl-dev:create-plan → implementation plan (this command)
                   ↓
-          /implement-plan → code changes
+          /awl-dev:implement-plan → code changes
                   ↓
-              /describe-pr → PR created
+              /awl-dev:describe-pr → PR created
 ```
 
 **How it connects:**
 
 - **Previous**: Gets research from Linear documents attached to ticket
-- **Next**: `/implement-plan` finds plan via `linear-document-locator`
+- **Next**: `/awl-dev:implement-plan` finds plan via `linear-document-locator`
 - **Workflow context**: Current ticket is already set from research phase
 
 ## Example Workflow
 
 ```bash
-# After running /research-codebase PROJ-123...
+# After running /awl-dev:research-codebase PROJ-123...
 
-/create-plan
+/awl-dev:create-plan
 # You:
 # 1. Get current ticket from workflow context (PROJ-123)
 # 2. Update ticket status to "Plan in Progress" (THE FIRST thing)

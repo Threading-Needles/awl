@@ -67,9 +67,9 @@ Return a table showing all documents found:
 No documents found attached to this issue.
 
 To create a document, use one of:
-- `/research-codebase {TICKET_ID}` - Create research document
-- `/create-plan` - Create implementation plan
-- `/create-handoff` - Create handoff document
+- `/awl-dev:research-codebase {TICKET_ID}` - Create research document
+- `/awl-dev:create-plan` - Create implementation plan
+- `/awl-dev:create-handoff` - Create handoff document
 ```
 
 ### Invalid Ticket

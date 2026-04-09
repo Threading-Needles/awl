@@ -21,7 +21,7 @@ These plugins are required for full functionality:
 
 | Plugin | Used By | Install |
 |--------|---------|---------|
-| pr-review-toolkit | `/implement-plan` | `/plugin install pr-review-toolkit` |
+| pr-review-toolkit | `/awl-dev:implement-plan` | `/plugin install pr-review-toolkit` |
 
 ### Recommended Plugins
 

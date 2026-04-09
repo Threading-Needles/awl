@@ -113,8 +113,8 @@ Free up context after debugging/analytics work:
 # Linear and GitHub MCPs (if configured) stay enabled
 
 # Use workflow commands
-/research-codebase
-/create-plan
+/awl-dev:research-codebase
+/awl-dev:create-plan
 ```
 
 **Context**: 3.5k tokens throughout

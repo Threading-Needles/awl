@@ -4,14 +4,14 @@ Context management and workflow tools using Linear documents.
 
 ## Commands
 
-### `/create-handoff`
+### `/awl-dev:create-handoff`
 
 Create handoff document for passing work to another developer or session.
 
 **Usage:**
 
 ```
-/create-handoff
+/awl-dev:create-handoff
 ```
 
 **Creates:**
@@ -29,14 +29,14 @@ Create handoff document for passing work to another developer or session.
 - Known blockers
 - Important context
 
-### `/resume-handoff`
+### `/awl-dev:resume-handoff`
 
 Resume work from handoff document.
 
 **Usage:**
 
 ```
-/resume-handoff PROJ-123
+/awl-dev:resume-handoff PROJ-123
 ```
 
 **Process:**
@@ -81,7 +81,7 @@ Commands use Linear documents attached to tickets:
 **Discovery:** Documents are discovered by querying Linear for attachments on the current ticket.
 
 **Workflow Context:** The current ticket is tracked in `.claude/.workflow-context.json` to enable
-command chaining (e.g., `/research-codebase` → `/create-plan` → `/implement-plan`).
+command chaining (e.g., `/awl-dev:research-codebase` → `/awl-dev:create-plan` → `/awl-dev:implement-plan`).
 
 ## Prerequisites
 

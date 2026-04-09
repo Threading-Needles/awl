@@ -29,7 +29,7 @@ CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
 I need a Linear ticket to find the implementation plan.
 
 Please either:
-1. Provide a ticket ID: `/validate-plan PROJ-123`
+1. Provide a ticket ID: `/awl-dev:validate-plan PROJ-123`
 2. Or tell me which ticket to validate
 
 Which would you prefer?
@@ -235,7 +235,7 @@ Current usage: {X}% ({Y}K/{Z}K tokens)
 1. Review this validation report
 2. Address any failures
 3. Close this session (clear context)
-4. Start fresh for: `/commit` and `/describe-pr`
+4. Start fresh for: `/awl-dev:commit` and `/awl-dev:describe-pr`
 
 {If <60%}:
 ✅ Context healthy. Ready for PR creation.
@@ -334,21 +334,21 @@ Always verify:
 ## Integration with Other Commands
 
 ```
-/research-codebase PROJ-123 → research document
+/awl-dev:research-codebase PROJ-123 → research document
                   ↓
-           /create-plan → implementation plan
+           /awl-dev:create-plan → implementation plan
                   ↓
-          /implement-plan → code changes
+          /awl-dev:implement-plan → code changes
                   ↓
-           /validate-plan → verification (this command)
+           /awl-dev:validate-plan → verification (this command)
                   ↓
-              /describe-pr → PR created
+              /awl-dev:describe-pr → PR created
 ```
 
 **How it connects:**
 
 - **Previous**: Finds plan from Linear documents attached to ticket
-- **Next**: `/describe-pr` creates PR description, also as Linear document
+- **Next**: `/awl-dev:describe-pr` creates PR description, also as Linear document
 - **Workflow context**: Current ticket is tracked throughout
 
 The validation works best after commits are made, as it can analyze the git history to understand
@@ -408,12 +408,12 @@ Critical checks pass. Non-critical issues noted:
 Proceeding to PR creation with warnings.
 ```
 
-**Note**: This command is typically called automatically by `/implement-plan` as part of the
+**Note**: This command is typically called automatically by `/awl-dev:implement-plan` as part of the
 post-implementation workflow. You can also run it standalone to validate an implementation.
 
 ## Status Update Convention
 
-This command is a downstream command (typically called by `/implement-plan`) and does NOT update status on start. However, on failure, it should roll back to the appropriate previous state:
+This command is a downstream command (typically called by `/awl-dev:implement-plan`) and does NOT update status on start. However, on failure, it should roll back to the appropriate previous state:
 
 - Use `mcp__linear__save_issue` to update the ticket state back to "In Dev"
 - Use `mcp__linear__save_comment` to add a comment explaining the validation failure and that the ticket is returning to development state

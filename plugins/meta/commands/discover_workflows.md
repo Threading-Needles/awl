@@ -254,8 +254,8 @@ Discovered {N} workflows ({X} commands, {Y} agents)
 
 ## Next Steps
 
-1. **Import a workflow**: `/import-workflow {repo} {workflow-name}`
-2. **Discover another repo**: `/discover-workflows`
+1. **Import a workflow**: `/awl-meta:import-workflow {repo} {workflow-name}`
+2. **Discover another repo**: `/awl-meta:discover-workflows`
 ```
 
 ## Advanced Usage
@@ -263,7 +263,7 @@ Discovered {N} workflows ({X} commands, {Y} agents)
 ### Discover All Repos (Maximum Parallelism)
 
 ```
-/discover-workflows all
+/awl-meta:discover-workflows all
 ```
 
 This will:
@@ -283,7 +283,7 @@ This will:
 ### Discover Custom Repo
 
 ```
-/discover-workflows org/repo
+/awl-meta:discover-workflows org/repo
 ```
 
 Works with any public GitHub repo with Claude Code workflows.
@@ -291,7 +291,7 @@ Works with any public GitHub repo with Claude Code workflows.
 ### Focus on Specific Type
 
 ```
-/discover-workflows wshobson/agents --focus agents
+/awl-meta:discover-workflows wshobson/agents --focus agents
 ```
 
 Only analyzes agents, skips commands.
@@ -300,13 +300,13 @@ Only analyzes agents, skips commands.
 
 - **Read-only**: This command only researches, doesn't import
 - **Reusable**: Run anytime to research new repos
-- **Combinable**: Use with `/import-workflow` to actually import
+- **Combinable**: Use with `/awl-meta:import-workflow` to actually import
 
 ## Integration with Other Commands
 
-- **Discover** → `/discover-workflows` (this command)
-- **Import** → `/import-workflow` (imports discovered workflows)
-- **Create** → `/create-workflow` (creates new using discovered patterns)
-- **Validate** → `/validate-frontmatter` (ensures consistency)
+- **Discover** → `/awl-meta:discover-workflows` (this command)
+- **Import** → `/awl-meta:import-workflow` (imports discovered workflows)
+- **Create** → `/awl-meta:create-workflow` (creates new using discovered patterns)
+- **Validate** → `/awl-meta:validate-frontmatter` (ensures consistency)
 
 This command is the first step in workflow discovery and reuse!
