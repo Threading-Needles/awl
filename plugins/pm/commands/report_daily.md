@@ -29,7 +29,7 @@ else
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts"
 fi
 
-# 2. Check PM plugin prerequisites (validates Linearis CLI and LINEAR_API_TOKEN)
+# 2. Check PM plugin prerequisites
 if [[ -f "${SCRIPT_DIR}/check-prerequisites.sh" ]]; then
   "${SCRIPT_DIR}/check-prerequisites.sh" || exit 1
 else

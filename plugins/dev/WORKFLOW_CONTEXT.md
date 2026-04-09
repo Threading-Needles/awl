@@ -54,7 +54,7 @@ You → /create-plan
       ↓
 Command reads current ticket from workflow-context.json
       ↓
-Queries Linear: linearis attachments list --issue PROJ-123
+Queries Linear: mcp__linear__get_issue for PROJ-123
       ↓
 Finds "Research: OAuth Implementation" document
       ↓
@@ -64,7 +64,7 @@ Claude reads research and creates plan
 **Key Components:**
 
 1. **Workflow Context** - Provides current ticket ID
-2. **Linear API** (via linearis CLI) - Query documents attached to ticket
+2. **Linear MCP** - Query documents attached to ticket
 3. **Command Instructions** - Auto-discover documents from Linear
 
 ---
@@ -182,9 +182,7 @@ TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
 
 **STEP 2: Query Linear for documents**
 
-```bash
-linearis attachments list --issue "$TICKET"
-```
+Use `mcp__linear__get_issue` with the ticket identifier to retrieve issue details and attached documents.
 
 **STEP 3: Determine which document to use**
 
@@ -225,8 +223,8 @@ Can always provide explicit ticket ID to override auto-discovery
 
 **Solutions**:
 1. Check current ticket is set: `workflow-context.sh get-ticket`
-2. Verify Linear documents exist: `linearis attachments list --issue PROJ-123`
-3. Ensure `LINEAR_API_TOKEN` is set
+2. Verify Linear documents exist using `mcp__linear__get_issue` for the ticket
+3. Ensure the Linear MCP server is configured and connected
 
 ### Workflow Context Empty
 

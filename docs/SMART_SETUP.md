@@ -82,7 +82,7 @@ Enter team number [1-3]: 1
 
 ### 4. Time Savings
 If you already have:
-- Linear CLI configured → Zero manual input
+- Linear token configured → Zero manual input
 - Sentry CLI configured → Zero manual input
 
 ## Setting Up for Auto-Discovery
@@ -101,7 +101,7 @@ echo "lin_api_..." > ~/.linear_api_token
 chmod 600 ~/.linear_api_token
 ```
 
-Then `linearis` CLI and Awl both auto-discover it.
+Then Awl setup scripts auto-discover it.
 
 ### Sentry
 

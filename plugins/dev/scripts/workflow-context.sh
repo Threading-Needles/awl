@@ -7,7 +7,6 @@
 #   workflow-context.sh get-ticket        - Get current ticket
 #   workflow-context.sh clear             - Clear current ticket
 #   workflow-context.sh detect-mode       - Detect interactive vs headless mode (or use CLAUDE_MODE env var)
-#   workflow-context.sh get-assignee [ID] - Get assignee name for ticket (returns empty on error)
 
 set -euo pipefail
 
@@ -110,44 +109,8 @@ detect-mode)
 		echo "headless"
 	fi
 	;;
-get-assignee)
-	# Get the assignee name for a ticket (for document mentions)
-	# Returns: assignee name if found, empty string if no assignee or on error
-	# Errors are logged to stderr for debugging
-	_ga_ticket="${2:-}"
-	if [[ -z "$_ga_ticket" ]]; then
-		_ga_ticket=$(get_ticket)
-	fi
-	if [[ -z "$_ga_ticket" || "$_ga_ticket" == "null" ]]; then
-		echo ""
-		exit 0
-	fi
-
-	# Check if linearis is available
-	if ! command -v linearis &>/dev/null; then
-		echo "Warning: linearis CLI not found, cannot fetch assignee" >&2
-		echo ""
-		exit 0
-	fi
-
-	# Attempt to read ticket with error handling
-	if ! _ga_response=$(linearis issues read "$_ga_ticket" 2>&1); then
-		echo "Warning: Could not fetch ticket $_ga_ticket: $_ga_response" >&2
-		echo ""
-		exit 0
-	fi
-
-	# Validate JSON and extract assignee
-	if ! _ga_assignee=$(echo "$_ga_response" | jq -r '.assignee.name // empty' 2>/dev/null); then
-		echo "Warning: Invalid response from Linear for ticket $_ga_ticket" >&2
-		echo ""
-		exit 0
-	fi
-
-	echo "$_ga_assignee"
-	;;
 *)
-	echo "Usage: $0 {init|set-ticket|get-ticket|clear|detect-mode|get-assignee}" >&2
+	echo "Usage: $0 {init|set-ticket|get-ticket|clear|detect-mode}" >&2
 	echo ""
 	echo "Commands:"
 	echo "  init              Initialize workflow context file"
@@ -155,7 +118,6 @@ get-assignee)
 	echo "  get-ticket        Get current ticket ID"
 	echo "  clear             Clear current ticket"
 	echo "  detect-mode       Detect interactive vs headless mode (CLAUDE_MODE overrides)"
-	echo "  get-assignee [id] Get assignee name for ticket (empty on error)"
 	exit 1
 	;;
 esac

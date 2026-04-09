@@ -85,5 +85,4 @@ command chaining (e.g., `/research-codebase` → `/create-plan` → `/implement-
 
 ## Prerequisites
 
-- `LINEAR_API_TOKEN` environment variable set
-- `linearis` CLI installed (`npm install -g linearis`)
+- **Linear MCP**: The official Linear MCP server must be configured (handles authentication automatically)

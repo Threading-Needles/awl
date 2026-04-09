@@ -20,13 +20,12 @@ Run all checks and output a structured status report:
 
 ## CLI Tools
 
-✅ linearis (Linear CLI)
 ✅ jq (JSON processor)
 ✅ gh (GitHub CLI)
 
 ## Environment Variables
 
-✅ LINEAR_API_TOKEN is set
+✅ Linear MCP connected
 ❌ SENTRY_AUTH_TOKEN is not set
    → Get token: https://sentry.io/settings/api-keys/
    → Set: export SENTRY_AUTH_TOKEN=your_token
@@ -86,7 +85,7 @@ echo "## CLI Tools"
 echo ""
 
 # Required tools
-REQUIRED_TOOLS=("linearis:Linear CLI:npm install -g linearis" "jq:JSON processor:brew install jq" "gh:GitHub CLI:brew install gh")
+REQUIRED_TOOLS=("jq:JSON processor:brew install jq" "gh:GitHub CLI:brew install gh")
 
 for tool_spec in "${REQUIRED_TOOLS[@]}"; do
     IFS=: read -r cmd name install <<< "$tool_spec"
@@ -117,13 +116,8 @@ echo ""
 echo "## Environment Variables"
 echo ""
 
-if [[ -n "${LINEAR_API_TOKEN:-}" ]]; then
-    echo "✅ LINEAR_API_TOKEN is set"
-else
-    echo "❌ LINEAR_API_TOKEN is not set"
-    echo "   → Get token: https://linear.app/settings/api"
-    echo "   → Set: export LINEAR_API_TOKEN=your_token"
-fi
+echo "ℹ️  Linear integration uses the official Linear MCP server"
+echo "   Verify by running a Linear command (e.g., /awl-dev:linear)"
 
 # Optional env vars
 if [[ -z "${SENTRY_AUTH_TOKEN:-}" ]]; then

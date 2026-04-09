@@ -1,7 +1,7 @@
 ---
 description: Generate or update PR description with incremental changes
 category: version-control-git
-tools: Bash, Read, Write
+tools: mcp__linear__get_issue, mcp__linear__save_issue, mcp__linear__save_comment, mcp__linear__create_document, mcp__linear__update_document, mcp__linear__get_document, Bash, Read, Write
 model: inherit
 version: 3.0.0
 ---
@@ -13,14 +13,9 @@ Linear tickets. The PR description is also saved as a Linear document for persis
 
 ## Prerequisites
 
-Before executing, verify Linear integration is available:
-
-```bash
-# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
-  "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
-fi
-```
+Before executing, verify Linear MCP tools are available by confirming that the
+`mcp__linear__get_issue` tool is accessible. No environment variables or CLI tools are
+needed for Linear integration -- all Linear operations use MCP tools directly.
 
 ## Process:
 
@@ -88,12 +83,8 @@ fi
 
 ### 4. Check for existing PR description in Linear
 
-```bash
-# Find existing PR documents attached to ticket
-linearis attachments list --issue "$ticket"
-```
-
-Look for documents with title starting with "PR:".
+Use `mcp__linear__get_issue` with the ticket identifier to retrieve the issue and its
+attached documents. Inspect the returned documents for any with a title starting with "PR:".
 
 ### 5. Gather comprehensive PR information
 
@@ -116,12 +107,9 @@ gh pr checks $pr_number
 
 ### 6. Get Linear ticket context
 
-```bash
-# Get ticket details from Linear
-linearis issues read "$ticket"
-```
-
-Use ticket title and description for context when generating the PR description.
+Use `mcp__linear__get_issue` with the ticket identifier to retrieve the ticket's title,
+description, status, and other metadata. Use the ticket title and description for context when
+generating the PR description.
 
 ### 7. Analyze changes incrementally
 
@@ -240,39 +228,24 @@ fi
 
 **Create or update Linear document:**
 
-```bash
-# Get team key from config
-TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' .claude/config.json)
+**If creating a new document:** Use `mcp__linear__create_document` with:
+- `title`: "PR: #${pr_number} - ${pr_title}"
+- `content`: The full PR description in markdown
+- `issueId`: The ticket identifier to attach the document to
 
-# If creating new document
-linearis documents create \
-  --title "PR: #${pr_number} - ${pr_title}" \
-  --team "${TEAM_KEY}" \
-  --content "${PR_DESCRIPTION}" \
-  --attach-to "${ticket}" \
-  --icon "CodeBlock" \
-  --color "#2f80ed"
-
-# If updating existing document
-linearis documents update "${document_id}" \
-  --content "${PR_DESCRIPTION}"
-```
+**If updating an existing document:** Use `mcp__linear__update_document` with:
+- `id`: The existing document ID found in Step 4
+- `content`: The updated PR description in markdown
 
 ### 11. Update PR on GitHub
 
 **Update title:**
 
-```bash
-# If ticket exists, format: TICKET: Descriptive title
-if [[ "$ticket" ]]; then
-    # Get ticket title from Linear
-    ticket_title=$(linearis issues read "$ticket" | jq -r '.title')
-    new_title="$ticket: ${ticket_title:0:60}"
-else
-    # Generate from primary change
-    new_title="Brief summary of main change"
-fi
+If a ticket exists, use `mcp__linear__get_issue` to retrieve the ticket title (if not
+already fetched in Step 6). Format the PR title as `TICKET: Descriptive title` (truncate the ticket
+title to 60 characters). If no ticket exists, generate a title from the primary change.
 
+```bash
 gh pr edit $pr_number --title "$new_title"
 ```
 
@@ -286,14 +259,17 @@ gh pr edit $pr_number --body-file /tmp/pr_body.md
 
 ### 12. Update Linear ticket
 
-```bash
-# Move to "In Review" state
-linearis issues update "$ticket" --state "In Review"
+Use `mcp__linear__save_issue` to move the ticket to "In Review" state by setting the
+appropriate status.
 
-# Add comment about PR description
-linearis comments create "$ticket" \
-    --body "PR description generated!\n\n**PR**: #${pr_number}\n**Verification**: ${checksPassedCount}/${totalChecks} automated checks passed\n\nView PR: ${prUrl}"
-```
+Use `mcp__linear__save_comment` to add a comment to the ticket with the following content:
+
+> PR description generated!
+>
+> **PR**: #${pr_number}
+> **Verification**: ${checksPassedCount}/${totalChecks} automated checks passed
+>
+> View PR: ${prUrl}
 
 ### 13. Report results
 
@@ -431,8 +407,8 @@ Uses `.claude/config.json`:
 
 This command is a downstream command (typically called by `/create-pr`) and does NOT update status on start - it updates to "In Review" on success. However, on failure, it should roll back to the appropriate previous state:
 
-```bash
-# Roll back to previous state on failure
-linearis issues update "$CURRENT_TICKET" --state "In Dev"
-linearis comments create "$CURRENT_TICKET" --body "PR description generation failed: ${ERROR_REASON}. Returning to development state."
-```
+Use `mcp__linear__save_issue` to set the ticket status back to "In Dev".
+
+Use `mcp__linear__save_comment` to add a comment explaining the failure:
+
+> PR description generation failed: ${ERROR_REASON}. Returning to development state.

@@ -1,7 +1,7 @@
 ---
 description: Conduct comprehensive codebase research using parallel sub-agents
 category: workflow
-tools: Read, Write, Grep, Glob, Task, TodoWrite, Bash
+tools: Read, Write, Grep, Glob, Task, TodoWrite, Bash, mcp__linear__get_issue, mcp__linear__save_issue, mcp__linear__save_comment, mcp__linear__create_document, mcp__linear__update_document
 model: inherit
 version: 2.0.0
 ---
@@ -26,7 +26,7 @@ by spawning parallel sub-agents and synthesizing their findings.
 Before executing, verify Linear integration is available:
 
 ```bash
-# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
+# Validate plugin prerequisites
 if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
   "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
 fi
@@ -71,9 +71,7 @@ Which would you prefer?
 
 4. **Get assignee for headless mode** (used for document mentions):
 
-```bash
-ASSIGNEE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-assignee "$TICKET_ID")
-```
+Use `mcp__linear__get_issue` with the ticket ID to retrieve the issue details. Extract the assignee name from the response to use for `@mentions` in document sections like "Questions for User".
 
 5. **Branch based on mode**:
 
@@ -90,7 +88,7 @@ Then wait for the user's research query.
 
 **If MODE is "headless":**
 
-- Read the ticket details: `linearis issues read "$TICKET_ID"`
+- Read the ticket details using `mcp__linear__get_issue` with the ticket ID
 - Use the ticket title and description as the research focus
 - Proceed directly to research steps (no user prompt needed)
 - Track questions that arise during research for embedding in document
@@ -101,11 +99,9 @@ Then wait for the user's research query.
 
 **This MUST be the first action after receiving the research query**:
 
-```bash
-# Update ticket state immediately - this is THE FIRST thing we do
-linearis issues update "$TICKET_ID" --state "Research in Progress"
-linearis comments create "$TICKET_ID" --body "Starting research: ${RESEARCH_QUESTION:-Analyzing ticket}"
-```
+Use `mcp__linear__save_issue` with the ticket ID to update the state to "Research in Progress".
+
+Then use `mcp__linear__save_comment` with the ticket ID and body "Starting research: {RESEARCH_QUESTION}" (or "Starting research: Analyzing ticket" if no explicit question was provided).
 
 ### Step 1: Read Any Directly Mentioned Files First
 
@@ -318,31 +314,18 @@ understanding could be deepened}
 
 Create the research document in Linear attached to the ticket:
 
-```bash
-# Get team key from config
-TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' .claude/config.json)
+Use `mcp__linear__create_document` with the following parameters:
+- **title**: "Research: {DESCRIPTION}"
+- **content**: The full research document content generated in Step 6
+- **issueId**: The ticket ID to attach the document to
 
-# Create Linear document with research content
-linearis documents create \
-  --title "Research: ${DESCRIPTION}" \
-  --team "${TEAM_KEY}" \
-  --content "${DOCUMENT_CONTENT}" \
-  --attach-to "${TICKET_ID}" \
-  --icon "Search" \
-  --color "#eb5757"
-
-# Add completion comment to ticket
-linearis comments create "$TICKET_ID" --body "Research complete! Document attached to this ticket."
-```
+Then use `mcp__linear__save_comment` with the ticket ID and body "Research complete! Document attached to this ticket."
 
 **In headless mode with embedded questions:**
 
 If the document contains a "Questions for User" section with unanswered questions:
 
-```bash
-# Set ticket status to "Spec Needed" to signal human input required
-linearis issues update "$TICKET_ID" --state "Spec Needed"
-```
+Use `mcp__linear__save_issue` with the ticket ID to update the state to "Spec Needed" to signal that human input is required.
 
 Then output a clear message:
 
@@ -414,18 +397,9 @@ Would you like me to:
 
 If the user has follow-up questions:
 
-1. **Update the existing Linear document** with new findings
-2. Use `linearis documents update <document-id>` to append content
-3. **Spawn new sub-agents as needed** for the follow-up research
-
-```bash
-# Update existing research document
-linearis documents update "$DOCUMENT_ID" \
-  --content "${UPDATED_CONTENT}"
-
-# Add comment about the update
-linearis comments create "$TICKET_ID" --body "Research updated with follow-up findings."
-```
+1. **Update the existing Linear document** with new findings using `mcp__linear__update_document` with the document ID and updated content
+2. **Spawn new sub-agents as needed** for the follow-up research
+3. **Add a comment** using `mcp__linear__save_comment` with the ticket ID and body "Research updated with follow-up findings."
 
 ## Important Notes
 
@@ -557,7 +531,6 @@ This command integrates with the complete development workflow:
 Please verify:
 1. The ticket ID is correct (e.g., PROJ-123)
 2. You have access to this Linear team
-3. LINEAR_API_TOKEN is set correctly
 
 Would you like me to create a new ticket for this research?
 ```
@@ -576,8 +549,6 @@ Would you like me to create a new ticket for this research?
 - Status stays "Research in Progress" after completion (next command advances it)
 - On failure, roll back to previous state:
 
-```bash
-# Roll back to previous state on failure
-linearis issues update "$TICKET_ID" --state "Backlog"
-linearis comments create "$TICKET_ID" --body "Research failed: ${ERROR_REASON}"
-```
+Use `mcp__linear__save_issue` with the ticket ID to update the state back to "Backlog".
+
+Then use `mcp__linear__save_comment` with the ticket ID and body "Research failed: {ERROR_REASON}".

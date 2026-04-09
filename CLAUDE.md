@@ -38,7 +38,7 @@ attached to tickets:
 - **Handoffs**: Created by `/create-handoff`, titled "Handoff: ..."
 - **PR Descriptions**: Created by `/describe-pr`, titled "PR: ..."
 
-Documents are discovered by querying Linear via `linearis attachments list --issue TICKET-123`.
+Documents are discovered by querying Linear via `mcp__linear__get_issue` with the ticket ID.
 
 ### Workflow State Management
 
@@ -84,7 +84,7 @@ Awl uses Linear documents attached to tickets for persistent workflow context:
 │  └─ PR: #456 - Add OAuth Support    │ ← From /describe-pr
 └─────────────────────────────────────┘
           │
-          ├──→ Queried via: linearis attachments list --issue PROJ-123
+          ├──→ Queried via: mcp__linear__get_issue(id: PROJ-123)
           │
           ▼
 ┌─────────────────────────────────────┐
@@ -211,13 +211,8 @@ Awl uses a **two-layer config system** to keep secrets out of git:
 }
 ```
 
-**Layer 2: Environment Variables** (set in shell or `.env` - NEVER committed):
-```bash
-export LINEAR_API_TOKEN="lin_api_..."
-```
-
 **Benefits**:
-- ✅ Secrets never in git (use environment variables)
+- ✅ Secrets never in git
 - ✅ Multiple projects per machine (work/personal/clients)
 - ✅ `.claude/config.json` only has non-sensitive metadata
 
@@ -235,21 +230,13 @@ Awl **requires** Linear for workflow document storage. This provides:
 
 **Prerequisites:**
 
-1. **Linearis CLI** installed: `npm install -g linearis`
-2. **LINEAR_API_TOKEN** environment variable set
+1. Install `awl-dev` plugin (bundles the Linear MCP server automatically)
 
 **Validation:**
 
-Commands automatically validate Linear is configured. If not, you'll see:
-
-```
-❌ Linearis CLI not found
-Install with: npm install -g linearis
-
-❌ LINEAR_API_TOKEN not set
-Get a token from: https://linear.app/settings/api
-Then: export LINEAR_API_TOKEN=your_token
-```
+The Linear MCP server (`https://mcp.linear.app/mcp`) is bundled in the `awl-dev` plugin's
+`.mcp.json` and connects automatically when the plugin is enabled. On first use, Claude Code
+opens a browser for OAuth consent. No API tokens needed - authentication is automatic.
 
 **Why Required?**
 
@@ -470,22 +457,16 @@ Use `/validate-frontmatter` to check consistency.
 - Claude Code (claude.ai/code)
 - Git
 - Bash
-- Linearis CLI (`linearis`) - For Linear document storage
-- LINEAR_API_TOKEN environment variable
+- Official Linear MCP server (available through Claude Code)
 
 **Optional:**
 
 - GitHub CLI (`gh`) - For PR creation and GitHub operations
 
-**Installation:**
+**Setup:**
 
-```bash
-# Install Linearis CLI
-npm install -g linearis
-
-# Set Linear API token
-export LINEAR_API_TOKEN="lin_api_..."
-```
+The Linear MCP server is bundled with the `awl-dev` plugin. On first use, Claude Code opens
+a browser for OAuth authentication. No API tokens or CLI tools needed.
 
 ## Update Strategy
 
@@ -578,7 +559,7 @@ to tickets instead of filesystem-based storage.
 
 **Consequences**:
 
-- Requires Linear and Linearis CLI for all workflow commands
+- Requires Linear (via official MCP server) for all workflow commands
 - Workflow-context.json only tracks `currentTicket`, not document paths
 - Commands query Linear by ticket ID to find documents
 - PM reports still go to git (not ticket-specific)
@@ -706,9 +687,8 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 
 **Setting up Linear in a new project:**
 
-1. Install Linearis CLI: `npm install -g linearis`
-2. Set `LINEAR_API_TOKEN` environment variable
-3. Configure team in `.claude/config.json`:
+1. Install `awl-dev` plugin (bundles Linear MCP server)
+2. Configure team in `.claude/config.json`:
 
 ```json
 {
@@ -721,7 +701,7 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 ```
 
 **Sharing with team:** Team members see documents in Linear. Each team member installs the Awl
-plugin independently and sets their own `LINEAR_API_TOKEN`.
+plugin independently. OAuth authentication happens automatically on first use.
 
 ## Key Principles When Editing
 

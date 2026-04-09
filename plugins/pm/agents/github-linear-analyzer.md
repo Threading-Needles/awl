@@ -129,13 +129,10 @@ Return structured markdown:
 | #126 | "Update docs" | docs-update | Bob | 5 | Link to existing or create |
 
 **Suggested Actions**:
-```bash
-# Create Linear issue for PR #125
-linearis issues create \
-  --team TEAM \
-  --title "Fix bug (from PR #125)" \
-  --description "Imported from PR: https://github.com/user/repo/pull/125"
-```
+
+Use `mcp__linear__save_issue` to create a new issue:
+- title: "Fix bug (from PR #125)"
+- description: "Imported from PR: https://github.com/user/repo/pull/125"
 
 ## 🏷️ Orphaned Issues (No PR)
 
@@ -151,18 +148,10 @@ linearis issues create \
 | TEAM-456 | #123 | 2025-01-25 | Close issue |
 | TEAM-457 | #124 | 2025-01-26 | Close issue |
 
-**Auto-close commands**:
-```bash
-# Update state
-linearis issues update TEAM-456 --state "Done"
-# Add comment
-linearis comments create TEAM-456 --body "PR #123 merged: https://github.com/user/repo/pull/123"
+**Auto-close actions**:
 
-# Update state
-linearis issues update TEAM-457 --state "Done"
-# Add comment
-linearis comments create TEAM-457 --body "PR #124 merged: https://github.com/user/repo/pull/124"
-```
+For each issue, use `mcp__linear__save_issue` to set state to "Done"
+and `mcp__linear__save_comment` to add a comment linking the merged PR.
 
 ## 🕐 Stale PRs (Open >14 Days)
 

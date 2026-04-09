@@ -216,11 +216,7 @@ Health Score: 75/100
 
 ### Required Tools
 
-1. **Linearis CLI** (with PR #4 cycle features)
-   ```bash
-   npm install -g --install-links czottmann/linearis
-   ```
-   See: https://github.com/czottmann/linearis/pull/4
+1. **Linear MCP**: The official Linear MCP server (handles authentication automatically)
 
 2. **jq** (JSON parsing)
    ```bash
@@ -361,26 +357,9 @@ Default settings in `.claude/config.json`:
 
 ## Troubleshooting
 
-### "Linearis CLI not found"
+### "Linear MCP not available"
 
-Install linearis:
-```bash
-npm install -g --install-links czottmann/linearis
-```
-
-Verify installation:
-```bash
-linearis --version
-```
-
-### "LINEAR_API_TOKEN not set"
-
-Export your Linear API token:
-```bash
-export LINEAR_API_TOKEN=your_token_here
-```
-
-Get token from: https://linear.app/settings/api
+Ensure the official Linear MCP server is configured in your Claude Code settings. The MCP server handles authentication automatically via OAuth.
 
 ### "Configuration file not found"
 
@@ -397,12 +376,7 @@ echo '{"linear": {"teamKey": "TEAM"}}' > .claude/config.json
 
 ### "No active cycle found"
 
-Verify you have an active cycle in Linear:
-```bash
-linearis cycles list --team TEAM
-```
-
-Create a cycle in Linear UI or via API.
+Verify you have an active cycle in Linear using the `mcp__linear__list_cycles` tool, or create a cycle in the Linear UI.
 
 ## Contributing
 

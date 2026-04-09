@@ -12,8 +12,7 @@ Workflow discovery and creation tools.
 
 ### Required
 
-- **Linearis CLI**: `npm install -g linearis`
-- **LINEAR_API_TOKEN**: Environment variable
+- **Linear MCP**: The official Linear MCP server (handles authentication automatically)
 
 ### Recommended Plugins
 

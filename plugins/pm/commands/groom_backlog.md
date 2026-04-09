@@ -26,7 +26,7 @@ else
   SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts"
 fi
 
-# 2. Check PM plugin prerequisites (validates Linearis CLI and LINEAR_API_TOKEN)
+# 2. Check PM plugin prerequisites
 if [[ -f "${SCRIPT_DIR}/check-prerequisites.sh" ]]; then
   "${SCRIPT_DIR}/check-prerequisites.sh" || exit 1
 else
@@ -156,24 +156,16 @@ Would you like to:
 
 If user chooses option 3, generate batch update script:
 
-```bash
-#!/usr/bin/env bash
-# Backlog grooming updates - Generated 2025-01-27
+Use the Linear MCP tools to apply updates:
 
-# Move TEAM-456 to Auth project
-linearis issues update TEAM-456 --project "Auth & Security"
+- **Move issues to projects**: `mcp__linear__save_issue` with project field
+- **Close stale issues**: `mcp__linear__save_issue` with state "Canceled"
+- **Add comments**: `mcp__linear__save_comment` with explanation
 
-# Move TEAM-123 to Frontend project
-linearis issues update TEAM-123 --project "Frontend"
-
-# Close stale issue TEAM-789
-linearis issues update TEAM-789 --state "Canceled"
-linearis comments create TEAM-789 --body "Closing stale issue (>30 days inactive)"
-
-# [... more commands ...]
-
-echo "✅ Backlog grooming updates applied"
-```
+Example actions:
+- Move TEAM-456 to "Auth & Security" project
+- Move TEAM-123 to "Frontend" project
+- Close stale TEAM-789 with comment "Closing stale issue (>30 days inactive)"
 
 ```bash
 # Save update script

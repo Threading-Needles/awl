@@ -107,7 +107,7 @@ error logging" )
 - Checking what context already exists
 - Listing document IDs for the analyzer agent
 
-**Tools**: Bash(linearis \*)
+**Tools**: mcp__linear__get_issue, mcp__linear__list_documents, mcp__linear__get_document
 
 **Example invocation:**
 
@@ -129,7 +129,7 @@ Task( subagent_type="awl-dev:linear-document-locator", prompt="Find documents fo
 - Understanding plan details
 - Reading handoff context
 
-**Tools**: Bash(linearis \*)
+**Tools**: mcp__linear__get_document, mcp__linear__get_issue
 
 **Example invocation:**
 
@@ -151,7 +151,7 @@ Task( subagent_type="awl-dev:linear-document-analyzer", prompt="Analyze document
 - Finding architectural decisions from previous work
 - Surfacing lessons learned from past implementations
 
-**Tools**: Bash(linearis \*), Bash(jq \*)
+**Tools**: mcp__linear__list_issues, mcp__linear__get_issue, mcp__linear__list_documents, mcp__linear__get_document
 
 **Example invocation:**
 

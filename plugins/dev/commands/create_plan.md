@@ -1,7 +1,7 @@
 ---
 description: Create detailed implementation plans through an interactive process
 category: workflow
-tools: Read, Write, Grep, Glob, Task, TodoWrite, Bash
+tools: Read, Write, Grep, Glob, Task, TodoWrite, Bash, mcp__linear__get_issue, mcp__linear__save_issue, mcp__linear__save_comment, mcp__linear__create_document, mcp__linear__update_document, mcp__linear__get_document, mcp__linear__list_documents
 model: inherit
 version: 2.0.0
 ---
@@ -77,21 +77,12 @@ Let me check for existing research on this ticket...
 
 **This MUST be the first action after confirming ticket**:
 
-```bash
-# Update ticket state immediately - this is THE FIRST thing we do
-linearis issues update "$CURRENT_TICKET" --state "Plan in Progress"
-linearis comments create "$CURRENT_TICKET" --body "Starting implementation planning"
-```
+1. Use `mcp__linear__save_issue` to update the ticket state to "Plan in Progress" immediately - this is THE FIRST thing we do.
+2. Use `mcp__linear__save_comment` to add a comment "Starting implementation planning" to the ticket.
 
 ### Step 3: Find Existing Research
 
-Use the linear-document-locator agent to find research documents:
-
-```bash
-linearis attachments list --issue "$CURRENT_TICKET"
-```
-
-Look for documents with title starting with "Research:".
+Use `mcp__linear__get_issue` with the ticket ID to retrieve the issue and its attached documents. Look for documents with title starting with "Research:".
 
 **If research found:**
 
@@ -147,13 +138,7 @@ Would you like me to:
 
 ### Step 3b: Check for Existing Plan
 
-After finding research (or deciding to proceed without it), check for existing plan documents:
-
-```bash
-linearis attachments list --issue "$CURRENT_TICKET"
-```
-
-Look for documents with title starting with "Plan:".
+After finding research (or deciding to proceed without it), check for existing plan documents. Use `mcp__linear__get_issue` with the ticket ID to retrieve the issue and its attached documents. Look for documents with title starting with "Plan:".
 
 **If existing plan found:**
 
@@ -216,9 +201,7 @@ Continue to Step 4b (iteration flow).
 
 **Get assignee for headless mode** (used for document mentions):
 
-```bash
-ASSIGNEE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-assignee "$CURRENT_TICKET")
-```
+Use `mcp__linear__get_issue` with the ticket ID to retrieve the issue details, including the assignee name. Extract the assignee from the response for use in document mentions.
 
 **If MODE is "interactive":**
 
@@ -238,7 +221,7 @@ Then wait for the user's input.
 **If MODE is "headless":**
 
 - Use the ticket title, description, and research document as context
-- Read the ticket details: `linearis issues read "$CURRENT_TICKET"`
+- Read the ticket details using `mcp__linear__get_issue` with the ticket ID
 - Make reasonable decisions based on research findings
 - Track questions that arise during planning for embedding in document
 - Do NOT wait for user input - proceed directly to planning steps
@@ -249,9 +232,7 @@ When iterating an existing plan (instead of creating new):
 
 #### 1. Read Existing Plan
 
-```bash
-EXISTING_PLAN=$(linearis documents read "$EXISTING_PLAN_ID")
-```
+Use `mcp__linear__get_document` with the existing plan document ID to retrieve the full plan content.
 
 Parse the existing plan to identify:
 - Current phases and their completion status (look for [x] checkboxes)
@@ -267,11 +248,7 @@ Compare existing plan against:
 - Feedback in ticket comments
 - New requirements or constraints
 
-In headless mode, look for ticket comments containing feedback:
-```bash
-# Get recent comments
-linearis issues read "$CURRENT_TICKET" | jq .comments
-```
+In headless mode, look for ticket comments containing feedback. Use `mcp__linear__get_issue` with the ticket ID to retrieve the issue details including comments.
 
 #### 3. Generate Updated Plan
 
@@ -319,10 +296,7 @@ After Step 4b, continue to Step 5 (Save Plan to Linear) with the iteration path.
 
 ### Step 1: Context Gathering & Initial Analysis
 
-1. **Read the ticket details from Linear**:
-   ```bash
-   linearis issues read "$CURRENT_TICKET"
-   ```
+1. **Read the ticket details from Linear** using `mcp__linear__get_issue` with the ticket ID
 
 2. **Read any research documents** using linear-document-analyzer
 
@@ -541,33 +515,13 @@ Please answer before proceeding to /implement-plan:
 
 **If creating new plan (no existing plan or user chose "new"):**
 
-```bash
-# Get team key from config
-TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' .claude/config.json)
-
-# Create Linear document with plan content
-linearis documents create \
-  --title "Plan: ${DESCRIPTION}" \
-  --team "${TEAM_KEY}" \
-  --content "${PLAN_CONTENT}" \
-  --attach-to "${CURRENT_TICKET}" \
-  --icon "Compass" \
-  --color "#f2c94c"
-
-# Add completion comment to ticket
-linearis comments create "$CURRENT_TICKET" --body "Implementation plan created and attached to this ticket."
-```
+1. Use `mcp__linear__create_document` to create a new Linear document with the plan content. Set the title to "Plan: {DESCRIPTION}" and include the full plan markdown as the content. Attach it to the current ticket.
+2. Use `mcp__linear__save_comment` to add a completion comment to the ticket: "Implementation plan created and attached to this ticket."
 
 **If updating existing plan (iteration):**
 
-```bash
-# Update existing document
-linearis documents update "$EXISTING_PLAN_ID" \
-  --content "${PLAN_CONTENT}"
-
-# Add iteration comment to ticket
-linearis comments create "$CURRENT_TICKET" --body "Implementation plan updated with latest feedback and research."
-```
+1. Use `mcp__linear__update_document` with the existing plan document ID to update its content with the revised plan.
+2. Use `mcp__linear__save_comment` to add an iteration comment to the ticket: "Implementation plan updated with latest feedback and research."
 
 Add metadata comment at top of plan to track iterations:
 
@@ -581,10 +535,7 @@ Add metadata comment at top of plan to track iterations:
 
 If the document contains a "Questions for User" section with unanswered questions:
 
-```bash
-# Set ticket status to "Spec Needed" to signal human input required
-linearis issues update "$CURRENT_TICKET" --state "Spec Needed"
-```
+Use `mcp__linear__save_issue` to set the ticket status to "Spec Needed" to signal human input is required.
 
 Then output a clear message:
 
@@ -677,8 +628,7 @@ Please review the updated plan and let me know:
 
 ### Step 7: Iterate Based on Feedback
 
-- Update the Linear document with changes
-- Use `linearis documents update <document-id>` to modify content
+- Update the Linear document with changes using `mcp__linear__update_document` with the document ID and revised content
 - Continue refining until user is satisfied
 
 ## Important Guidelines
@@ -800,9 +750,5 @@ Please review the updated plan and let me know:
 - Step 2a updates status to "Plan in Progress" BEFORE any document lookups
 - Status stays "Plan in Progress" after completion (next command advances it)
 - On failure, roll back to previous state:
-
-```bash
-# Roll back to previous state on failure
-linearis issues update "$CURRENT_TICKET" --state "Research in Progress"
-linearis comments create "$CURRENT_TICKET" --body "Planning failed: ${ERROR_REASON}"
-```
+  1. Use `mcp__linear__save_issue` to set the ticket state back to "Research in Progress"
+  2. Use `mcp__linear__save_comment` to add a comment: "Planning failed: {ERROR_REASON}"

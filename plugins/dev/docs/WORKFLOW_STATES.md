@@ -93,9 +93,9 @@ This document defines the Linear ticket state transitions for Awl workflow comma
 
 Every command that updates status MUST do so as THE FIRST action after confirming the ticket:
 
-```bash
+```
 # CORRECT - Status update is THE FIRST thing
-linearis issues update "$TICKET_ID" --state "Research in Progress"
+Use mcp__linear__save_issue to set state to "Research in Progress"
 # Then read files, spawn agents, etc.
 
 # INCORRECT - Status update buried in workflow
@@ -108,10 +108,10 @@ linearis issues update "$TICKET_ID" --state "Research in Progress"
 
 On failure, roll back to the previous logical state:
 
-```bash
+```
 # Example: Research fails
-linearis issues update "$TICKET_ID" --state "Backlog"
-linearis comments create "$TICKET_ID" --body "Research failed: ${ERROR_REASON}"
+Use mcp__linear__save_issue to set state back to "Backlog"
+Use mcp__linear__save_comment to add "Research failed: {error reason}"
 ```
 
 ### 3. Downstream Commands Don't Update Start Status

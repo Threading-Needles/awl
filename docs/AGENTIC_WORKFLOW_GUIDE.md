@@ -340,7 +340,7 @@ uses title prefixes for easy discovery:
 | PR Description | "PR: ..." | "PR: #456 - Add OAuth Support" |
 | Validation | "Validation: ..." | "Validation: OAuth Implementation" |
 
-Documents are discovered by querying Linear via `linearis attachments list --issue PROJ-123`.
+Documents are discovered by querying Linear via the `mcp__linear__get_issue` tool with the ticket identifier.
 
 ---
 

@@ -12,8 +12,7 @@ Core development workflow commands for AI-assisted development.
 
 ### Required
 
-- **Linearis CLI**: `npm install -g linearis`
-- **LINEAR_API_TOKEN**: Environment variable ([Get token](https://linear.app/settings/api))
+- **Linear MCP**: The official Linear MCP server (handles authentication automatically)
 - **GitHub CLI**: `brew install gh` or `gh auth login`
 
 ### Required Plugins

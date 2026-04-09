@@ -293,10 +293,11 @@ Run `/awl-dev:doctor` to verify your setup - it will show the CLAUDE.md status.
 
 ### Linear (Project Management)
 
-**Installation**:
-```bash
-npm install -g --install-links ryanrozich/linearis#feat/cycles-cli
-```
+The Linear MCP server (`https://mcp.linear.app/mcp`) is **bundled with the `awl-dev` plugin**.
+No separate installation needed.
+
+**First-time setup**: OAuth authentication happens automatically when you first use a Linear
+command - Claude Code opens your browser for consent. No API tokens needed.
 
 **Configuration**:
 
@@ -306,25 +307,13 @@ Project config (`.claude/config.json`):
   "awl": {
     "project": {
       "ticketPrefix": "ENG"
-    }
-  }
-}
-```
-
-Secrets config (`~/.config/awl/config-{projectKey}.json`):
-```json
-{
-  "awl": {
+    },
     "linear": {
-      "apiToken": "lin_api_...",
-      "teamKey": "ENG",
-      "defaultTeam": "Engineering"
+      "teamKey": "ENG"
     }
   }
 }
 ```
-
-**Authentication**: Set `LINEAR_API_TOKEN` environment variable or store in `~/.linear_api_token`
 
 ### Sentry (Error Monitoring)
 

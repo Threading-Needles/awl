@@ -16,7 +16,7 @@ Transform raw milestone data into actionable health insights with specific recom
 ## Agent Contract
 
 **Input**:
-- Milestone data JSON from linearis (milestone metadata + full issues array)
+- Milestone data JSON from Linear MCP (milestone metadata + full issues array)
 - Current date/time for target date calculations
 - Project configuration (optional)
 

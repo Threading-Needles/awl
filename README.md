@@ -9,10 +9,10 @@ fork it, and contribute ideas back.
 
 ## Tech Stack & Integrations
 
-Awl integrates with your development tools through both **CLI-based** (token-efficient) and **MCP-based** (richer features) approaches:
+Awl integrates with your development tools through MCP servers and CLI tools:
 
 ### Project Management & Issue Tracking
-- **Linear** - Issue tracking, sprint planning, ticket lifecycle (CLI via [Linearis](https://github.com/ryanrozich/linearis))
+- **Linear** - Issue tracking, sprint planning, ticket lifecycle (MCP bundled with `awl-dev`, automatic OAuth)
   - `awl-dev`: Core research agents and workflow commands
   - `awl-pm`: Advanced PM workflows (cycle analysis, milestone tracking, backlog grooming)
 
@@ -62,7 +62,7 @@ and shared memory systems.
 
 - 11 research agents (codebase + infrastructure)
 - 18 commands covering full dev lifecycle
-- Linear integration via Linearis CLI
+- Linear MCP bundled (OAuth, no API tokens needed)
 - Handoff system for context persistence
 - ~3.5k context (lightweight MCPs: DeepWiki, Context7)
 
@@ -230,8 +230,8 @@ before running out of context, creating structured handoff documents that add to
   planning, handoff, worktree, implementation, verify, and PR workflows
 - [Context Engineering](docs/CONTEXT_ENGINEERING.md) - Token efficiency strategies and context
   management patterns
-- [Linear Workflow Automation](docs/LINEAR_WORKFLOW_AUTOMATION.md) - Linearis integration for ticket
-  → branch → PR → merge lifecycle ([Linearis GitHub](https://github.com/ryanrozich/linearis))
+- [Linear Workflow Automation](docs/LINEAR_WORKFLOW_AUTOMATION.md) - Linear MCP integration for ticket
+  → branch → PR → merge lifecycle
 
 ## Core Philosophy
 
@@ -242,12 +242,9 @@ before running out of context, creating structured handoff documents that add to
 3. **Focused Planning** - Planning agents work with compressed context
 4. **Persistent Memory** - Handoffs preserve context across sessions
 
-### CLI-First Integration
+### MCP-First Integration
 
-When possible, uses CLIs instead of MCPs for token efficiency:
-
-- Linear: Linearis CLI (1k tokens) vs Linear MCP (13k tokens) = **13x reduction**
-- Infrastructure research via CLIs (Railway, Sentry, GitHub)
+Uses the official Linear MCP server for rich Linear integration with structured tool calls.
 
 ## Key Features
 
@@ -260,7 +257,6 @@ When possible, uses CLIs instead of MCPs for token efficiency:
 **Token Efficiency**
 
 - Parallel agents compress research before synthesis
-- CLI-based tools minimize token overhead
 - Focused agents for specific tasks
 - Context-aware handoff prompts
 
@@ -280,7 +276,6 @@ When possible, uses CLIs instead of MCPs for token efficiency:
 
 **CLI Integrations** (optional but recommended):
 
-- `linearis` - Linear integration ([install](https://github.com/ryanrozich/linearis))
 - `gh` - GitHub CLI
 - `railway` - Railway deployments
 - `sentry-cli` - Error monitoring

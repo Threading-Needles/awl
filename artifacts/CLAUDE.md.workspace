@@ -103,7 +103,7 @@ See `.claude/.personal/README.md` for personal customization (gitignored).
 Workflow commands require:
 - jq: `brew install jq`
 - GitHub CLI: `brew install gh` (for PR commands)
-- Linearis CLI: `npm install -g linearis` (for Linear integration)
+- Linear MCP: The official Linear MCP server (for Linear integration)
 
 Commands will verify prerequisites and provide installation instructions if missing.
 

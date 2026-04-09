@@ -1,7 +1,7 @@
 ---
 description: Create pull request with automatic Linear integration
 category: version-control-git
-tools: Bash(linearis *), Bash(git *), Bash(gh *), Read, Task
+tools: mcp__linear__get_issue, mcp__linear__save_issue, mcp__linear__save_comment, Bash(git *), Bash(gh *), Read, Task
 model: inherit
 version: 2.0.0
 ---
@@ -16,7 +16,7 @@ ticket.
 Before executing, verify Linear integration is available:
 
 ```bash
-# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
+# Validate plugin prerequisites
 if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
   "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
 fi
@@ -219,14 +219,10 @@ Immediately call `/awl-dev:describe_pr` with the PR number to:
 
 If ticket was extracted:
 
-```bash
-# Update ticket state to "In Review"
-linearis issues update "$ticket" --state "In Review" --assignee "@me"
+Update the ticket state to "In Review" using `mcp__linear__save_issue` with the ticket ID.
 
-# Add comment with PR link
-linearis comments create "$ticket" \
-    --body "PR created and ready for review!\n\n**PR**: $prUrl\n\nDescription has been auto-generated with verification checks."
-```
+Add a comment using `mcp__linear__save_comment` with the body:
+"PR created and ready for review!\n\n**PR**: $prUrl\n\nDescription has been auto-generated with verification checks."
 
 ### 13. Report success
 
@@ -302,17 +298,6 @@ Run: gh auth login
 Then: gh repo set-default
 ```
 
-**Linear API token not set:**
-
-```
-❌ LINEAR_API_TOKEN not set
-
-Set your Linear API token:
-  export LINEAR_API_TOKEN=your_token
-
-Get a token from: https://linear.app/settings/api
-```
-
 **Linear ticket not found:**
 
 ```
@@ -383,8 +368,5 @@ You can also run it standalone to create a PR for existing changes.
 
 This command is a downstream command (typically called by `/implement-plan`) and does NOT update status on start - it updates to "In Review" on successful PR creation. However, on failure, it should roll back to the appropriate previous state:
 
-```bash
-# Roll back to previous state on failure
-linearis issues update "$CURRENT_TICKET" --state "In Dev"
-linearis comments create "$CURRENT_TICKET" --body "PR creation failed: ${ERROR_REASON}. Returning to development state."
-```
+On failure, use `mcp__linear__save_issue` to roll back the ticket state to "In Dev" and
+`mcp__linear__save_comment` to add a comment explaining the failure.

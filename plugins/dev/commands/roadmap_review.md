@@ -1,7 +1,7 @@
 ---
 description: Review project roadmap and milestone progress
 category: project-task-management
-tools: Bash(linearis *), Read, Write, TodoWrite
+tools: mcp__linear__list_projects, mcp__linear__get_project, mcp__linear__list_milestones, mcp__linear__list_issues, mcp__linear__research, Read, Write, TodoWrite
 model: inherit
 version: 2.0.0
 status: placeholder
@@ -23,52 +23,13 @@ This command will help you review your roadmap by:
 
 ## Current Workaround
 
-Use Linearis CLI directly:
+Use the Linear MCP tools directly:
 
-```bash
-# List projects
-linearis projects list --team TEAM
-
-# Parse project status from JSON
-linearis projects list --team TEAM | jq '.[] | {name, status, progress}'
-
-# List tickets for specific project
-linearis issues list --team TEAM | jq '.[] | select(.project.name == "Project Name")'
-```
-
-### Example Workflow
-
-```bash
-# 1. List all active projects
-linearis projects list --team ENG | \
-  jq '.[] | select(.state != "completed") | {name, lead, targetDate}'
-
-# 2. Get project details with ticket counts
-for project in $(linearis projects list --team ENG | jq -r '.[].name'); do
-  echo "Project: $project"
-
-  # Count tickets by status
-  linearis issues list --team ENG | \
-    jq --arg proj "$project" '
-      [.[] | select(.project.name == $proj)] |
-      group_by(.state.name) |
-      map({status: .[0].state.name, count: length})
-    '
-done
-
-# 3. Identify project dependencies
-# (Manual - look at project descriptions or ticket relationships)
-
-# 4. Calculate overall progress
-# total_tickets in project
-# completed_tickets in project
-# progress = (completed / total) * 100
-
-# 5. Identify at-risk projects
-# - No tickets completed in last 2 weeks
-# - Target date approaching with <50% completion
-# - Blocked tickets preventing progress
-```
+- **List projects**: `mcp__linear__list_projects`
+- **Get project details**: `mcp__linear__get_project` with project ID
+- **List milestones**: `mcp__linear__list_milestones`
+- **List project tickets**: `mcp__linear__list_issues` with project filter
+- **Complex queries**: `mcp__linear__research` with natural language
 
 ## Future Implementation
 

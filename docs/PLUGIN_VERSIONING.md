@@ -199,9 +199,7 @@ gh release create awl-dev-v2.0.0 \
 
 ## Migration
 Users must configure:
-\`\`\`bash
-npm install -g linearis
-export LINEAR_API_TOKEN=your_token
+- Ensure the official Linear MCP server is set up in Claude Code settings
 \`\`\`
 "
 ```

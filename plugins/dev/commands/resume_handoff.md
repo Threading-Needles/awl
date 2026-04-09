@@ -1,7 +1,7 @@
 ---
 description: Resume work from a handoff document
 category: workflow
-tools: Read, Bash, TodoWrite, Task
+tools: mcp__linear__get_issue, mcp__linear__save_issue, mcp__linear__save_comment, mcp__linear__get_document, Read, Bash, TodoWrite, Task
 model: inherit
 version: 2.0.0
 ---
@@ -11,17 +11,6 @@ version: 2.0.0
 You are tasked with resuming work from a handoff document stored in Linear. These handoffs contain
 critical context, learnings, and next steps from previous work sessions that need to be understood
 and continued.
-
-## Prerequisites
-
-Before executing, verify Linear integration is available:
-
-```bash
-# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
-  "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
-fi
-```
 
 ## Initial Response
 
@@ -52,21 +41,12 @@ Please provide a ticket ID: `/resume-handoff PROJ-123`
 
 **This MUST be the first action after confirming ticket**:
 
-```bash
-# Update ticket state immediately - this is THE FIRST thing we do
-linearis issues update "$CURRENT_TICKET" --state "In Progress"
-linearis comments create "$CURRENT_TICKET" --body "Resuming work from handoff"
-```
+- Use `mcp__linear__save_issue` to update the ticket state to "In Progress" immediately -- this is THE FIRST thing we do
+- Use `mcp__linear__save_comment` to add a comment: "Resuming work from handoff"
 
 ### Step 2: Find Handoff Documents
 
-Use the linear-document-locator to find handoff documents:
-
-```bash
-linearis attachments list --issue "$CURRENT_TICKET"
-```
-
-Look for documents with title starting with "Handoff:".
+Use `mcp__linear__get_issue` with the ticket identifier to retrieve the issue and its attached documents. Look for documents with title starting with "Handoff:".
 
 **If no handoff found:**
 
@@ -99,7 +79,7 @@ Let me read and analyze it...
 
 ### Step 3: Read Handoff and Related Documents
 
-1. **Read handoff document completely** using `linearis documents read <document-id>`
+1. **Read handoff document completely** using `mcp__linear__get_document` with the document ID
 
 2. **Find and read related documents** using linear-document-locator:
    - Research documents attached to the ticket
@@ -294,7 +274,6 @@ Shall I proceed with [recommended action 1], or would you like to adjust the app
 Please verify:
 1. The document ID is correct
 2. You have access to this Linear workspace
-3. LINEAR_API_TOKEN is set correctly
 ```
 
 **If ticket not found:**
@@ -305,7 +284,6 @@ Please verify:
 Please verify:
 1. The ticket ID is correct (e.g., PROJ-123)
 2. You have access to this Linear team
-3. LINEAR_API_TOKEN is set correctly
 ```
 
 ## Example Interaction Flow
@@ -337,9 +315,5 @@ Assistant: [Creates todo list and begins implementation]
 
 - Step 1a updates status to "In Progress" BEFORE any document lookups
 - On failure, roll back to previous state:
-
-```bash
-# Roll back to previous state on failure
-linearis issues update "$CURRENT_TICKET" --state "Backlog"
-linearis comments create "$CURRENT_TICKET" --body "Handoff resume failed: ${ERROR_REASON}"
-```
+  - Use `mcp__linear__save_issue` to update the ticket state back to "Backlog"
+  - Use `mcp__linear__save_comment` to add a comment explaining the handoff resume failure

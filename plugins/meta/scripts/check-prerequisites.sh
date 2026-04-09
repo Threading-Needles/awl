@@ -14,7 +14,6 @@ NC='\033[0m' # No Color
 REQUIRED_TOOLS=(
 	"jq:JSON processor:brew install jq"
 	"gh:GitHub CLI:brew install gh"
-	"linearis:Linear CLI:npm install -g linearis"
 )
 
 # Optional MCP servers (name:purpose:install-command)

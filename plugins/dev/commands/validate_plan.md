@@ -1,7 +1,7 @@
 ---
 description: Validate that implementation plans were correctly executed
 category: workflow
-tools: Read, Grep, Glob, Task, TodoWrite, Bash
+tools: mcp__linear__get_issue, mcp__linear__save_issue, mcp__linear__save_comment, mcp__linear__create_document, mcp__linear__get_document, Read, Grep, Glob, Task, TodoWrite, Bash
 model: inherit
 version: 2.0.0
 ---
@@ -10,17 +10,6 @@ version: 2.0.0
 
 You are tasked with validating that an implementation plan was correctly executed, verifying all
 success criteria and identifying any deviations or issues.
-
-## Prerequisites
-
-Before executing, verify Linear integration is available:
-
-```bash
-# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
-  "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
-fi
-```
 
 ## Initial Setup
 
@@ -61,16 +50,10 @@ Let me find the plan and gather implementation evidence...
 
 ### Step 3: Find and Read the Plan
 
-Use the linear-document-locator to find plan documents:
-
-```bash
-linearis attachments list --issue "$CURRENT_TICKET"
-```
-
-Look for documents with title starting with "Plan:".
+Use `mcp__linear__get_issue` with the ticket identifier to retrieve the issue and its attached documents. Look for documents with title starting with "Plan:".
 
 **If plan found:**
-- Read the full plan content using `linearis documents read <document-id>`
+- Read the full plan content using `mcp__linear__get_document` with the document ID
 
 **If no plan found:**
 
@@ -125,20 +108,7 @@ For each failing check:
 
 ### Step 6: Create Validation Document
 
-Create a Linear document with validation results:
-
-```bash
-# Get team key from config
-TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' .claude/config.json)
-
-linearis documents create \
-  --title "Validation: ${FEATURE_NAME}" \
-  --team "${TEAM_KEY}" \
-  --content "${VALIDATION_CONTENT}" \
-  --attach-to "${CURRENT_TICKET}" \
-  --icon "CheckCircle" \
-  --color "#27ae60"
-```
+Create a Linear document with validation results using `mcp__linear__create_document`. Set the title to "Validation: {FEATURE_NAME}" and include the validation content as the document body. Attach the document to the current ticket.
 
 **Validation Document Content**:
 
@@ -329,15 +299,8 @@ Current usage: {X}% ({Y}K/{Z}K tokens)
 
 Add validation results to the ticket:
 
-```bash
-# Add validation comment to ticket
-linearis comments create "$CURRENT_TICKET" --body "Validation complete: ${STATUS}
-
-${SUMMARY_OF_FINDINGS}"
-
-# If all phases complete, update ticket state to In Review
-linearis issues update "$CURRENT_TICKET" --state "In Review"
-```
+- Use `mcp__linear__save_comment` to add a comment to the ticket with the validation status and summary of findings.
+- If all phases are complete, use `mcp__linear__save_issue` to update the ticket state to "In Review".
 
 ## Working with Existing Context
 
@@ -411,7 +374,6 @@ Options:
 Please verify:
 1. The ticket ID is correct (e.g., PROJ-123)
 2. You have access to this Linear team
-3. LINEAR_API_TOKEN is set correctly
 ```
 
 Remember: Good validation catches issues before they reach production. Be constructive but thorough
@@ -453,8 +415,5 @@ post-implementation workflow. You can also run it standalone to validate an impl
 
 This command is a downstream command (typically called by `/implement-plan`) and does NOT update status on start. However, on failure, it should roll back to the appropriate previous state:
 
-```bash
-# Roll back to previous state on failure
-linearis issues update "$CURRENT_TICKET" --state "In Dev"
-linearis comments create "$CURRENT_TICKET" --body "Validation failed: ${ERROR_REASON}. Returning to development state."
-```
+- Use `mcp__linear__save_issue` to update the ticket state back to "In Dev"
+- Use `mcp__linear__save_comment` to add a comment explaining the validation failure and that the ticket is returning to development state

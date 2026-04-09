@@ -50,7 +50,7 @@ Checked in order:
 1. `$LINEAR_API_TOKEN` environment variable
 2. `~/.linear_api_token` file
 
-**Compatible with `linearis` CLI** - uses same standard locations!
+**Compatible with standard Linear token locations!**
 
 ### Sentry
 
