@@ -17,7 +17,7 @@ Awl now uses a **use case-based** plugin architecture:
 
 ```bash
 # One-time setup
-/plugin marketplace add ralfschimmel/awl
+/plugin marketplace add Threading-Needles/awl
 
 # Install plugins based on your needs
 /plugin install awl-dev           # Required
@@ -270,7 +270,7 @@ immediately after to free context.
 
 ```bash
 # Make sure marketplace is added
-/plugin marketplace add ralfschimmel/awl
+/plugin marketplace add Threading-Needles/awl
 
 # Install the plugin
 /plugin install awl-analytics

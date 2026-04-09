@@ -1,11 +1,8 @@
 # Awl - Claude Code Workspace
 
-[Ryan Rozich's](https://ryanrozich.bio/) personal development workflow for Claude Code, now open
-sourced and packaged as a Claude Code plugin marketplace.
+[Threading Needles](https://github.com/Threading-Needles)' development workflow for Claude Code, open sourced and packaged as a Claude Code plugin marketplace.
 
-This is the workspace I use daily for AI-assisted development. It's battle-tested on real projects
-and optimized for efficient, context-aware AI collaboration. I'm sharing it so others can use it,
-fork it, and contribute ideas back.
+Awl is the workflow we use daily at Threading Needles for AI-assisted development. It's battle-tested on real projects and optimized for efficient, context-aware AI collaboration.
 
 ## Tech Stack & Integrations
 
@@ -24,10 +21,6 @@ Awl integrates with your development tools through MCP servers and CLI tools:
 - **PostHog** - Error tracking, session replay, stack traces, HogQL queries (MCP)
   - `awl-debugging`: PostHog error tracking MCP integration
 
-### Deployment & Infrastructure
-- **Railway** - Deployment logs, service health, environment variables (CLI via `railway`)
-  - `awl-dev`: Railway research agent for deployment investigation
-
 ### Product Analytics
 - **PostHog** - User behavior, conversion funnels, feature analytics (MCP)
   - `awl-analytics`: PostHog MCP integration (~40k tokens when enabled)
@@ -44,7 +37,7 @@ Awl integrates with your development tools through MCP servers and CLI tools:
 
 **Why CLI + lightweight MCP?** Most development sessions don't need heavy integrations:
 
-- Start with `awl-dev` (~3.5k tokens): Core workflow + Linear + GitHub + Railway
+- Start with `awl-dev` (~3.5k tokens): Core workflow + Linear + GitHub
 - Enable `awl-analytics` when analyzing user behavior (~+40k tokens)
 - Enable `awl-debugging` when investigating production errors (~+20k tokens)
 - Disable when done to free context for code and conversation
@@ -100,7 +93,7 @@ Get started in 5 minutes with the unified setup script:
 
 ```bash
 # Download the setup script
-curl -O https://raw.githubusercontent.com/ralfschimmel/awl/main/setup-awl.sh
+curl -O https://raw.githubusercontent.com/Threading-Needles/awl/main/setup-awl.sh
 chmod +x setup-awl.sh
 
 # Run it (requires interactive input)
@@ -110,13 +103,13 @@ chmod +x setup-awl.sh
 This script will guide you through:
 - Prerequisites check and installation (jq, etc.)
 - Project configuration (ticket prefix, project name)
-- Integration setup (Linear, PostHog, Railway, Exa)
+- Integration setup (Linear, PostHog, Exa)
 
 **Then install the plugins:**
 
 ```bash
 # In Claude Code:
-/plugin marketplace add ralfschimmel/awl
+/plugin marketplace add Threading-Needles/awl
 /plugin install awl-dev
 
 # Restart Claude Code
@@ -135,7 +128,7 @@ Alternatively, install plugins manually via Claude Code plugin system:
 
 ```bash
 # Add the marketplace repository
-/plugin marketplace add ralfschimmel/awl
+/plugin marketplace add Threading-Needles/awl
 
 # Install core workflow (required)
 /plugin install awl-dev
@@ -276,7 +269,7 @@ Uses the official Linear MCP server for rich Linear integration with structured 
 **CLI Integrations** (optional but recommended):
 
 - `gh` - GitHub CLI
-- `railway` - Railway deployments
+
 **MCP Tools** (bundled with plugins):
 
 - Context7 & DeepWiki - Built into `awl-dev` (~3.5k tokens)
@@ -290,20 +283,7 @@ Run the prerequisite check:
 
 ## Contributing
 
-**This is my personal workflow workspace**, primarily built for my own development style and
-preferences. That said, I'm happy to:
-
-- **Discuss ideas** - Open issues with workflow suggestions or improvements
-- **See your forks** - Adapt it to your needs and share what you built
-- **Fix bugs** - If something's broken, let me know
-- **Learn together** - Share your workflow patterns and approaches
-
-**Important**: I may not accept PRs that change core workflows or add features I don't personally
-use, since this is the workspace I rely on daily. But I **love** seeing how others adapt these
-patterns to their own needs!
-
-**Best approach**: Fork it, make it yours, and share what you learned. That's how we all get
-better!
+We welcome contributions! Open issues for bugs, workflow suggestions, or to share how you've adapted Awl to your needs.
 
 ## Documentation
 
@@ -317,12 +297,6 @@ better!
 
 MIT - Use it however you want!
 
-## Note on Personal Use
-
-This is my personal workflow shared for learning and inspiration. You're welcome to use it as-is, fork it, or adapt the patterns to your own needs. Just keep in mind that it's optimized for my development style, so your mileage may vary. Some decisions are opinionated based on my preferences, and I may not accept PRs that don't align with how I work. Think of it as a starting point rather than a one-size-fits-all solution—take what works, adapt what doesn't!
-
 ---
 
-Built by [Ryan Rozich](https://github.com/ryanrozich)
-
-Want to chat about workflows, contribute ideas, or share your fork? Open an issue or discussion!
+Built by [Threading Needles](https://github.com/Threading-Needles)

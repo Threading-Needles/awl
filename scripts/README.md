@@ -86,7 +86,7 @@ source ./scripts/load-awl-config.sh
 
 1. **Install Awl plugin**:
    ```bash
-   /plugin marketplace add ralfschimmel/awl
+   /plugin marketplace add Threading-Needles/awl
    /plugin install awl-dev
    ```
 

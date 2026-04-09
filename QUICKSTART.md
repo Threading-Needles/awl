@@ -20,7 +20,7 @@ Complete guide to installing and configuring Awl for Claude Code.
 **Download and run setup script:**
 ```bash
 # Download the setup script
-curl -O https://raw.githubusercontent.com/ralfschimmel/awl/main/setup-awl.sh
+curl -O https://raw.githubusercontent.com/Threading-Needles/awl/main/setup-awl.sh
 chmod +x setup-awl.sh
 
 # Run it (requires interactive input)
@@ -35,7 +35,7 @@ chmod +x setup-awl.sh
 **Then:**
 ```bash
 # In Claude Code:
-/plugin marketplace add ralfschimmel/awl
+/plugin marketplace add Threading-Needles/awl
 /plugin install awl-dev
 
 # Restart Claude Code
@@ -57,7 +57,7 @@ Awl is distributed as a 5-plugin system. Install what you need:
 
 ```bash
 # Add the marketplace
-/plugin marketplace add ralfschimmel/awl
+/plugin marketplace add Threading-Needles/awl
 
 # Core workflow (required)
 /plugin install awl-dev
@@ -132,7 +132,7 @@ Awl uses a **two-layer configuration system**:
 
 ```bash
 # Download and run
-curl -fsSL https://raw.githubusercontent.com/ralfschimmel/awl/main/setup-awl.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Threading-Needles/awl/main/setup-awl.sh | bash
 ```
 
 **What you'll be asked:**
@@ -236,7 +236,7 @@ Copy this section into your project's CLAUDE.md:
 ```markdown
 ## Awl Workflow Integration
 
-This project uses [Awl](https://github.com/ralfschimmel/awl) for Linear-driven development
+This project uses [Awl](https://github.com/Threading-Needles/awl) for Linear-driven development
 workflows.
 
 ### Ticket-Driven Development
@@ -268,7 +268,7 @@ Where `PROJ-123` is your Linear ticket ID (replace `PROJ` with your project's ti
 ### Configuration
 
 Project configuration is in `.claude/config.json`. See
-[Awl Configuration Guide](https://github.com/ralfschimmel/awl/blob/main/docs/CONFIGURATION.md).
+[Awl Configuration Guide](https://github.com/Threading-Needles/awl/blob/main/docs/CONFIGURATION.md).
 ```
 
 ### Customize
@@ -516,5 +516,5 @@ Check that you've enabled the plugin:
 - [docs/](docs/) - Full documentation
 
 **Get help**:
-- Visit [GitHub repository](https://github.com/ralfschimmel/awl)
+- Visit [GitHub repository](https://github.com/Threading-Needles/awl)
 - Check documentation in [docs/](docs/)

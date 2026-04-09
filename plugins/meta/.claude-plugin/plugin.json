@@ -3,12 +3,12 @@
   "version": "2.0.1",
   "description": "Workflow discovery and creation tools: learn from community patterns and extend Awl with new workflows.",
   "author": {
-    "name": "Awl Team",
+    "name": "Threading Needles",
     "email": "hello@coalesce.dev",
-    "url": "https://github.com/ralfschimmel"
+    "url": "https://github.com/Threading-Needles"
   },
-  "homepage": "https://github.com/ralfschimmel/awl",
-  "repository": "https://github.com/ralfschimmel/awl.git",
+  "homepage": "https://github.com/Threading-Needles/awl",
+  "repository": "https://github.com/Threading-Needles/awl.git",
   "keywords": [
     "meta",
     "discovery",

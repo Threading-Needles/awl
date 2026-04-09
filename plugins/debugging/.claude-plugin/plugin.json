@@ -3,12 +3,12 @@
   "version": "2.0.0",
   "description": "Production error monitoring with PostHog MCP integration. Enable when debugging errors, analyzing stack traces, and investigating incidents. Provides error tracking, session replay, and HogQL queries.",
   "author": {
-    "name": "Awl Team",
+    "name": "Threading Needles",
     "email": "hello@coalesce.dev",
-    "url": "https://github.com/ralfschimmel"
+    "url": "https://github.com/Threading-Needles"
   },
-  "homepage": "https://github.com/ralfschimmel/awl",
-  "repository": "https://github.com/ralfschimmel/awl.git",
+  "homepage": "https://github.com/Threading-Needles/awl",
+  "repository": "https://github.com/Threading-Needles/awl.git",
   "keywords": [
     "debugging",
     "posthog",

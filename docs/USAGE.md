@@ -19,7 +19,7 @@ Install Awl via the Claude Code plugin marketplace:
 
 ```bash
 # Add the marketplace repository
-/plugin marketplace add ralfschimmel/awl
+/plugin marketplace add Threading-Needles/awl
 
 # Install awl-dev (main workflow)
 /plugin install awl-dev

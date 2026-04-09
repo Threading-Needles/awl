@@ -224,7 +224,7 @@ Check if plugin is outdated:
 
 \`\`\`bash
 CURRENT_VERSION="2.0.0"
-LATEST=$(curl -s https://api.github.com/repos/ralfschimmel/awl/releases/latest | jq -r .tag_name)
+LATEST=$(curl -s https://api.github.com/repos/Threading-Needles/awl/releases/latest | jq -r .tag_name)
 
 if [[ "$LATEST" > "awl-dev-v$CURRENT_VERSION" ]]; then
   echo "⚠️  Update available: $LATEST"

@@ -76,7 +76,7 @@ When fully implemented, this command will:
 - **Summary generation** - Create review document in `reports/cycles/`
 - **Burndown visualization** - Show progress over time (text-based chart)
 
-Track progress at: https://github.com/ralfschimmel/awl/issues
+Track progress at: https://github.com/Threading-Needles/awl/issues
 
 ## Configuration
 

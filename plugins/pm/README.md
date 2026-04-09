@@ -300,7 +300,7 @@ PM commands read from two config sources:
 ### Via Claude Code Marketplace (Coming Soon)
 
 ```bash
-/plugin marketplace add ralfschimmel/awl
+/plugin marketplace add Threading-Needles/awl
 /plugin install awl-pm
 ```
 
@@ -308,7 +308,7 @@ PM commands read from two config sources:
 
 ```bash
 # Clone the repository
-git clone https://github.com/ralfschimmel/awl.git
+git clone https://github.com/Threading-Needles/awl.git
 
 # Create symlink in your project
 mkdir -p .claude/plugins
@@ -444,6 +444,6 @@ MIT License - see LICENSE file in main repository
 
 ## Support
 
-- GitHub Issues: https://github.com/ralfschimmel/awl/issues
+- GitHub Issues: https://github.com/Threading-Needles/awl/issues
 - Documentation: https://awl.dev/docs
 - Community: https://awl.dev/community

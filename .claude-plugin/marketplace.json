@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Research-driven development workflow with Linear integration, PM tools, and infrastructure research agents",
   "owner": {
-    "name": "Awl Team",
+    "name": "Threading Needles",
     "email": "hello@coalesce.dev"
   },
   "plugins": [
@@ -14,11 +14,11 @@
       "description": "Core development workflow: research → plan → implement → validate → ship. Includes 10 research agents, workflow commands, Linear integration, handoff system. Always enabled. ~3.5k context (lightweight MCPs: DeepWiki, Context7).",
       "version": "3.0.1",
       "author": {
-        "name": "Awl Team",
+        "name": "Threading Needles",
         "email": "hello@coalesce.dev"
       },
-      "homepage": "https://github.com/ralfschimmel/awl",
-      "repository": "https://github.com/ralfschimmel/awl.git",
+      "homepage": "https://github.com/Threading-Needles/awl",
+      "repository": "https://github.com/Threading-Needles/awl.git",
       "license": "MIT",
       "category": "development",
       "keywords": [
@@ -37,11 +37,11 @@
       "description": "Linear-focused project management: cycle tracking, milestone planning, backlog grooming, daily standups, GitHub-Linear sync. Enable when managing Linear projects. ~5k context when enabled.",
       "version": "3.0.1",
       "author": {
-        "name": "Awl Team",
+        "name": "Threading Needles",
         "email": "hello@coalesce.dev"
       },
-      "homepage": "https://github.com/ralfschimmel/awl",
-      "repository": "https://github.com/ralfschimmel/awl.git",
+      "homepage": "https://github.com/Threading-Needles/awl",
+      "repository": "https://github.com/Threading-Needles/awl.git",
       "license": "MIT",
       "category": "productivity",
       "keywords": [
@@ -60,11 +60,11 @@
       "description": "Product analytics with PostHog MCP integration. Enable when analyzing user behavior, conversion funnels, and product metrics. ~40k context when enabled.",
       "version": "1.0.1",
       "author": {
-        "name": "Awl Team",
+        "name": "Threading Needles",
         "email": "hello@coalesce.dev"
       },
-      "homepage": "https://github.com/ralfschimmel/awl",
-      "repository": "https://github.com/ralfschimmel/awl.git",
+      "homepage": "https://github.com/Threading-Needles/awl",
+      "repository": "https://github.com/Threading-Needles/awl.git",
       "license": "MIT",
       "category": "analytics",
       "keywords": [
@@ -82,11 +82,11 @@
       "description": "Production error monitoring with PostHog MCP integration. Enable when debugging errors, analyzing stack traces, session replays, and investigating incidents.",
       "version": "2.0.0",
       "author": {
-        "name": "Awl Team",
+        "name": "Threading Needles",
         "email": "hello@coalesce.dev"
       },
-      "homepage": "https://github.com/ralfschimmel/awl",
-      "repository": "https://github.com/ralfschimmel/awl.git",
+      "homepage": "https://github.com/Threading-Needles/awl",
+      "repository": "https://github.com/Threading-Needles/awl.git",
       "license": "MIT",
       "category": "debugging",
       "keywords": [
@@ -105,11 +105,11 @@
       "description": "Workflow discovery and creation: learn from community patterns and extend Awl. Optional plugin for advanced users.",
       "version": "2.0.1",
       "author": {
-        "name": "Awl Team",
+        "name": "Threading Needles",
         "email": "hello@coalesce.dev"
       },
-      "homepage": "https://github.com/ralfschimmel/awl",
-      "repository": "https://github.com/ralfschimmel/awl.git",
+      "homepage": "https://github.com/Threading-Needles/awl",
+      "repository": "https://github.com/Threading-Needles/awl.git",
       "license": "MIT",
       "category": "development",
       "keywords": [

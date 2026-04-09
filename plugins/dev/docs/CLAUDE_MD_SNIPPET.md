@@ -15,7 +15,7 @@ Copy the section below (between the `---` markers) into your project's CLAUDE.md
 
 ## Awl Workflow Integration
 
-This project uses [Awl](https://github.com/ralfschimmel/awl) for Linear-driven development
+This project uses [Awl](https://github.com/Threading-Needles/awl) for Linear-driven development
 workflows.
 
 ### Ticket-Driven Development
@@ -49,7 +49,7 @@ Where `PROJ-123` is your Linear ticket ID (replace `PROJ` with your project's ti
 ### Configuration
 
 Project configuration is in `.claude/config.json`. See
-[Awl Configuration Guide](https://github.com/ralfschimmel/awl/blob/main/docs/CONFIGURATION.md).
+[Awl Configuration Guide](https://github.com/Threading-Needles/awl/blob/main/docs/CONFIGURATION.md).
 
 ---
 
