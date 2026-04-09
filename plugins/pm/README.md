@@ -1,6 +1,6 @@
 # Awl PM Plugin
 
-Linear-focused project management plugin with cycle management, backlog grooming, GitHub-Linear correlation, and team analytics.
+Linear-focused project management plugin with cycle management, initiative analysis, status updates, backlog grooming, GitHub-Linear correlation, and team analytics.
 
 ## Overview
 
@@ -27,6 +27,18 @@ The Awl PM plugin provides AI-powered project management workflows that integrat
 - **Gap Identification**: Orphaned PRs, orphaned issues
 - **Merge Automation**: Auto-close candidates with generated commands
 - **Stale PR Detection**: PRs open >14 days
+
+### Initiative Management
+- **Portfolio Health**: Aggregate health scoring across project portfolios
+- **Cross-Project Risks**: Dependency conflicts, resource contention, off-track projects
+- **Strategic Recommendations**: Timeline adjustments, resource allocation, scope decisions
+- **Target Date Feasibility**: Initiative-level completion projections
+
+### Status Updates
+- **Automated Composition**: Gathers recent activity, blockers, and progress automatically
+- **Project & Initiative**: Post updates for either entity type
+- **Health Assessment**: Auto-calculated onTrack/atRisk/offTrack with override option
+- **Preview & Approve**: Review before posting to Linear
 
 ### Daily Standups
 - **Yesterday's Deliveries**: Completed issues and merged PRs
@@ -74,6 +86,20 @@ Priority Actions:
   2. Pair Bob with senior dev on TEAM-462 (dependency conflict)
   3. Assign 2 backlog issues to Dave (no active work)
 ```
+
+### Initiative Management
+- `/pm:analyze-initiative` - Analyze initiative health across project portfolio
+  - Strategic health assessment (🟢/🟡/🔴)
+  - Project portfolio status table
+  - Cross-project risk identification
+  - Strategic recommendations
+
+### Status Updates
+- `/pm:update-status` - Generate and post status updates to Linear
+  - Works for both projects and initiatives
+  - Auto-gathers recent completions, blockers, progress
+  - Preview before posting
+  - Saves local copy to `reports/status-updates/`
 
 ### Daily Operations
 - `/pm:report-daily` - Quick daily standup report
@@ -160,7 +186,7 @@ Health Score: 75/100
 ## Agents
 
 ### Research Agents
-- `linear-research` (Haiku) - Gathers Linear data via CLI
+- `linear-research` (Haiku) - Gathers Linear data via MCP
   - Cycles, issues, milestones, projects
   - Natural language interface
   - Returns structured JSON
@@ -200,6 +226,17 @@ Health Score: 75/100
 - Estimation gap identification
 
 **Returns**: Structured markdown with categorized recommendations and confidence scores
+
+### `initiative-analyzer`
+**Purpose**: Analyze initiative health across project portfolios
+
+**Responsibilities**:
+- Calculate health scores (portfolio progress, project health distribution, strategic risk)
+- Identify cross-project risk factors (off-track projects, resource gaps, staleness)
+- Assess target date feasibility at initiative level
+- Generate strategic recommendations (intervention, timeline, staffing)
+
+**Returns**: Structured markdown with health assessment, portfolio status, risks, recommendations
 
 ### `github-linear-analyzer`
 **Purpose**: Ensure proper GitHub-Linear correlation
@@ -310,7 +347,7 @@ cd /path/to/your/project
 
 **Start of Week**:
 ```bash
-/pm:cycle-status
+/pm:analyze-cycle
 ```
 - Assess cycle health
 - Review capacity
@@ -319,15 +356,34 @@ cd /path/to/your/project
 
 **Mid-Week**:
 ```bash
-/pm:pr-sync
+/pm:sync-prs
 ```
+
+### Strategic Review
+
+**Bi-Weekly/Monthly**:
+```bash
+/pm:analyze-initiative
+```
+- Assess initiative health across projects
+- Identify cross-project risks
+- Review target date feasibility
+- Decide on interventions
+
+**Weekly Status Posts**:
+```bash
+/pm:update-status
+```
+- Auto-compose project/initiative status updates
+- Review and post to Linear
+- Keep stakeholders informed
 - Check GitHub-Linear correlation
 - Close merged issues
 - Create missing Linear issues
 
 **End of Week**:
 ```bash
-/pm:backlog-groom
+/pm:groom-backlog
 ```
 - Clean up orphaned issues
 - Categorize new issues

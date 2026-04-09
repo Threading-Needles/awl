@@ -1,7 +1,7 @@
 {
   "name": "awl-pm",
-  "version": "3.0.1",
-  "description": "Linear-focused project management plugin with cycle management, milestone tracking, backlog grooming, and team analytics",
+  "version": "4.0.0",
+  "description": "Linear-focused project management plugin with cycle management, milestone tracking, initiative analysis, status updates, backlog grooming, and team analytics",
   "author": {
     "name": "Awl Team",
     "email": "hello@coalesce.dev",
@@ -14,6 +14,8 @@
     "linear",
     "cycles",
     "milestones",
+    "initiatives",
+    "status-updates",
     "backlog",
     "analytics",
     "pm"
@@ -22,6 +24,8 @@
   "commands": [
     "./commands/analyze_cycle.md",
     "./commands/analyze_milestone.md",
+    "./commands/analyze_initiative.md",
+    "./commands/update_status.md",
     "./commands/report_daily.md",
     "./commands/groom_backlog.md",
     "./commands/sync_prs.md"
@@ -30,6 +34,7 @@
     "./agents/linear-research.md",
     "./agents/cycle-analyzer.md",
     "./agents/milestone-analyzer.md",
+    "./agents/initiative-analyzer.md",
     "./agents/backlog-analyzer.md",
     "./agents/github-linear-analyzer.md"
   ]
