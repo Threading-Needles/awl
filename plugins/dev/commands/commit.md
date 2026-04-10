@@ -43,7 +43,7 @@ during this session.
 
    **Extract ticket reference:**
    - Get current branch: `git branch --show-current`
-   - Extract ticket pattern: `{PREFIX}-{NUMBER}` (e.g., RCW-13, ENG-123)
+   - Extract ticket pattern: `{PREFIX}-{NUMBER}` (e.g., PROJ-13, ENG-123)
    - Will be added to commit footer
 
 3. **Generate conventional commit message:**
@@ -74,7 +74,7 @@ during this session.
    and scope from changed files, following conventional commits spec.
    Extracts ticket references from branch names for traceability.
 
-   Refs: RCW-13
+   Refs: PROJ-13
    ```
 
 4. **Present plan to user:**
@@ -122,7 +122,7 @@ feat(agents): add codebase-pattern-finder agent
 Implements new agent for finding similar code patterns across
 the codebase with concrete examples and file references.
 
-Refs: RCW-45
+Refs: PROJ-45
 ```
 
 **Fix:**
@@ -133,7 +133,7 @@ fix(commands): handle missing PR description gracefully
 Previously crashed when PR document was not found in Linear.
 Now provides clear error with instructions to create one.
 
-Refs: RCW-78
+Refs: PROJ-78
 ```
 
 **Documentation:**
@@ -144,7 +144,7 @@ docs(scripts): add README for plugin scripts
 Documents all bundled scripts with usage examples
 and explains when to use each installation method.
 
-Refs: RCW-12
+Refs: PROJ-12
 ```
 
 **Chore (no ticket):**

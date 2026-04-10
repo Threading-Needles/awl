@@ -151,7 +151,9 @@ YAML frontmatter validation, required fields, valid categories/tools, validation
 
 - [../plugins/dev/README.md](../plugins/dev/README.md) - Development plugin
 - [../plugins/pm/README.md](../plugins/pm/README.md) - Project management plugin
-- [../plugins/meta/README.md](../plugins/meta/README.md) - Meta plugin
+- [../plugins/analytics/README.md](../plugins/analytics/README.md) - Analytics plugin (PostHog)
+- [../plugins/debugging/README.md](../plugins/debugging/README.md) - Debugging plugin (PostHog)
+- [../plugins/meta/README.md](../plugins/meta/README.md) - Meta plugin (workflow discovery)
 
 **External**:
 

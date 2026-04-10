@@ -498,7 +498,7 @@ About to merge PR #123...
 Proceed? Y
 
 ✅ Merged!
-✅ Linear ticket RCW-13 → Done
+✅ Linear ticket PROJ-13 → Done
 ✅ Branches deleted
 ```
 

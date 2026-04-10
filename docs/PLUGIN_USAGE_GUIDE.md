@@ -1,15 +1,16 @@
 # Awl Plugin Usage Guide
 
-Complete guide to using Awl's 4-plugin architecture for session-aware context management.
+Complete guide to using Awl's 5-plugin architecture for session-aware context management.
 
 ## Overview
 
-Awl now uses a **use case-based** plugin architecture:
+Awl uses a **use case-based** plugin architecture:
 
 1. **awl-dev** - Core workflow (always enabled, ~3.5k context)
-2. **awl-analytics** - Product analytics (enable when needed, +40k context)
-3. **awl-debugging** - Error monitoring (enable when needed, +20k context)
-4. **awl-meta** - Workflow discovery (optional)
+2. **awl-pm** - Project management (enable for cycle/milestone/backlog work, lightweight)
+3. **awl-analytics** - Product analytics (enable when needed, +40k context)
+4. **awl-debugging** - Error monitoring (enable when needed, +20k context)
+5. **awl-meta** - Workflow discovery (optional)
 
 **Key insight**: Plugins automatically load/unload their bundled MCPs when enabled/disabled.
 
@@ -21,8 +22,9 @@ Awl now uses a **use case-based** plugin architecture:
 
 # Install plugins based on your needs
 /plugin install awl-dev           # Required
-/plugin install awl-analytics     # If you use PostHog
-/plugin install awl-debugging     # If you need error tracking (uses PostHog)
+/plugin install awl-pm            # If you manage Linear cycles, milestones, backlogs
+/plugin install awl-analytics     # If you use PostHog for product analytics
+/plugin install awl-debugging     # If you need PostHog error tracking
 /plugin install awl-meta          # If you want workflow discovery
 ```
 
@@ -193,6 +195,17 @@ Get your token from PostHog → Project Settings → API Keys
 
 **Install if**: You're using Awl **Why**: Core workflow, research agents, Linear integration
 
+### awl-pm (Optional)
+
+**Install if**:
+
+- You manage Linear cycles and milestones
+- You run sprint planning or backlog grooming
+- You generate team status reports
+- You sync GitHub PRs with Linear tickets
+
+**Skip if**: You only do individual-contributor development
+
 ### awl-analytics (Optional)
 
 **Install if**:
@@ -292,8 +305,7 @@ immediately after to free context.
 ### Environment variables not working
 
 ```bash
-# Verify they're set
-echo $POSTHOG_AUTH_HEADER
+# Verify POSTHOG_AUTH_HEADER is set
 echo $POSTHOG_AUTH_HEADER
 
 # Make sure to restart shell after adding to ~/.zshrc
@@ -310,6 +322,8 @@ source ~/.zshrc
 
 ## See Also
 
+- `plugins/dev/README.md` - Dev plugin documentation
+- `plugins/pm/README.md` - PM plugin documentation
 - `plugins/analytics/README.md` - Analytics plugin documentation
 - `plugins/debugging/README.md` - Debugging plugin documentation
-- `docs/MCP_MANAGEMENT_STRATEGY.md` - Overall MCP strategy
+- `plugins/meta/README.md` - Meta plugin documentation

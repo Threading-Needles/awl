@@ -142,6 +142,6 @@ Recommended Linear workflow configuration:
 
 ## Related Documentation
 
-- [LINEAR_DOCUMENTS.md](./LINEAR_DOCUMENTS.md) - Document storage conventions
+- [LINEAR_DOCUMENTS.md](../LINEAR_DOCUMENTS.md) - Document storage conventions
 - [CLAUDE.md](../../../CLAUDE.md) - Main project configuration
 - [USAGE.md](../../../docs/USAGE.md) - Workflow usage guide

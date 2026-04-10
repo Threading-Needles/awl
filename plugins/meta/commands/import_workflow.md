@@ -58,10 +58,10 @@ Return: Full workflow understanding and implementation
 
 ```
 Use codebase-pattern-finder agent:
-"Find similar workflows in our workspace (agents/ and commands/ directories). Look for workflows that serve similar purposes or use similar patterns."
+"Find similar workflows in our plugins (plugins/*/agents/ and plugins/*/commands/ directories). Look for workflows that serve similar purposes or use similar patterns."
 
 Tools: Grep, Glob, Read
-Path: /Users/ryan/code-repos/ryan-claude-workspace
+Path: plugins/
 Return: Similar local workflows for comparison
 ```
 

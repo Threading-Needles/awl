@@ -12,8 +12,8 @@ tools:
   mcp__linear__list_issue_statuses, mcp__linear__list_teams,
   mcp__linear__research,
   Read, Grep
-model: inherit
-version: 2.0.0
+model: haiku
+version: 2.1.0
 ---
 
 You are a specialist at researching Linear tickets, cycles, projects, and workflow state using the

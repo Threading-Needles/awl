@@ -202,45 +202,35 @@ See `plugins/dev/LINEAR_DOCUMENTS.md` for comprehensive guide.
 
 ```
 awl/
-├── plugins/                 # Plugin packages for distribution
-│   ├── dev/                 # Development workflow plugin (awl-dev)
-│   │   ├── agents/          # Specialized research agents
-│   │   │   ├── codebase-locator.md
-│   │   │   ├── codebase-analyzer.md
-│   │   │   ├── codebase-pattern-finder.md
-│   │   │   ├── linear-document-locator.md  # Find docs attached to tickets
-│   │   │   ├── linear-document-analyzer.md # Analyze Linear documents
-│   │   │   ├── external-research.md
-│   │   │   └── README.md
-│   │   ├── commands/        # Core workflow commands
-│   │   │   ├── route.md             # Smart entry point (routes to one-shot or full workflow)
-│   │   │   ├── one_shot_fix.md      # Quick fix for simple tickets
-│   │   │   ├── babysit_pr.md        # Monitor PR through CI and run test plan
-│   │   │   ├── commit.md
-│   │   │   ├── debug.md
-│   │   │   ├── describe_pr.md
-│   │   │   ├── create_plan.md
-│   │   │   ├── implement_plan.md
-│   │   │   ├── validate_plan.md
-│   │   │   └── README.md
-│   │   ├── scripts/         # Runtime scripts bundled with plugin
-│   │   │   ├── check-prerequisites.sh
-│   │   │   └── frontmatter-utils.sh
-│   │   ├── LINEAR_DOCUMENTS.md  # Linear documents conventions
-│   │   └── plugin.json      # Plugin manifest
-│   ├── pm/                  # Project management plugin (awl-pm)
-│   │   ├── agents/          # PM analysis agents
-│   │   ├── commands/        # PM workflow commands
-│   │   ├── scripts/         # PM utility scripts
-│   │   │   ├── check-prerequisites.sh
-│   │   │   └── pm-utils.sh
+├── plugins/                 # Plugin packages distributed via the marketplace
+│   ├── dev/                 # Core development workflow (awl-dev)
+│   │   ├── agents/          # 9 research agents (codebase, Linear, GitHub, external)
+│   │   ├── commands/        # 17 workflow commands (research/plan/implement/PR/etc.)
+│   │   ├── scripts/         # check-prerequisites.sh, frontmatter-utils.sh
+│   │   ├── docs/            # WORKFLOW_STATES.md, CLAUDE_MD_SNIPPET.md
+│   │   ├── LINEAR_DOCUMENTS.md
 │   │   ├── README.md
-│   │   └── plugin.json
-│   └── meta/                # Meta/workflow management plugin (awl-meta)
+│   │   └── .claude-plugin/  # plugin.json, .mcp.json (Linear MCP)
+│   ├── pm/                  # Project management (awl-pm)
+│   │   ├── agents/          # 6 PM analysis agents (cycle, milestone, initiative, backlog, github-linear, linear-research)
+│   │   ├── commands/        # 7 PM commands (analyze/groom/sync/report/update)
+│   │   ├── scripts/
+│   │   ├── README.md
+│   │   └── .claude-plugin/
+│   ├── meta/                # Workflow discovery and creation (awl-meta)
+│   │   ├── commands/        # discover/import/create/validate-frontmatter
+│   │   ├── scripts/
+│   │   ├── README.md
+│   │   └── .claude-plugin/
+│   ├── debugging/           # PostHog error tracking (awl-debugging)
+│   │   ├── commands/
+│   │   ├── README.md
+│   │   └── .claude-plugin/  # plugin.json, .mcp.json (PostHog MCP)
+│   └── analytics/           # PostHog product analytics (awl-analytics)
 │       ├── commands/
-│       ├── scripts/
-│       └── plugin.json
-├── docs/                    # Documentation
+│       ├── README.md
+│       └── .claude-plugin/  # plugin.json, .mcp.json (PostHog MCP)
+├── docs/                    # Documentation (USAGE, PATTERNS, CONTEXT_ENGINEERING, etc.)
 ├── reports/                 # PM reports (git-tracked, not in Linear)
 ├── .claude/                 # Local Claude Code installation
 │   └── plugins/             # Symlinks to plugin source (dogfooding)

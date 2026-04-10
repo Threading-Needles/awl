@@ -110,7 +110,7 @@ branch=$(git branch --show-current)
 
 # Extract from branch pattern: PREFIX-NUMBER
 if [[ "$branch" =~ ([A-Z]+-[0-9]+) ]]; then
-    ticket="${BASH_REMATCH[1]}"  # e.g., RCW-13
+    ticket="${BASH_REMATCH[1]}"  # e.g., PROJ-13
 fi
 ```
 
@@ -118,7 +118,7 @@ fi
 
 ```bash
 # Branch format examples:
-# - RCW-13-implement-pr-lifecycle → "RCW-13: implement pr lifecycle"
+# - PROJ-13-implement-pr-lifecycle → "PROJ-13: implement pr lifecycle"
 # - feature-add-validation → "add validation"
 
 # Extract description from branch name
@@ -292,16 +292,16 @@ Update manually or check ticket ID.
 
 ## Examples
 
-**Branch: `RCW-13-implement-pr-lifecycle`**
+**Branch: `PROJ-13-implement-pr-lifecycle`**
 
 ```
-Extracting ticket: RCW-13
-Generated title: "RCW-13: Implement pr lifecycle"
+Extracting ticket: PROJ-13
+Generated title: "PROJ-13: Implement pr lifecycle"
 Creating PR...
 ✅ PR #2 created
 Calling /awl-dev:describe_pr to generate description...
 Saving PR description to Linear...
-Updating Linear ticket RCW-13 → In Review
+Updating Linear ticket PROJ-13 → In Review
 ✅ Complete!
 ```
 

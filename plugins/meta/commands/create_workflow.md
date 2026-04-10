@@ -57,10 +57,10 @@ Use TodoWrite to track parallel research.
 
 ```
 Use codebase-pattern-finder agent:
-"Find all {agents/commands} in our workspace that are similar to {user-description}. Focus on {category} workflows. Return file paths and brief descriptions."
+"Find all {agents/commands} in plugins/ that are similar to {user-description}. Focus on {category} workflows. Return file paths and brief descriptions."
 
 Tools: Glob, Grep, Read
-Path: /Users/ryan/code-repos/ryan-claude-workspace
+Path: plugins/
 Return: List of similar local workflows with their frontmatter and key patterns
 ```
 
@@ -68,7 +68,7 @@ Return: List of similar local workflows with their frontmatter and key patterns
 
 ```
 Use codebase-analyzer agent:
-"Search for workflow examples in the plugin directories (plugins/dev/, plugins/meta/) similar to {user-description}. Find examples that match the {category} category."
+"Search for workflow examples in the plugin directories (plugins/dev/, plugins/pm/, plugins/meta/) similar to {user-description}. Find examples that match the {category} category."
 
 Tools: Grep, Read
 Path: plugins/
@@ -78,12 +78,9 @@ Return: Workflow examples with their implementations
 **Task 3 - Frontmatter Standards**:
 
 ```
-Use codebase-analyzer agent:
-"Analyze all existing {agents/commands} in the workspace to extract the frontmatter standard. What fields are required? What patterns are used? What categories exist?"
-
-Tools: Glob, Grep, Read
-Path: /Users/ryan/code-repos/ryan-claude-workspace/{agents,commands}/
-Return: Frontmatter standard with field definitions and examples
+Read docs/FRONTMATTER_STANDARD.md directly — it is the canonical source for required fields,
+optional fields, model tiers, and validation rules. Do not re-derive the standard from existing
+files; the standard document is authoritative.
 ```
 
 **WAIT for all 3 tasks to complete.**
