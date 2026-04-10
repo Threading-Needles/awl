@@ -181,20 +181,19 @@ To read a specific document, use `mcp__linear__get_document` with the document I
 When workflow commands are run, they automatically update the associated ticket:
 
 **During `/awl-dev:research-codebase PROJ-123`:**
-1. Sets ticket in workflow context
-2. Moves to "Research" status
-3. Creates "Research: ..." document attached to ticket
+1. Moves to "Research" status
+2. Creates "Research: ..." document attached to ticket
 
-**During `/awl-dev:create-plan`:**
+**During `/awl-dev:create-plan PROJ-123`:**
 1. Moves to "Planning" status
 2. Creates "Plan: ..." document attached to ticket
 
-**During `/awl-dev:implement-plan`:**
+**During `/awl-dev:implement-plan PROJ-123`:**
 1. Moves to "In Progress" status
 2. Adds progress comments as phases complete
 
 **During `/awl-dev:create-pr`:**
-1. Moves to "In Review" status
+1. Moves to "In Review" status (ticket extracted from branch name)
 2. Creates "PR: ..." document attached to ticket
 
 **During `/awl-dev:merge-pr`:**

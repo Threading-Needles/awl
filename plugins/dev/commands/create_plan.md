@@ -48,7 +48,7 @@ I'll create an implementation plan for ticket {TICKET_ID}.
 Let me check for existing research on this ticket...
 ```
 
-### Step 2a: Update Linear Ticket Status (FIRST)
+### Step 2: Update Linear Ticket Status (FIRST)
 
 **This MUST be the first action after confirming ticket**:
 
@@ -263,9 +263,9 @@ Does this look correct? (yes/no/edit)
 
 **If MODE is "headless":**
 
-Proceed directly to Step 5 with the updated plan content.
+Proceed directly to the "Save Plan to Linear" step (see `## Process Steps` below) with the updated plan content.
 
-After Step 4b, continue to Step 5 (Save Plan to Linear) with the iteration path.
+After Step 4b, continue to "Save Plan to Linear" (in `## Process Steps`) with the iteration path.
 
 ## Process Steps
 
@@ -688,17 +688,17 @@ Please review the updated plan and let me know:
 **How it connects:**
 
 - **Previous**: Gets research from Linear documents attached to ticket
-- **Next**: `/awl-dev:implement-plan` finds plan via `linear-document-locator`
-- **Workflow context**: Current ticket is already set from research phase
+- **Next**: `/awl-dev:implement-plan TICKET-123` finds plan via `linear-document-locator`
+- **Ticket**: Passed explicitly as the first positional argument
 
 ## Example Workflow
 
 ```bash
 # After running /awl-dev:research-codebase PROJ-123...
 
-/awl-dev:create-plan
+/awl-dev:create-plan PROJ-123
 # You:
-# 1. Get current ticket from workflow context (PROJ-123)
+# 1. Use ticket ID passed as argument (PROJ-123)
 # 2. Update ticket status to "Plan in Progress" (THE FIRST thing)
 # 3. Find research document in Linear
 # 4. Read research content

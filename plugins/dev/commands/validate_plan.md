@@ -33,7 +33,7 @@ I'll validate the implementation for ticket {TICKET_ID}.
 Let me find the plan and gather implementation evidence...
 ```
 
-### Step 3: Find and Read the Plan
+### Step 2: Find and Read the Plan
 
 Use `mcp__linear__get_issue` with the ticket identifier to retrieve the issue and its attached documents. Look for documents with title starting with "Plan:".
 
@@ -50,7 +50,7 @@ Cannot validate without a plan. Would you like me to:
 2. Validate against a different source?
 ```
 
-### Step 4: Gather Implementation Evidence
+### Step 3: Gather Implementation Evidence
 
 ```bash
 # Check recent commits
@@ -65,7 +65,7 @@ cd $(git rev-parse --show-toplevel) && make check test
 
 After running initial checks, if any failures are detected, attempt to fix them automatically:
 
-### Step 5: Analyze and Fix Issues
+### Step 4: Analyze and Fix Issues
 
 For each failing check:
 
@@ -91,7 +91,7 @@ For each failing check:
    - **Critical** (build, test): Must pass to continue
    - **Non-critical** (lint warnings): Note and continue
 
-### Step 6: Create Validation Document
+### Step 5: Create Validation Document
 
 Create a Linear document with validation results using `mcp__linear__create_document`. Set the title to "Validation: {FEATURE_NAME}" and include the validation content as the document body. Attach the document to the current ticket.
 
@@ -334,7 +334,7 @@ Always verify:
 
 - **Previous**: Finds plan from Linear documents attached to ticket
 - **Next**: `/awl-dev:describe-pr` creates PR description, also as Linear document
-- **Workflow context**: Current ticket is tracked throughout
+- **Ticket**: Passed explicitly as the first positional argument
 
 The validation works best after commits are made, as it can analyze the git history to understand
 what was implemented.

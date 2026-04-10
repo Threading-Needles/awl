@@ -65,7 +65,7 @@ I'll implement the plan for ticket {TICKET_ID}.
 Let me find the implementation plan...
 ```
 
-### Step 2a: Update Linear Ticket Status (FIRST)
+### Step 2: Update Linear Ticket Status (FIRST)
 
 **This MUST be the first action after confirming ticket**:
 
@@ -559,7 +559,7 @@ Please verify:
 
 **EVERY workflow step MUST update status as the FIRST action**:
 
-- Step 2a updates status to "In Dev" BEFORE any plan lookups
+- Step 2 updates status to "In Dev" BEFORE any plan lookups
 - Status transitions to "In Review" via create_pr (which is already correct)
 - On failure, roll back to previous state:
 

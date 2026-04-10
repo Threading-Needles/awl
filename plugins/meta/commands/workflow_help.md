@@ -166,7 +166,7 @@ Tools: Read, Grep
 **Task 3 - Check for User's Current Ticket**:
 
 ```
-"Get the current ticket from workflow context and query Linear for documents.
+"Extract the ticket from the current git branch name (pattern [A-Z]+-[0-9]+) and query Linear for documents.
 Return: What documents exist for current ticket, suggesting next steps"
 
 Tools: Bash
@@ -522,7 +522,7 @@ See full guide: `docs/AGENTIC_WORKFLOW_GUIDE.md` (Handoff System section)
 The parallel agents can detect:
 
 - Current git branch
-- Current ticket from workflow context
+- Current ticket (inferred from branch name pattern `[A-Z]+-[0-9]+`)
 - Linear documents attached to ticket
 - Plan documents with checkboxes
 - Research documents
