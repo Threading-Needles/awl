@@ -1,6 +1,6 @@
 # Usage Guide
 
-A comprehensive guide to using the Ryan Claude Workspace for AI-assisted development.
+A comprehensive guide to using Awl for AI-assisted development.
 
 ## Table of Contents
 

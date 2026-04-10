@@ -1,7 +1,7 @@
-# Contributing to Ryan Claude Workspace
+# Contributing to Awl
 
 Thank you for your interest in contributing! This document provides guidelines for contributing to
-the workspace.
+Awl.
 
 ## Development Setup
 
