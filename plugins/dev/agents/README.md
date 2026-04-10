@@ -163,6 +163,52 @@ Task( subagent_type="awl-dev:history-reader", prompt="How was authentication imp
 
 ---
 
+### Linear and GitHub Research Agents
+
+#### linear-research
+
+**Purpose**: Research Linear tickets, cycles, projects, and milestones
+
+**Use when**: You need data from Linear
+
+- Finding tickets by status, label, cycle, or team
+- Looking up project and milestone details
+- Gathering ticket context for planning or analysis
+
+**Tools**: Linear MCP tools (`mcp__linear__list_issues`, `mcp__linear__get_issue`, etc.), Read, Grep
+
+**Example invocation:**
+
+```markdown
+Task( subagent_type="awl-dev:linear-research", prompt="List all In Progress tickets in team ENG with the backend label" )
+```
+
+**Returns**: Structured Linear data (tickets, cycles, projects) — pure data gathering, no synthesis
+
+---
+
+#### github-research
+
+**Purpose**: Research GitHub PRs, issues, and workflows via the `gh` CLI
+
+**Use when**: You need GitHub-specific metadata that git alone can't provide
+
+- Looking up PR status, CI checks, reviews, comments
+- Finding issues by label, author, or date
+- Gathering workflow run history
+
+**Tools**: `Bash(gh *)`, Read, Grep
+
+**Example invocation:**
+
+```markdown
+Task( subagent_type="awl-dev:github-research", prompt="List all open PRs assigned to me with failing CI checks" )
+```
+
+**Returns**: Structured GitHub data from `gh` CLI — pure data gathering, no synthesis
+
+---
+
 ### External Research Agents
 
 #### external-research
@@ -176,7 +222,7 @@ Task( subagent_type="awl-dev:history-reader", prompt="How was authentication imp
 - Researching best practices from open-source
 - Discovering external documentation
 
-**Tools**: mcp**deepwiki**ask_question, mcp**deepwiki**read_wiki_structure
+**Tools**: `mcp__deepwiki__ask_question`, `mcp__deepwiki__read_wiki_structure`, `mcp__context7__get_library_docs`, `mcp__exa__search`
 
 **Example invocation:**
 
@@ -210,12 +256,24 @@ Instructions for the agent...
 - ONLY describe what exists...
 ```
 
-### Required Frontmatter Fields
+### Frontmatter Fields
 
-- `name` - Agent identifier (matches filename without .md)
-- `description` - One-line description for invoking commands
-- `tools` - Tools available to the agent
-- `model` - AI model to use (usually "inherit")
+**Required** (Claude Code needs these to load the agent):
+
+- `name` - Agent identifier (must match filename without `.md`)
+- `description` - Tells Claude Code when to invoke this agent
+
+**Recommended** (improves safety and cost):
+
+- `tools` - Comma-separated tool list; omit to grant all tools
+- `model` - `inherit` (default), `haiku`, `sonnet`, or `opus`
+
+**Optional metadata**:
+
+- `version`, `category`, `color`
+
+See [`docs/FRONTMATTER_STANDARD.md`](../../../docs/FRONTMATTER_STANDARD.md) for the full rules
+and model-tier guidance.
 
 ### Naming Convention
 

@@ -44,6 +44,10 @@ That's it — no aggregator, no runtime pins, no `.trunk` cache.
 
 ## Command and Agent Development
 
+See [`docs/FRONTMATTER_STANDARD.md`](docs/FRONTMATTER_STANDARD.md) for the full frontmatter rules,
+including model-tier guidance (`inherit`/`haiku`/`sonnet`/`opus`). The steps below are a quick
+starting point.
+
 ### Adding a New Command
 
 1. Create markdown file in the appropriate plugin directory:
@@ -51,14 +55,14 @@ That's it — no aggregator, no runtime pins, no `.trunk` cache.
    - `plugins/pm/commands/{command-name}.md` for project-management commands
    - `plugins/meta/commands/{command-name}.md` for meta/creation commands
 
-2. **Add frontmatter** (required):
+2. **Add frontmatter** (at minimum `description`; the rest is recommended):
 
    ```yaml
    ---
-   description: Brief description of what command does
-   category: workflow|version-control-git|project-task-management|utility|pm
-   tools: Read, Write, Bash, Task, etc.
-   model: inherit
+   description: Brief description of what the command does
+   category: workflow          # free-form grouping
+   tools: Read, Write, Bash, Task
+   model: inherit              # respects the user's session model
    version: 1.0.0
    ---
    ```
@@ -75,14 +79,14 @@ That's it — no aggregator, no runtime pins, no `.trunk` cache.
 
 1. Create markdown file in `plugins/dev/agents/{agent-name}.md` (or `plugins/pm/agents/`)
 
-2. **Add frontmatter** (required):
+2. **Add frontmatter** (at minimum `name` + `description`; the rest is recommended):
 
    ```yaml
    ---
-   name: agent-name
-   description: What this agent does
-   tools: Grep, Glob, Read, etc.
-   model: inherit
+   name: agent-name            # must match filename (kebab-case)
+   description: What this agent does and when Claude should invoke it
+   tools: Grep, Glob, Read     # restrict where it makes sense
+   model: inherit              # or haiku/sonnet — see FRONTMATTER_STANDARD.md
    ---
    ```
 
