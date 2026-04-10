@@ -13,42 +13,27 @@ success criteria and identifying any deviations or issues.
 
 ## Initial Setup
 
-### Step 1: Get Current Ticket
+### Step 1: Validate Ticket Argument
 
-Check workflow context for current ticket:
-
-```bash
-CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
-```
-
-### Step 2: Handle Ticket State
-
-**If no current ticket:**
+**A ticket ID is REQUIRED as the first argument.** If no ticket ID was provided, respond with:
 
 ```
 I need a Linear ticket to find the implementation plan.
 
-Please either:
-1. Provide a ticket ID: `/awl-dev:validate-plan PROJ-123`
-2. Or tell me which ticket to validate
-
-Which would you prefer?
+Usage: /awl-dev:validate-plan TICKET-123
 ```
 
-If user provides ticket, set it:
-```bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
-```
+Then stop. Do not proceed without a ticket ID.
 
-**If current ticket exists:**
+Use the provided ticket ID as `TICKET_ID` throughout this command.
 
 ```
-I'll validate the implementation for ticket {CURRENT_TICKET}.
+I'll validate the implementation for ticket {TICKET_ID}.
 
 Let me find the plan and gather implementation evidence...
 ```
 
-### Step 3: Find and Read the Plan
+### Step 2: Find and Read the Plan
 
 Use `mcp__linear__get_issue` with the ticket identifier to retrieve the issue and its attached documents. Look for documents with title starting with "Plan:".
 
@@ -58,14 +43,14 @@ Use `mcp__linear__get_issue` with the ticket identifier to retrieve the issue an
 **If no plan found:**
 
 ```
-No implementation plan found for {CURRENT_TICKET}.
+No implementation plan found for {TICKET_ID}.
 
 Cannot validate without a plan. Would you like me to:
 1. Check a different ticket?
 2. Validate against a different source?
 ```
 
-### Step 4: Gather Implementation Evidence
+### Step 3: Gather Implementation Evidence
 
 ```bash
 # Check recent commits
@@ -80,7 +65,7 @@ cd $(git rev-parse --show-toplevel) && make check test
 
 After running initial checks, if any failures are detected, attempt to fix them automatically:
 
-### Step 5: Analyze and Fix Issues
+### Step 4: Analyze and Fix Issues
 
 For each failing check:
 
@@ -106,7 +91,7 @@ For each failing check:
    - **Critical** (build, test): Must pass to continue
    - **Non-critical** (lint warnings): Note and continue
 
-### Step 6: Create Validation Document
+### Step 5: Create Validation Document
 
 Create a Linear document with validation results using `mcp__linear__create_document`. Set the title to "Validation: {FEATURE_NAME}" and include the validation content as the document body. Attach the document to the current ticket.
 
@@ -115,7 +100,7 @@ Create a Linear document with validation results using `mcp__linear__create_docu
 ```markdown
 # Validation: {Feature Name}
 
-**Ticket**: {CURRENT_TICKET}
+**Ticket**: {TICKET_ID}
 **Date**: {timestamp}
 **Status**: {PASS|FAIL|PARTIAL}
 
@@ -213,7 +198,7 @@ Create comprehensive validation summary:
 ```
 # Validation Report: {Feature Name}
 
-**Ticket**: {CURRENT_TICKET}
+**Ticket**: {TICKET_ID}
 **Plan**: (Linear document attached to ticket)
 **Validated**: {date}
 **Validation Status**: {PASS/FAIL/PARTIAL}
@@ -349,7 +334,7 @@ Always verify:
 
 - **Previous**: Finds plan from Linear documents attached to ticket
 - **Next**: `/awl-dev:describe-pr` creates PR description, also as Linear document
-- **Workflow context**: Current ticket is tracked throughout
+- **Ticket**: Passed explicitly as the first positional argument
 
 The validation works best after commits are made, as it can analyze the git history to understand
 what was implemented.
@@ -359,7 +344,7 @@ what was implemented.
 **If plan not found:**
 
 ```
-⚠️ No plan document found for {CURRENT_TICKET}.
+⚠️ No plan document found for {TICKET_ID}.
 
 Options:
 1. Provide a different ticket ID

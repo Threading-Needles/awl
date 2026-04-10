@@ -442,38 +442,12 @@ View linked PRs in Linear:
 
 ## Configuration
 
-### Recommended `.claude/config.json`
+None. PR commands are stateless:
 
-```json
-{
-  "project": {
-    "ticketPrefix": "RCW"
-  },
-  "linear": {
-    "teamId": "your-team-id",
-    "projectId": "your-project-id",
-    "inReviewStatusName": "In Review",
-    "doneStatusName": "Done"
-  },
-  "commit": {
-    "useConventional": true,
-    "scopes": ["agents", "commands", "hack", "docs", "claude", "config"],
-    "autoDetectType": true,
-    "autoDetectScope": true
-  },
-  "pr": {
-    "defaultMergeStrategy": "squash",
-    "deleteRemoteBranch": true,
-    "deleteLocalBranch": true,
-    "updateLinearOnMerge": true,
-    "requireApproval": false,
-    "requireCI": false,
-    "testCommand": "make test",
-    "lintCommand": "make lint",
-    "buildCommand": "make build"
-  }
-}
-```
+- Ticket ID is extracted from the branch name (pattern `[A-Z]+-[0-9]+`) or PR title/body
+- Merge strategy is hardcoded to squash + delete branches
+- Status transitions ("In Review", "Done") use the standard names — make sure your Linear workspace has them
+- CI checks come from `gh pr checks`; pre-merge local tests are not run (rely on CI)
 
 ---
 
@@ -588,30 +562,6 @@ What would you like to do?
 
 ## Advanced Usage
 
-### Custom Scopes
-
-Add project-specific scopes to config:
-
-```json
-{
-  "commit": {
-    "scopes": ["api", "ui", "database", "auth", "tests"]
-  }
-}
-```
-
-### Custom Test Commands
-
-```json
-{
-  "pr": {
-    "testCommand": "npm run test:all",
-    "lintCommand": "npm run lint:fix",
-    "buildCommand": "npm run build:prod"
-  }
-}
-```
-
 ### Skip Linear Integration
 
 ```bash
@@ -634,7 +584,7 @@ Add project-specific scopes to config:
 ## See Also
 
 - [commands/README.md](../commands/README.md) - All available commands
-- [docs/LINEAR_WORKFLOW_AUTOMATION.md](LINEAR_WORKFLOW_AUTOMATION.md) - Linear integration details
+- [LINEAR_DOCUMENTS.md](../plugins/dev/LINEAR_DOCUMENTS.md) - Linear documents conventions
 - [docs/USAGE.md](USAGE.md) - General workspace usage
 - [commands/dev/commit.md](../commands/dev/commit.md) - Commit command details
 - [commands/linear/create_pr.md](../commands/linear/create_pr.md) - Create PR command details

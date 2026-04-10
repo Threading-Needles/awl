@@ -15,38 +15,25 @@ to the appropriate workflow path: either a quick **one-shot fix** or the full
 
 You ONLY read, analyze, and delegate. You never modify code or create documents.
 
-## Prerequisites
-
-```bash
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
-  "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
-fi
-```
-
 ## Execution Mode Detection
 
 ```bash
-MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
-# MODE will be "interactive" or "headless"
+MODE=$([[ "${CLAUDE_NON_INTERACTIVE:-}" == "1" || "${CLAUDE_CODE_ENTRYPOINT:-}" == "sdk-cli" ]] && echo headless || echo interactive)
 ```
 
-## Step 1: Ticket ID Handling
+## Step 1: Validate Ticket Argument
 
-A ticket ID is required.
-
-**If no ticket ID provided:**
+**A ticket ID is REQUIRED as the first argument.** If no ticket ID was provided, respond with:
 
 ```
 I need a Linear ticket to route.
 
-Usage: /route PROJ-123
+Usage: /awl-dev:route TICKET-123
 ```
 
-**If ticket ID provided**, set it in workflow context immediately:
+Then stop. Do not proceed without a ticket ID.
 
-```bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
-```
+Use the provided ticket ID as `TICKET_ID` throughout this command.
 
 ## Step 2: Read the Ticket
 
@@ -181,10 +168,10 @@ Use `mcp__linear__save_comment` with the ticket ID and body "Routing decision: F
 
 Based on the routing decision (or user override):
 
-- **ONE_SHOT**: Invoke `/awl-dev:one_shot_fix` — the ticket is already set in workflow context
+- **ONE_SHOT**: Invoke `/awl-dev:one_shot_fix $TICKET_ID`
 - **FULL_RESEARCH**: Invoke `/awl-dev:research_codebase $TICKET_ID`
 
-Use the Skill tool to invoke the chosen command.
+Use the Skill tool to invoke the chosen command, passing the ticket ID explicitly.
 
 ## Important Notes
 
@@ -198,9 +185,8 @@ The router does NOT:
 
 The router ONLY:
 
-- Sets the workflow context ticket
 - Adds a routing decision comment (headless mode only)
-- Delegates to the appropriate command
+- Delegates to the appropriate command with the ticket ID as an argument
 
 ### Override Is Always Available
 

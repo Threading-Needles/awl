@@ -78,19 +78,6 @@ When fully implemented, this command will:
 
 Track progress at: https://github.com/Threading-Needles/awl/issues
 
-## Configuration
-
-Uses `.claude/config.json`:
-
-```json
-{
-  "linear": {
-    "teamKey": "ENG",
-    "defaultTeam": "Backend"
-  }
-}
-```
-
 ## Tips
 
 - Review **mid-cycle** to course-correct

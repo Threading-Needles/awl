@@ -87,40 +87,25 @@ and shared memory systems.
 - Import and adapt patterns
 - Create new workflows
 
-## Quick Setup (5 Minutes)
-
-Get started in 5 minutes with the unified setup script:
-
-```bash
-# Download the setup script
-curl -O https://raw.githubusercontent.com/Threading-Needles/awl/main/setup-awl.sh
-chmod +x setup-awl.sh
-
-# Run it (requires interactive input)
-./setup-awl.sh
-```
-
-This script will guide you through:
-- Prerequisites check and installation (jq, etc.)
-- Project configuration (ticket prefix, project name)
-- Integration setup (Linear, PostHog, Exa)
-
-**Then install the plugins:**
+## Quick Setup
 
 ```bash
 # In Claude Code:
 /plugin marketplace add Threading-Needles/awl
 /plugin install awl-dev
-
-# Restart Claude Code
 ```
 
-You're ready! Try `/awl-dev:research-codebase` in your next session.
+That's it. No setup script, no config file, no API tokens — Linear authenticates via OAuth on first use.
 
-**Recommended**: Add the Awl workflow snippet to your project's CLAUDE.md. See
-[CLAUDE.md Setup](QUICKSTART.md#claudemd-setup) for the copy-paste snippet.
+Try it:
 
-See [QUICKSTART.md](QUICKSTART.md) for detailed setup instructions.
+```bash
+/awl-dev:research-codebase TICKET-123
+```
+
+Every workflow command takes a Linear ticket ID as a positional argument. Commands are stateless — no hidden "current ticket" state between runs.
+
+See [QUICKSTART.md](QUICKSTART.md) for details.
 
 ## Installation
 
@@ -222,8 +207,7 @@ before running out of context, creating structured handoff documents that add to
   planning, handoff, worktree, implementation, verify, and PR workflows
 - [Context Engineering](docs/CONTEXT_ENGINEERING.md) - Token efficiency strategies and context
   management patterns
-- [Linear Workflow Automation](docs/LINEAR_WORKFLOW_AUTOMATION.md) - Linear MCP integration for ticket
-  → branch → PR → merge lifecycle
+- [PR Lifecycle](docs/PR_LIFECYCLE.md) - PR creation, review, and merge workflow
 
 ## Core Philosophy
 
@@ -252,11 +236,11 @@ Uses the official Linear MCP server for rich Linear integration with structured 
 - Focused agents for specific tasks
 - Context-aware handoff prompts
 
-**Secure Configuration**
+**Stateless Commands**
 
-- Template system prevents committing secrets
-- `.gitignore` protection for sensitive files
-- No hardcoded credentials
+- No config files, no hidden state between runs
+- Ticket ID and team key passed explicitly as arguments
+- Linear MCP authenticates via OAuth on first use
 
 ## Requirements
 
@@ -264,21 +248,21 @@ Uses the official Linear MCP server for rich Linear integration with structured 
 
 - Claude Code
 - Git
-- jq
 
-**CLI Integrations** (optional but recommended):
+**CLI Integrations**:
 
-- `gh` - GitHub CLI
+- `gh` - GitHub CLI (required for PR creation, merge, sync)
 
 **MCP Tools** (bundled with plugins):
 
+- Linear - Built into `awl-dev`
 - Context7 & DeepWiki - Built into `awl-dev` (~3.5k tokens)
 - PostHog - Built into `awl-analytics` and `awl-debugging`
 
-Run the prerequisite check:
+Run the doctor:
 
 ```bash
-/check_prerequisites
+/awl-dev:doctor
 ```
 
 ## Contributing
@@ -288,9 +272,8 @@ We welcome contributions! Open issues for bugs, workflow suggestions, or to shar
 ## Documentation
 
 - [Full Documentation](docs/) - Comprehensive guides
-- [Quick Start](QUICKSTART.md) - 5-minute setup
+- [Quick Start](QUICKSTART.md) - Installation and first steps
 - [Usage Guide](docs/USAGE.md) - How to use all features
-- [Commands](COMMANDS_ANALYSIS.md) - Complete command reference
 - [Architecture](CLAUDE.md) - How it's built
 
 ## License

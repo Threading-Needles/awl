@@ -56,14 +56,14 @@ If hooks aren't working, restart Claude Code:
 # Hooks will be active in the new session
 ```
 
-## Commands That Use Workflow Context
+## Commands That Query Linear By Ticket
 
-These commands automatically read workflow context to find the current ticket and query Linear for documents:
+These commands take the ticket ID as a positional argument and query Linear for documents attached to it:
 
-- `/awl-dev:resume-handoff` - Finds handoff document for the current ticket
-- `/awl-dev:create-plan` - Finds research document for the current ticket
-- `/awl-dev:implement-plan` - Finds plan document for the current ticket
-- `/awl-dev:validate-plan` - Verifies plan was followed
+- `/awl-dev:resume-handoff TICKET-123` - Finds handoff document for the ticket
+- `/awl-dev:create-plan TICKET-123` - Finds research document for the ticket
+- `/awl-dev:implement-plan TICKET-123` - Finds plan document for the ticket
+- `/awl-dev:validate-plan TICKET-123` - Verifies plan was followed
 
 ## Troubleshooting
 
@@ -85,6 +85,5 @@ These commands automatically read workflow context to find the current ticket an
 
 ## See Also
 
-- [Workflow Context](./WORKFLOW_CONTEXT.md)
 - [Scripts](./scripts/)
 - [Claude Code Hooks Documentation](https://docs.claude.com/en/docs/claude-code/hooks)

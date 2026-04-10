@@ -255,13 +255,7 @@ Health Score: 75/100
 
 1. **Linear MCP**: The official Linear MCP server (handles authentication automatically)
 
-2. **jq** (JSON parsing)
-   ```bash
-   brew install jq  # macOS
-   apt install jq   # Ubuntu/Debian
-   ```
-
-3. **GitHub CLI** (optional, for PR sync)
+2. **GitHub CLI** (required for `sync_prs`, optional for others)
    ```bash
    brew install gh  # macOS
    ```
@@ -269,31 +263,16 @@ Health Score: 75/100
 
 ### Configuration
 
-PM commands read from two config sources:
+None. PM commands are **stateless** — every command takes the Linear team key as a positional argument:
 
-**1. Project metadata** (`.claude/config.json` - safe to commit):
-```json
-{
-  "awl": {
-    "projectKey": "acme",
-    "project": {
-      "ticketPrefix": "ACME"
-    }
-  }
-}
+```bash
+/awl-pm:analyze-cycle ENG
+/awl-pm:report-daily ENG
+/awl-pm:sync-prs ENG
+/awl-pm:groom-backlog ENG
 ```
 
-**2. Secrets** (`~/.config/awl/config-acme.json` - NEVER committed):
-```json
-{
-  "linear": {
-    "apiToken": "lin_api_...",
-    "teamKey": "ACME"
-  }
-}
-```
-
-**Setup**: Run `./scripts/setup-awl-config.sh` to configure your project
+Milestone, initiative, and status commands take their target name interactively or as an argument. No config file needed.
 
 ## Installation
 
@@ -336,7 +315,7 @@ cd /path/to/your/project
 
 **Morning Standup**:
 ```bash
-/awl-pm:report-daily
+/awl-pm:report-daily ENG
 ```
 - See what shipped yesterday
 - Review current work
@@ -347,7 +326,7 @@ cd /path/to/your/project
 
 **Start of Week**:
 ```bash
-/awl-pm:analyze-cycle
+/awl-pm:analyze-cycle ENG
 ```
 - Assess cycle health
 - Review capacity
@@ -356,7 +335,7 @@ cd /path/to/your/project
 
 **Mid-Week**:
 ```bash
-/awl-pm:sync-prs
+/awl-pm:sync-prs ENG
 ```
 
 ### Strategic Review
@@ -383,52 +362,18 @@ cd /path/to/your/project
 
 **End of Week**:
 ```bash
-/awl-pm:groom-backlog
+/awl-pm:groom-backlog ENG
 ```
 - Clean up orphaned issues
 - Categorize new issues
 - Remove stale issues
 - Prepare next cycle
 
-## Configuration Options
-
-Default settings in `.claude/config.json`:
-
-```json
-{
-  "pm": {
-    "defaultCycleView": "active",
-    "cycleProgressThreshold": 80,
-    "staleIssueDays": 30,
-    "atRiskIssueDays": 5,
-    "teamAnalyticsEnabled": true,
-    "backlogGrooming": {
-      "autoDetectProjects": true,
-      "duplicateSimilarityThreshold": 0.85,
-      "requireEstimates": true
-    }
-  }
-}
-```
-
 ## Troubleshooting
 
 ### "Linear MCP not available"
 
 Ensure the official Linear MCP server is configured in your Claude Code settings. The MCP server handles authentication automatically via OAuth.
-
-### "Configuration file not found"
-
-Ensure `.claude/config.json` exists:
-```bash
-cat .claude/config.json
-```
-
-Create if missing:
-```bash
-mkdir -p .claude
-echo '{"linear": {"teamKey": "TEAM"}}' > .claude/config.json
-```
 
 ### "No active cycle found"
 

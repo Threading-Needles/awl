@@ -133,7 +133,7 @@ WARNING: No active cycle found for team ENG
 
 1. **Use appropriate tools**: Choose the most specific tool for the query
 2. **Use research for complex queries**: Natural language queries are handled by `mcp__linear__research`
-3. **Cache team configuration**: Read from `.claude/config.json` once
+3. **Team key comes from caller**: The team key is passed in via the prompt by the calling command — do not read configuration files
 4. **Fail fast**: Return errors immediately, don't retry
 
 ## Communication Principles

@@ -72,13 +72,14 @@ Return: Evidence of active work with file paths"
 Tools: Bash (git status), Grep, Glob
 ```
 
-**Task 2 - Check Current Ticket**:
+**Task 2 - Infer Current Ticket From Branch**:
 
 ```
-"Get the current ticket from workflow context.
-Run: ${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh get-ticket
-If ticket exists, query Linear for documents attached to it.
-Return: Current ticket and any documents (research, plan, handoff) found"
+"Extract the ticket ID from the current git branch name.
+Run: git branch --show-current
+If the branch matches pattern ([A-Z]+-[0-9]+), that is the current ticket.
+If ticket found, query Linear for documents attached to it.
+Return: Current ticket (if any) and any documents (research, plan, handoff) found"
 
 Tools: Bash
 ```
@@ -164,7 +165,7 @@ Tools: Read, Grep
 **Task 3 - Check for User's Current Ticket**:
 
 ```
-"Get the current ticket from workflow context and query Linear for documents.
+"Infer the current ticket from the git branch name (pattern [A-Z]+-[0-9]+) and query Linear for documents.
 Return: What documents exist for current ticket, suggesting next steps"
 
 Tools: Bash
@@ -523,7 +524,7 @@ See full guide: `docs/AGENTIC_WORKFLOW_GUIDE.md` (Handoff System section)
 The parallel agents can detect:
 
 - Current git branch
-- Current ticket from workflow context
+- Current ticket (inferred from branch name pattern `[A-Z]+-[0-9]+`)
 - Linear documents attached to ticket
 - Plan documents with checkboxes
 - Research documents

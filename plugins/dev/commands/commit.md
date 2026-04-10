@@ -34,9 +34,9 @@ during this session.
    **Scope detection (suggest to user):**
    - Parse changed file paths
    - Map to scopes:
-     - `agents/*.md` → `agents`
-     - `commands/*.md` → `commands`
-     - `hack/*` → `hack`
+     - `plugins/dev/agents/*.md` → `agents`
+     - `plugins/*/commands/*.md` → `commands`
+     - `plugins/*/scripts/*` → `scripts`
      - `docs/*.md` → `docs`
      - `.claude/` → `claude`
      - Multiple dirs or root files → empty scope (cross-cutting)
@@ -93,27 +93,6 @@ during this session.
    - Show result: `git log --oneline -n 1`
    - Show summary: `git show --stat HEAD`
 
-## Configuration
-
-Reads from `.claude/config.json`:
-
-```json
-{
-  "awl": {
-    "commit": {
-      "useConventional": true,
-      "scopes": ["agents", "commands", "hack", "docs", "claude", "config"],
-      "autoDetectType": true,
-      "autoDetectScope": true,
-      "requireBody": false
-    },
-    "project": {
-      "ticketPrefix": "RCW"
-    }
-  }
-}
-```
-
 ## Type Reference
 
 **Types that appear in CHANGELOG:**
@@ -160,9 +139,9 @@ Refs: RCW-78
 **Documentation:**
 
 ```
-docs(hack): add README for installation scripts
+docs(scripts): add README for plugin scripts
 
-Documents all scripts in hack/ directory with usage examples
+Documents all bundled scripts with usage examples
 and explains when to use each installation method.
 
 Refs: RCW-12

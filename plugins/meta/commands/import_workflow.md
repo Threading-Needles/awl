@@ -169,10 +169,10 @@ source: { repo-url } # Track origin
 
 Check for and replace:
 
-- Ticket prefixes (ENG-XXX → read from `.claude/config.json`)
+- Hardcoded ticket prefixes (ENG-XXX → placeholder `TICKET-123` or parameterize via command argument)
 - Repository paths (their paths → local paths)
-- Team/project IDs (their IDs → prompt or use config)
-- User names (their names → generic or config)
+- Team/project IDs (their IDs → command arguments or interactive prompts)
+- User names (their names → generic placeholders)
 - Tool names (check compatibility)
 
 #### 5c. Add Attribution

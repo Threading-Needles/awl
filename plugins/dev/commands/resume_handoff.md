@@ -14,28 +14,19 @@ and continued.
 
 ## Initial Response
 
-### Step 1: Determine Ticket
+### Step 1: Validate Ticket Argument
 
-**If user provided a ticket ID as parameter** (e.g., `/awl-dev:resume-handoff PROJ-123`):
-- Set the ticket in workflow context:
-  ```bash
-  "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
-  ```
-- Continue to Step 2
-
-**If no parameter provided**:
-- Check workflow context for current ticket:
-  ```bash
-  CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
-  ```
-
-**If no current ticket:**
+**A ticket ID is REQUIRED as the first argument.** If no ticket ID was provided, respond with:
 
 ```
 I need a Linear ticket to find handoff documents.
 
-Please provide a ticket ID: `/awl-dev:resume-handoff PROJ-123`
+Usage: /awl-dev:resume-handoff TICKET-123
 ```
+
+Then stop. Do not proceed without a ticket ID.
+
+Use the provided ticket ID as `TICKET_ID` throughout this command.
 
 ### Step 1a: Update Linear Ticket Status (FIRST)
 
@@ -51,7 +42,7 @@ Use `mcp__linear__get_issue` with the ticket identifier to retrieve the issue an
 **If no handoff found:**
 
 ```
-No handoff documents found for {CURRENT_TICKET}.
+No handoff documents found for {TICKET_ID}.
 
 Would you like me to:
 1. Check for other document types (research, plans)?
@@ -61,7 +52,7 @@ Would you like me to:
 **If multiple handoffs found:**
 
 ```
-Found multiple handoff documents for {CURRENT_TICKET}:
+Found multiple handoff documents for {TICKET_ID}:
 1. Handoff: {title1} (created {date1})
 2. Handoff: {title2} (created {date2})
 
@@ -71,7 +62,7 @@ Which handoff should I resume from? (Usually the most recent)
 **If single handoff found:**
 
 ```
-Found handoff for {CURRENT_TICKET}:
+Found handoff for {TICKET_ID}:
 - Handoff: {title}
 
 Let me read and analyze it...
@@ -132,7 +123,7 @@ After reading the handoff:
 Present comprehensive analysis:
 
 ```
-I've analyzed the handoff for {CURRENT_TICKET}. Here's the current situation:
+I've analyzed the handoff for {TICKET_ID}. Here's the current situation:
 
 **Original Tasks:**
 - [Task 1]: [Status from handoff] → [Current verification]
@@ -292,7 +283,6 @@ Please verify:
 User: /awl-dev:resume-handoff PROJ-123
 Assistant: Let me find and analyze handoff documents for PROJ-123...
 
-[Sets ticket in workflow context]
 [Queries Linear for documents]
 [Reads handoff completely]
 [Spawns research tasks]

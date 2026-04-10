@@ -4,8 +4,7 @@ This document contains the recommended CLAUDE.md snippet for projects using the 
 
 ## Why Add This?
 
-Adding Awl workflow instructions to your project's CLAUDE.md helps Claude Code understand how to
-work effectively with your codebase using Linear-driven development workflows.
+Adding Awl workflow instructions to your project's CLAUDE.md helps Claude Code understand how to work effectively with your codebase using Linear-driven development workflows.
 
 ## The Snippet
 
@@ -15,51 +14,30 @@ Copy the section below (between the `---` markers) into your project's CLAUDE.md
 
 ## Awl Workflow Integration
 
-This project uses [Awl](https://github.com/Threading-Needles/awl) for Linear-driven development
-workflows.
+This project uses [Awl](https://github.com/Threading-Needles/awl) for Linear-driven development workflows.
 
 ### Ticket-Driven Development
 
-Always work with a Linear ticket. The standard workflow is:
+Always work with a Linear ticket. Every workflow command takes the ticket ID as a positional argument:
 
 ```
-/awl-dev:research_codebase PROJ-123 → /awl-dev:create_plan → /awl-dev:implement_plan
+/awl-dev:research-codebase TICKET-123 → /awl-dev:create-plan TICKET-123 → /awl-dev:implement-plan TICKET-123
 ```
-
-Where `PROJ-123` is your Linear ticket ID (replace `PROJ` with your project's ticket prefix).
 
 ### Key Commands
 
 | Command | Purpose |
 |---------|---------|
-| `/awl-dev:research_codebase` | Research codebase and save findings to Linear |
-| `/awl-dev:create_plan` | Create implementation plan from research |
-| `/awl-dev:implement_plan` | Execute plan with auto-validation and PR creation |
-| `/awl-dev:create_handoff` | Save context for later sessions |
-| `/awl-dev:resume_handoff` | Resume from saved context |
+| `/awl-dev:research-codebase TICKET-123` | Research codebase and save findings to Linear |
+| `/awl-dev:create-plan TICKET-123` | Create implementation plan from research |
+| `/awl-dev:implement-plan TICKET-123` | Execute plan with auto-validation and PR creation |
+| `/awl-dev:create-handoff TICKET-123` | Save context for later sessions |
+| `/awl-dev:resume-handoff TICKET-123` | Resume from saved context |
 | `/awl-dev:doctor` | Check Awl setup and dependencies |
 
-### Context Persistence
-
-- All workflow documents (research, plans, handoffs) are stored as Linear documents attached to
-  tickets
-- Use `/awl-dev:create_handoff` before ending a session to save context
-- Use `/awl-dev:resume_handoff PROJ-123` to resume work on a ticket
-
-### Configuration
-
-Project configuration is in `.claude/config.json`. See
-[Awl Configuration Guide](https://github.com/Threading-Needles/awl/blob/main/docs/CONFIGURATION.md).
+All workflow documents (research, plans, handoffs, PR descriptions) are stored as Linear documents attached to the ticket. There is no local config file, no hidden state — commands are fully stateless.
 
 ---
-
-## Customization
-
-After adding the snippet:
-
-1. Replace `PROJ` with your actual ticket prefix (e.g., `ENG`, `ACME`)
-2. Update any project-specific workflow notes
-3. Run `/awl-dev:doctor` to verify your setup
 
 ## Verification
 
@@ -69,4 +47,4 @@ After adding the snippet, run:
 /awl-dev:doctor
 ```
 
-This will verify your Awl setup and show the CLAUDE.md status.
+This will verify that prerequisites (gh CLI) and recommended plugins are installed.

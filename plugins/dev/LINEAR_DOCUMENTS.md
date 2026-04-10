@@ -87,36 +87,23 @@ Use `mcp__linear__get_document` with the document ID to read its full content.
 
 ### Entry Point
 
-All workflows start with a ticket ID. The first command (`/awl-dev:research-codebase PROJ-123`) sets the current ticket in workflow context.
+Every workflow command takes a ticket ID as a required positional argument. Commands are fully stateless — there is no hidden "current ticket" state.
 
 ### Document Discovery
 
-Subsequent commands query Linear for documents on the current ticket:
+Each command queries Linear for documents on the ticket passed to it:
 
 ```
 /awl-dev:research-codebase PROJ-123
   └─→ Creates: Research document attached to PROJ-123
-  └─→ Sets: currentTicket = PROJ-123
 
-/awl-dev:create-plan (no args needed)
-  └─→ Reads: currentTicket from workflow-context
+/awl-dev:create-plan PROJ-123
   └─→ Queries: Linear for Research documents on PROJ-123
   └─→ Creates: Plan document attached to PROJ-123
 
-/awl-dev:implement-plan (no args needed)
-  └─→ Reads: currentTicket from workflow-context
+/awl-dev:implement-plan PROJ-123
   └─→ Queries: Linear for Plan documents on PROJ-123
   └─→ Implements the plan
-```
-
-### Workflow Context
-
-The workflow context file (`.claude/.workflow-context.json`) stores only the current ticket:
-
-```json
-{
-  "currentTicket": "PROJ-123"
-}
 ```
 
 ## Best Practices

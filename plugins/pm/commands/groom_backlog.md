@@ -39,20 +39,25 @@ mkdir -p "reports/backlog"
 
 ## Process
 
-### Step 1: Spawn Research Agent
+### Step 1: Validate Team Argument
+
+**A Linear team key is REQUIRED as the first argument.** If no team was provided, respond with:
+
+```
+I need a Linear team key to groom the backlog.
+
+Usage: /awl-pm:groom-backlog TEAM-KEY
+
+Example: /awl-pm:groom-backlog ENG
+```
+
+Then stop. Do not proceed without a team key.
 
 ```bash
-# Determine script directory with fallback
-if [[ -n "${CLAUDE_PLUGIN_ROOT}" ]]; then
-  SCRIPT_DIR="${CLAUDE_PLUGIN_ROOT}/scripts"
-else
-  # Fallback: resolve relative to this command file
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts"
-fi
-
-source "${SCRIPT_DIR}/pm-utils.sh"
-TEAM_KEY=$(get_team_key)
+TEAM_KEY="$1"
 ```
+
+### Step 2: Spawn Research Agent
 
 Use Task tool with `awl-dev:linear-research` agent:
 
@@ -61,7 +66,7 @@ Prompt: "Get all backlog issues for team ${TEAM_KEY} including issues with no cy
 Model: haiku
 ```
 
-### Step 2: Spawn Analysis Agent
+### Step 3: Spawn Analysis Agent
 
 Use Task tool with `backlog-analyzer` agent:
 
@@ -74,7 +79,7 @@ Use Task tool with `backlog-analyzer` agent:
 - Potential duplicates
 - Missing estimates
 
-### Step 3: Generate Grooming Report
+### Step 4: Generate Grooming Report
 
 Create markdown report with sections:
 
@@ -131,7 +136,7 @@ Create markdown report with sections:
   - **Action**: Add story point estimates
 ```
 
-### Step 4: Interactive Review
+### Step 5: Interactive Review
 
 Present recommendations and ask user:
 
@@ -152,7 +157,7 @@ Would you like to:
 4. Skip (report saved for later)
 ```
 
-### Step 5: Generate Update Commands
+### Step 6: Generate Update Commands
 
 If user chooses option 3, generate batch update script:
 
@@ -175,7 +180,7 @@ mkdir -p "$(dirname "$UPDATE_SCRIPT")"
 chmod +x "$UPDATE_SCRIPT"
 ```
 
-### Step 6: Save Report
+### Step 7: Save Report
 
 ```bash
 REPORT_DIR="reports/backlog"

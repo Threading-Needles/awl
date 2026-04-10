@@ -142,10 +142,9 @@ Commands use Linear documents attached to tickets:
 | Handoff | `Handoff: ...` | handshake | orange |
 | PR Description | `PR: ...` | git-pull-request | purple |
 
-**Discovery:** Documents are discovered by querying Linear for attachments on the current ticket.
+**Discovery:** Documents are discovered by querying Linear for attachments on the ticket passed as argument.
 
-**Workflow Context:** The current ticket is tracked in `.claude/.workflow-context.json` to enable
-command chaining (e.g., `/awl-dev:research-codebase` → `/awl-dev:create-plan` → `/awl-dev:implement-plan`).
+**Stateless commands:** Every workflow command takes the ticket ID as a required positional argument (e.g., `/awl-dev:research-codebase TICKET-123`). There is no hidden state or config — commands are fully stateless between invocations.
 
 ## Prerequisites
 

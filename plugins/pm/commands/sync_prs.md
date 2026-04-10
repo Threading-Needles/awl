@@ -38,20 +38,25 @@ mkdir -p "reports/pr-sync"
 
 ## Process
 
-### Step 1: Spawn Research Tasks (Parallel)
+### Step 1: Validate Team Argument
+
+**A Linear team key is REQUIRED as the first argument.** If no team was provided, respond with:
+
+```
+I need a Linear team key to sync PRs.
+
+Usage: /awl-pm:sync-prs TEAM-KEY
+
+Example: /awl-pm:sync-prs ENG
+```
+
+Then stop. Do not proceed without a team key.
 
 ```bash
-# Determine script directory with fallback
-if [[ -n "${CLAUDE_PLUGIN_ROOT}" ]]; then
-  SCRIPT_DIR="${CLAUDE_PLUGIN_ROOT}/scripts"
-else
-  # Fallback: resolve relative to this command file
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts"
-fi
-
-source "${SCRIPT_DIR}/pm-utils.sh"
-TEAM_KEY=$(get_team_key)
+TEAM_KEY="$1"
 ```
+
+### Step 2: Spawn Research Tasks (Parallel)
 
 **Task 1 - Get GitHub PRs**:
 Use `awl-dev:github-research` agent (if exists) or inline `gh` commands:
@@ -68,7 +73,7 @@ Model: haiku
 
 **Wait for both tasks to complete**
 
-### Step 2: Spawn Analysis Agent
+### Step 3: Spawn Analysis Agent
 
 Use Task tool with `github-linear-analyzer` agent:
 
@@ -83,7 +88,7 @@ Use Task tool with `github-linear-analyzer` agent:
 - Ready to close (PR merged, issue open)
 - Stale PRs (>14 days)
 
-### Step 3: Generate Sync Report
+### Step 4: Generate Sync Report
 
 ```markdown
 # PR-Linear Sync Report
@@ -146,7 +151,7 @@ and `mcp__linear__save_comment` to add a comment linking the merged PR.
 | #120 | TEAM-450 | 18 days | Alice | Review and merge or close |
 ```
 
-### Step 4: Save Report
+### Step 5: Save Report
 
 ```bash
 REPORT_DIR="reports/pr-sync"
@@ -164,7 +169,7 @@ EOF
 echo "✅ Report saved: $REPORT_FILE"
 ```
 
-### Step 5: Display Summary
+### Step 6: Display Summary
 
 ```
 🔗 PR-Linear Sync Report

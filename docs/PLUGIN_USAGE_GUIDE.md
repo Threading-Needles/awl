@@ -310,7 +310,6 @@ source ~/.zshrc
 
 ## See Also
 
-- `PLUGIN_MIGRATION.md` - Technical details of the plugin architecture
 - `plugins/analytics/README.md` - Analytics plugin documentation
 - `plugins/debugging/README.md` - Debugging plugin documentation
 - `docs/MCP_MANAGEMENT_STRATEGY.md` - Overall MCP strategy

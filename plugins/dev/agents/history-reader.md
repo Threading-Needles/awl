@@ -26,25 +26,17 @@ decisions, patterns, and lessons that may inform current work.
 
 ### Step 1: Determine Project Context
 
-If a project name is provided, use it directly.
+The calling command must pass either a **project name** or a **ticket ID** in the prompt.
 
-If no project is provided, derive it from the current ticket:
+- If a project name is provided, use it directly.
+- If a ticket ID is provided, use `mcp__linear__get_issue` to read the ticket and extract the project name from its `project` field.
 
-```bash
-# Read workflow context for current ticket
-CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket 2>/dev/null)
-```
-
-If a current ticket is found, use `mcp__linear__get_issue` to read the ticket and
-extract the project name from its project field.
-
-If no ticket and no project can be determined, report the error:
+If neither is provided, report the error:
 
 ```
 Cannot determine project context.
 
-Please provide a project name, or set a current ticket first:
-  /awl-dev:research-codebase PROJ-123
+The calling command must provide either a project name or a ticket ID (e.g., PROJ-123).
 ```
 
 ### Step 2: Search for Completed Tickets

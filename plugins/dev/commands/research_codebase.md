@@ -21,24 +21,12 @@ by spawning parallel sub-agents and synthesizing their findings.
 - ONLY describe what exists, where it exists, how it works, and how components interact
 - You are creating a technical map/documentation of the existing system
 
-## Prerequisites
-
-Before executing, verify Linear integration is available:
-
-```bash
-# Validate plugin prerequisites
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
-  "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
-fi
-```
-
 ## Execution Mode Detection
 
 Detect whether running interactively or headless (e.g., `claude -p`):
 
 ```bash
-MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
-# MODE will be "interactive" or "headless"
+MODE=$([[ "${CLAUDE_NON_INTERACTIVE:-}" == "1" || "${CLAUDE_CODE_ENTRYPOINT:-}" == "sdk-cli" ]] && echo headless || echo interactive)
 ```
 
 **Mode behavior:**
@@ -49,35 +37,25 @@ MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
 
 When this command is invoked:
 
-1. **Check for ticket ID argument**
-2. **If no ticket ID provided**, respond with:
+1. **A ticket ID is REQUIRED as the first argument.** If no ticket ID was provided, respond with:
 
 ```
 I need a Linear ticket to attach this research to.
 
-Please either:
-1. Provide a ticket ID: `/awl-dev:research-codebase PROJ-123`
-2. Let me create a new ticket for this research
-
-Which would you prefer?
+Usage: /awl-dev:research-codebase TICKET-123
 ```
 
-3. **If ticket ID provided**, set it in workflow context and proceed:
+Then stop. Do not proceed without a ticket ID.
 
-```bash
-# Set current ticket for subsequent commands
-"${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
-```
-
-4. **Get assignee for headless mode** (used for document mentions):
+2. **Get assignee for headless mode** (used for document mentions):
 
 Use `mcp__linear__get_issue` with the ticket ID to retrieve the issue details. Extract the assignee name from the response to use for `@mentions` in document sections like "Questions for User".
 
-5. **Read the ticket details** (both modes):
+3. **Read the ticket details** (both modes):
 
 Use `mcp__linear__get_issue` with the ticket ID to retrieve the full ticket details including title, description, labels, priority, and estimate. You need this context to assess whether the ticket is clear enough to start research.
 
-6. **Branch based on mode**:
+4. **Branch based on mode**:
 
 **If MODE is "interactive":**
 
@@ -540,9 +518,8 @@ This command integrates with the complete development workflow:
 /awl-dev:research-codebase PROJ-123
 
 # You:
-# 1. Set current ticket in workflow context
-# 2. Update ticket status to "Research"
-# 3. Ask for research question
+# 1. Update ticket status to "Research"
+# 2. Ask for research question
 
 # User asks: "How does authentication work in the API?"
 

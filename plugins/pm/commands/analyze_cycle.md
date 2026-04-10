@@ -46,22 +46,22 @@ mkdir -p "reports/cycles"
 
 ## Process
 
-### Step 1: Gather Configuration
+### Step 1: Validate Team Argument
+
+**A Linear team key is REQUIRED as the first argument.** If no team was provided, respond with:
+
+```
+I need a Linear team key to analyze the cycle.
+
+Usage: /awl-pm:analyze-cycle TEAM-KEY
+
+Example: /awl-pm:analyze-cycle ENG
+```
+
+Then stop. Do not proceed without a team key.
 
 ```bash
-# Determine script directory with fallback (if not already set)
-if [[ -z "${SCRIPT_DIR}" ]]; then
-  if [[ -n "${CLAUDE_PLUGIN_ROOT}" ]]; then
-    SCRIPT_DIR="${CLAUDE_PLUGIN_ROOT}/scripts"
-  else
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts"
-  fi
-fi
-
-source "${SCRIPT_DIR}/pm-utils.sh"
-
-TEAM_KEY=$(get_team_key)
-CONFIG_FILE=".claude/config.json"
+TEAM_KEY="$1"
 ```
 
 ### Step 2: Spawn Research Tasks (Parallel)

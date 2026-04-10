@@ -20,7 +20,6 @@ Run all checks and output a structured status report:
 
 ## CLI Tools
 
-✅ jq (JSON processor)
 ✅ gh (GitHub CLI)
 
 ## Environment Variables
@@ -85,7 +84,7 @@ echo "## CLI Tools"
 echo ""
 
 # Required tools
-REQUIRED_TOOLS=("jq:JSON processor:brew install jq" "gh:GitHub CLI:brew install gh")
+REQUIRED_TOOLS=("gh:GitHub CLI:brew install gh")
 
 for tool_spec in "${REQUIRED_TOOLS[@]}"; do
     IFS=: read -r cmd name install <<< "$tool_spec"

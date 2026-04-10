@@ -25,7 +25,6 @@ The workspace uses a plugin-based architecture where agents and commands are org
 
 2. **Installation Layer** (`.claude/`)
    - Symlinks to local plugin directories
-   - Configuration file (`config.json`)
    - Claude Code reads plugins from here
 
 ### Linear Documents System
@@ -40,40 +39,25 @@ attached to tickets:
 
 Documents are discovered by querying Linear via `mcp__linear__get_issue` with the ticket ID.
 
-### Workflow State Management
+### Stateless Commands
 
-Commands track the current ticket via `.claude/.workflow-context.json`:
+Awl commands are **stateless**. Every workflow command takes the Linear ticket ID as a required positional argument:
 
-**Purpose**: Enable workflow commands to auto-discover documents attached to the current ticket.
-
-**How it works**:
-
-- `/awl-dev:research-codebase PROJ-123` sets ticket → saves research to Linear
-- `/awl-dev:create-plan` reads research from Linear → saves plan to Linear
-- `/awl-dev:implement-plan` reads plan from Linear → implements phases
-- `/awl-dev:create-handoff` saves handoff to Linear
-- `/awl-dev:resume-handoff PROJ-123` finds handoff from Linear
-
-**Structure**:
-
-```json
-{
-  "lastUpdated": "2025-10-26T10:30:00Z",
-  "currentTicket": "PROJ-123"
-}
+```bash
+/awl-dev:research-codebase PROJ-123
+/awl-dev:create-plan PROJ-123
+/awl-dev:implement-plan PROJ-123
+/awl-dev:create-handoff PROJ-123
+/awl-dev:resume-handoff PROJ-123
 ```
 
-**Key benefit**: Commands chain together by querying Linear for documents attached to the current
-ticket. No file paths to remember.
+There is **no hidden state** between command runs — no `workflow-context.json`, no `.claude/config.json`, no "current ticket" file. Each command is fully self-contained.
 
-**Management**: Set via `workflow-context.sh set-ticket`, read via `workflow-context.sh get-ticket`.
-Tracked per-worktree (not committed to git).
+PR commands extract the ticket from the branch name (pattern `[A-Z]+-[0-9]+`) and from PR title/body. PM commands take the team key as their first argument (e.g., `/awl-pm:analyze-cycle ENG`).
 
 ### Linear Documents Architecture
 
 Awl uses Linear documents attached to tickets for persistent workflow context:
-
-**How It Works:**
 
 ```
 ┌─────────────────────────────────────┐
@@ -84,15 +68,7 @@ Awl uses Linear documents attached to tickets for persistent workflow context:
 │  └─ PR: #456 - Add OAuth Support    │ ← From /awl-dev:describe-pr
 └─────────────────────────────────────┘
           │
-          ├──→ Queried via: mcp__linear__get_issue(id: PROJ-123)
-          │
-          ▼
-┌─────────────────────────────────────┐
-│  .claude/.workflow-context.json     │
-│  {                                  │
-│    "currentTicket": "PROJ-123"      │ ← Tracks active ticket
-│  }                                  │
-└─────────────────────────────────────┘
+          └──→ Queried via: mcp__linear__get_issue(id: PROJ-123)
 ```
 
 **Benefits:**
@@ -105,13 +81,11 @@ Awl uses Linear documents attached to tickets for persistent workflow context:
 
 **Example Flow:**
 
-1. `/awl-dev:research-codebase PROJ-123` sets ticket, creates "Research: ..." document
-2. `/awl-dev:create-plan` queries PROJ-123 for research, creates "Plan: ..." document
-3. `/awl-dev:implement-plan` queries PROJ-123 for plan, implements phases
-4. `/awl-dev:describe-pr` creates "PR: ..." document
-5. `/awl-dev:create-handoff` creates "Handoff: ..." document if pausing work
-
-All documents attached to the same ticket for easy discovery.
+1. `/awl-dev:research-codebase PROJ-123` creates "Research: ..." document
+2. `/awl-dev:create-plan PROJ-123` queries PROJ-123 for research, creates "Plan: ..."
+3. `/awl-dev:implement-plan PROJ-123` queries PROJ-123 for plan, implements phases
+4. `/awl-dev:describe-pr` creates "PR: ..." document (ticket extracted from branch)
+5. `/awl-dev:create-handoff PROJ-123` creates "Handoff: ..." document if pausing work
 
 ### Agent Philosophy
 
@@ -140,7 +114,7 @@ All commands:
 
 - Orchestrate multi-step processes via sub-agents
 - Use Linear documents for persistent context
-- Are configuration-driven (see `.claude/config.json`)
+- Are stateless — take ticket/team as positional arguments
 - Spawn parallel sub-agents for efficiency
 
 ## Common Development Tasks
@@ -191,35 +165,6 @@ This means:
 - ✅ Restart Claude Code to reload after editing plugins
 - ✅ True dogfooding - we use Awl exactly as users do
 
-### Configuration System
-
-Awl uses a **two-layer config system** to keep secrets out of git:
-
-**Layer 1: Project Config** (`.claude/config.json` - safe to commit):
-```json
-{
-  "projectKey": "acme",
-  "project": {
-    "ticketPrefix": "ACME",
-    "name": "Acme Corp Project"
-  },
-  "awl": {
-    "linear": {
-      "teamKey": "ACME"
-    }
-  }
-}
-```
-
-**Benefits**:
-- ✅ Secrets never in git
-- ✅ Multiple projects per machine (work/personal/clients)
-- ✅ `.claude/config.json` only has non-sensitive metadata
-
-**Switching projects**: Just update `projectKey` and team settings in `.claude/config.json`
-
-Commands read config to customize behavior per-project.
-
 ### Linear Integration (REQUIRED)
 
 Awl **requires** Linear for workflow document storage. This provides:
@@ -242,7 +187,7 @@ opens a browser for OAuth consent. No API tokens needed - authentication is auto
 
 Awl requires Linear because:
 1. Workflow commands chain together via ticket documents (research → plan → implement)
-2. Commands auto-find documents by querying the current ticket
+2. Each command queries Linear by the ticket ID passed as argument
 3. Team members see the same documents
 4. Documents survive across sessions and worktrees
 
@@ -280,57 +225,25 @@ awl/
 │   │   │   └── README.md
 │   │   ├── scripts/         # Runtime scripts bundled with plugin
 │   │   │   ├── check-prerequisites.sh
-│   │   │   └── workflow-context.sh
+│   │   │   └── frontmatter-utils.sh
 │   │   ├── LINEAR_DOCUMENTS.md  # Linear documents conventions
 │   │   └── plugin.json      # Plugin manifest
 │   ├── pm/                  # Project management plugin (awl-pm)
 │   │   ├── agents/          # PM analysis agents
-│   │   │   ├── cycle-analyzer.md
-│   │   │   ├── backlog-analyzer.md
-│   │   │   └── github-linear-analyzer.md
 │   │   ├── commands/        # PM workflow commands
-│   │   │   ├── analyze_cycle.md
-│   │   │   ├── analyze_milestone.md
-│   │   │   ├── report_daily.md
-│   │   │   ├── groom_backlog.md
-│   │   │   └── sync_prs.md
 │   │   ├── scripts/         # PM utility scripts
-│   │   │   └── check-prerequisites.sh
-│   │   ├── README.md        # PM plugin documentation
-│   │   └── plugin.json      # Plugin manifest
+│   │   │   ├── check-prerequisites.sh
+│   │   │   └── pm-utils.sh
+│   │   ├── README.md
+│   │   └── plugin.json
 │   └── meta/                # Meta/workflow management plugin (awl-meta)
-│       ├── commands/        # Workflow discovery & creation
-│       │   ├── create_workflow.md
-│       │   ├── discover_workflows.md
-│       │   ├── import_workflow.md
-│       │   └── validate_frontmatter.md
-│       ├── scripts/         # Runtime scripts for meta commands
-│       │   └── validate-frontmatter.sh
-│       └── plugin.json      # Plugin manifest
-├── scripts/                 # One-time setup scripts (not bundled in plugins)
-│   └── README.md            # Setup scripts documentation
+│       ├── commands/
+│       ├── scripts/
+│       └── plugin.json
 ├── docs/                    # Documentation
-│   ├── USAGE.md                  # Comprehensive usage guide
-│   ├── BEST_PRACTICES.md
-│   ├── PATTERNS.md
-│   ├── CONTEXT_ENGINEERING.md
-│   ├── CONFIGURATION.md
-│   ├── AGENTIC_WORKFLOW_GUIDE.md
-│   ├── LINEAR_WORKFLOW_AUTOMATION.md
-│   ├── FRONTMATTER_STANDARD.md
-│   └── PR_LIFECYCLE.md
 ├── reports/                 # PM reports (git-tracked, not in Linear)
-│   ├── cycles/              # Cycle analysis reports
-│   ├── milestones/          # Milestone progress reports
-│   ├── daily/               # Daily standup reports
-│   ├── backlog/             # Backlog grooming reports
-│   └── pr-sync/             # GitHub-Linear sync reports
 ├── .claude/                 # Local Claude Code installation
-│   ├── config.json          # Configuration (generic template values)
-│   ├── .workflow-context.json # Workflow state (not committed)
 │   └── plugins/             # Symlinks to plugin source (dogfooding)
-│       ├── dev -> ../../plugins/dev/
-│       └── meta -> ../../plugins/meta/
 ├── README.md                # Overview and quick start
 ├── QUICKSTART.md            # 5-minute setup guide
 └── CLAUDE.md                # This file
@@ -376,7 +289,6 @@ For simple tickets that don't need formal research or planning:
 > "How does authentication work in the API?"
 ```
 
-- Sets current ticket to PROJ-123
 - Spawns parallel sub-agents (locator, analyzer, pattern-finder)
 - Documents what exists with file:line references
 - Saves to Linear as "Research: ..." document attached to PROJ-123
@@ -384,10 +296,10 @@ For simple tickets that don't need formal research or planning:
 **2. Planning Phase:**
 
 ```
-/awl-dev:create-plan
+/awl-dev:create-plan PROJ-123
 ```
 
-- Auto-finds research from Linear (attached to current ticket)
+- Queries Linear for research attached to PROJ-123
 - Interactive planning with user (when in interactive mode)
 - Includes automated AND manual success criteria
 - Saves to Linear as "Plan: ..." document attached to PROJ-123
@@ -395,10 +307,10 @@ For simple tickets that don't need formal research or planning:
 **3. Implementation Phase (AUTOMATED):**
 
 ```
-/awl-dev:implement-plan
+/awl-dev:implement-plan PROJ-123
 ```
 
-- Reads plan from Linear (attached to current ticket)
+- Queries Linear for the plan attached to PROJ-123
 - Implements each phase sequentially
 - Updates checkboxes in Linear document as work completes
 - **Auto-validates** (self-healing, creates "Validation: ..." doc)
@@ -448,10 +360,9 @@ When understanding the system:
 
 1. **README.md** - High-level overview and philosophy
 2. **docs/USAGE.md** - Comprehensive usage guide with examples
-3. **docs/CONFIGURATION.md** - How config system works
-4. **docs/AGENTIC_WORKFLOW_GUIDE.md** - Agent patterns and best practices
-5. **plugins/dev/agents/codebase-locator.md** - Example of agent structure
-6. **plugins/dev/commands/create_plan.md** - Example of command structure
+3. **docs/AGENTIC_WORKFLOW_GUIDE.md** - Agent patterns and best practices
+4. **plugins/dev/agents/codebase-locator.md** - Example of agent structure
+5. **plugins/dev/commands/create_plan.md** - Example of command structure
 
 ## Frontmatter Standard
 
@@ -514,17 +425,13 @@ a browser for OAuth authentication. No API tokens or CLI tools needed.
 
 - Agents and commands are bundled in `plugins/dev/` and `plugins/meta/`
 - Users get updates via Claude Code plugin system
-- Local config (`.claude/config.json`) is never overwritten
-- Project-specific customizations are preserved
 
 ## Integration Points
 
 ### Linear Integration
 
 - `/awl-dev:linear` command for ticket management
-- Auto-configures on first use
-- Saves config to `.claude/config.json`
-- See `docs/LINEAR_WORKFLOW_AUTOMATION.md`
+- Linear MCP server bundled with `awl-dev`, OAuth on first use
 
 ### PM Plugin (awl-pm)
 
@@ -566,13 +473,12 @@ Brief records of key architectural decisions made in this project.
 - Users get updates via `/plugin update awl-dev`
 - No manual git pulls or symlink setup
 - Plugin marketplace provides discoverability
-- Local customizations (`.claude/config.json`) are preserved
 
 **Consequences**:
 
-- Plugin structure must be maintained in `plugins/dev/` and `plugins/meta/`
+- Plugin structure must be maintained in `plugins/dev/`, `plugins/pm/`, `plugins/meta/`
 - Breaking changes require version management
-- Users can install only what they need (dev vs meta plugins)
+- Users can install only what they need (dev / pm / meta / analytics / debugging)
 
 ---
 
@@ -587,34 +493,34 @@ to tickets instead of filesystem-based storage.
 - Team members can see documents in Linear UI
 - No filesystem path management
 - Documents automatically shared across worktrees
-- Simplified architecture
 
 **Consequences**:
 
 - Requires Linear (via official MCP server) for all workflow commands
-- Workflow-context.json only tracks `currentTicket`, not document paths
 - Commands query Linear by ticket ID to find documents
 - PM reports still go to git (not ticket-specific)
 
 ---
 
-### ADR-003: Workflow-Context for Ticket Tracking
+### ADR-003: Stateless Commands
 
-**Decision**: Store current ticket in `.claude/.workflow-context.json` for command chaining.
+**Decision**: All workflow commands are stateless. The Linear ticket ID is passed as a required positional argument to every command. There is no `.claude/config.json`, no `.workflow-context.json`, no hidden "current ticket" state.
 
 **Rationale**:
 
-- Users shouldn't remember ticket IDs between commands
-- `/awl-dev:research-codebase PROJ-123` → `/awl-dev:create-plan` → `/awl-dev:implement-plan` should flow naturally
-- Context must be local to each worktree
-- Must not contain secrets or be committed to git
+- Each stage runs in a clean context, so there's no benefit to persistent state
+- Stateful "current ticket" tracking caused bugs (wrong worktree, forgot to reset, etc.)
+- The team key can always be derived from the ticket ID; nothing else is load-bearing
+- Zero setup: install plugin, pass ticket ID, go
+- Branch name acts as natural fallback for PR commands (pattern `[A-Z]+-[0-9]+`)
 
 **Consequences**:
 
-- Workflow commands set/get ticket via workflow-context.sh
-- Documents are discovered by querying Linear for the current ticket
-- Context is lost when worktree is deleted (by design)
-- Each worktree can work on a different ticket
+- Every workflow command takes the ticket as `$1`
+- PM commands take the team key as `$1` (e.g., `/awl-pm:analyze-cycle ENG`)
+- No setup script, no config file to maintain
+- `pr-create` / `pr-merge` / `describe-pr` extract the ticket from branch/title
+- Linear MCP authenticates via OAuth — no API tokens stored anywhere
 
 ## Context Management Principles
 
@@ -662,13 +568,17 @@ TodoWrite:
 5. Validate against success criteria
 ```
 
-### Configuration Access
+### Argument Handling
 
-Commands access config with:
+Commands take the ticket ID (or team key for PM commands) as their first positional argument:
 
 ```bash
-CONFIG_FILE=".claude/config.json"
-TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
+# Validate the argument
+if [[ -z "$1" ]]; then
+  echo "Usage: /awl-dev:research-codebase TICKET-123"
+  exit 1
+fi
+TICKET_ID="$1"
 ```
 
 ## Testing and Validation
@@ -720,17 +630,9 @@ TICKET_PREFIX=$(jq -r '.project.ticketPrefix // "PROJ"' "$CONFIG_FILE")
 **Setting up Linear in a new project:**
 
 1. Install `awl-dev` plugin (bundles Linear MCP server)
-2. Configure team in `.claude/config.json`:
+2. Run any workflow command with a ticket ID — Linear OAuth happens in your browser on first use
 
-```json
-{
-  "awl": {
-    "linear": {
-      "teamKey": "YOUR-TEAM"
-    }
-  }
-}
-```
+There is no config file. The ticket ID encodes everything Awl needs (team is derivable from the prefix).
 
 **Sharing with team:** Team members see documents in Linear. Each team member installs the Awl
 plugin independently. OAuth authentication happens automatically on first use.
@@ -739,67 +641,42 @@ plugin independently. OAuth authentication happens automatically on first use.
 
 1. **Agents are documentarians** - Never suggest improvements unless asked
 2. **Commands are workflows** - Orchestrate, don't implement
-3. **Config drives behavior** - No hardcoded values
+3. **Stateless** - Take parameters as positional args, never read config files
 4. **Read fully, not partially** - Especially tickets, plans, research
 5. **Spawn parallel agents** - Maximize efficiency
 6. **Wait for completion** - Don't synthesize partial results
 7. **Preserve context** - Save to Linear documents, not just memory
-8. **Smart updates** - Merge workspace changes, keep local config
 
 ## User CLAUDE.md Snippet
 
-When users install Awl in their projects, they should add a workflow snippet to their project's
-CLAUDE.md. This section provides the reference snippet that users copy-paste into their own projects.
+When users install Awl in their projects, they may add a workflow snippet to their project's CLAUDE.md to help Claude Code understand how to use Awl commands.
 
-**For projects using Awl (not this repository)**, add this to your CLAUDE.md:
+**For projects using Awl**, add this to your CLAUDE.md:
 
 ```markdown
 ## Awl Workflow Integration
 
-This project uses [Awl](https://github.com/Threading-Needles/awl) for Linear-driven development
-workflows.
+This project uses [Awl](https://github.com/Threading-Needles/awl) for Linear-driven development workflows.
 
 ### Ticket-Driven Development
 
-Always work with a Linear ticket. The standard workflow is:
+Always work with a Linear ticket. Every workflow command takes the ticket ID as a positional argument:
 
-/awl-dev:research_codebase PROJ-123 → /awl-dev:create_plan → /awl-dev:implement_plan
-
-Where `PROJ-123` is your Linear ticket ID (replace `PROJ` with your project's ticket prefix).
+/awl-dev:research-codebase TICKET-123 → /awl-dev:create-plan TICKET-123 → /awl-dev:implement-plan TICKET-123
 
 ### Key Commands
 
 | Command | Purpose |
 |---------|---------|
-| `/awl-dev:research_codebase` | Research codebase and save findings to Linear |
-| `/awl-dev:create_plan` | Create implementation plan from research |
-| `/awl-dev:implement_plan` | Execute plan with auto-validation and PR creation |
-| `/awl-dev:create_handoff` | Save context for later sessions |
-| `/awl-dev:resume_handoff` | Resume from saved context |
+| `/awl-dev:research-codebase TICKET-123` | Research codebase and save findings to Linear |
+| `/awl-dev:create-plan TICKET-123` | Create implementation plan from research |
+| `/awl-dev:implement-plan TICKET-123` | Execute plan with auto-validation and PR creation |
+| `/awl-dev:create-handoff TICKET-123` | Save context for later sessions |
+| `/awl-dev:resume-handoff TICKET-123` | Resume from saved context |
 | `/awl-dev:doctor` | Check Awl setup and dependencies |
 
-### Context Persistence
-
-- All workflow documents (research, plans, handoffs) are stored as Linear documents attached to
-  tickets
-- Use `/awl-dev:create_handoff` before ending a session to save context
-- Use `/awl-dev:resume_handoff PROJ-123` to resume work on a ticket
-
-### Configuration
-
-Project configuration is in `.claude/config.json`. See
-[Awl Configuration Guide](https://github.com/Threading-Needles/awl/blob/main/docs/CONFIGURATION.md).
+All workflow documents (research, plans, handoffs, PR descriptions) are stored as Linear documents attached to the ticket. There is no local config file or hidden state.
 ```
-
-**Why this exists here**: This demonstrates the "dogfooding" principle - the Awl repository itself
-uses Awl workflows, but this snippet section serves as the reference for users who install Awl in
-their projects.
-
-**Progressive Disclosure**: This snippet follows Anthropic's CLAUDE.md best practices - it's minimal
-(~30 lines of actual content) and references detailed documentation for users who want more.
-
-See `plugins/dev/docs/CLAUDE_MD_SNIPPET.md` for the full user documentation with customization
-instructions.
 
 ## Getting Help
 
@@ -816,17 +693,6 @@ This workspace tracks:
 - Agent definitions
 - Command workflows
 - Documentation
-- Scripts
-- Configuration templates (generic values)
 - PM reports (`reports/` directory)
 
-**Do NOT commit to this workspace:**
-
-- Specific ticket prefixes (keep "PROJ")
-- Linear team keys (keep generic)
-
-**Do commit to project repos:**
-
-- Real config values in `.claude/config.json`
-- Project-specific customizations
-- PM reports in `reports/`
+**Examples in command docs use `TICKET-123` or `PROJ-123` as placeholders.** Real ticket IDs are passed by users at command invocation time — they never live in the source.

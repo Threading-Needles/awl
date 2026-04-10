@@ -12,7 +12,6 @@ NC='\033[0m' # No Color
 
 # Required tools (command:name:install-instruction)
 REQUIRED_TOOLS=(
-	"jq:JSON processor:brew install jq"
 	"gh:GitHub CLI:brew install gh"
 )
 
@@ -115,20 +114,6 @@ for plugin_spec in "${RECOMMENDED_PLUGINS[@]}"; do
 	echo -e "   • ${YELLOW}$name${NC} ($purpose): $install"
 done
 echo ""
-
-# Check CLAUDE.md for Awl workflow integration
-echo "ℹ️  CLAUDE.md setup:"
-if [[ -f "CLAUDE.md" ]]; then
-	if grep -q "Awl Workflow Integration" CLAUDE.md 2>/dev/null; then
-		echo -e "   ${GREEN}✓${NC} CLAUDE.md contains Awl workflow instructions"
-	else
-		echo -e "   ${YELLOW}○${NC} CLAUDE.md exists but missing Awl workflow snippet"
-		echo -e "      Add the snippet from: plugins/dev/docs/CLAUDE_MD_SNIPPET.md"
-	fi
-else
-	echo -e "   ${YELLOW}○${NC} No CLAUDE.md found"
-	echo -e "      Create one with the Awl snippet from: plugins/dev/docs/CLAUDE_MD_SNIPPET.md"
-fi
 
 echo ""
 echo -e "${GREEN}✅ Prerequisites check complete${NC}"

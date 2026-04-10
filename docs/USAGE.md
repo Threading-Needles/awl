@@ -400,82 +400,35 @@ Verifies implementation correctness and identifies deviations.
 
 ---
 
-## Workflow State Management
+## Stateless Commands
 
-Awl automatically tracks your current ticket in `.claude/.workflow-context.json` to enable
-intelligent command chaining. Documents are stored as Linear documents attached to tickets.
-
-### What is workflow-context.json?
-
-A local file that tracks the current ticket so commands can auto-discover Linear documents
-without manual specification.
-
-**Location**: `.claude/.workflow-context.json` (not committed to git)
-
-**Structure**:
-
-```json
-{
-  "lastUpdated": "2025-10-26T10:30:00Z",
-  "currentTicket": "PROJ-123"
-}
-```
-
-### How Commands Use It
-
-**Automatic document discovery via Linear**:
-
-1. `/awl-dev:research-codebase PROJ-123` → Sets ticket, saves research to Linear
-2. `/awl-dev:create-plan` → Finds research from Linear (attached to current ticket)
-3. `/awl-dev:implement-plan` → Finds plan from Linear (attached to current ticket)
-4. `/awl-dev:create-handoff` → Saves handoff to Linear
-5. `/awl-dev:resume-handoff PROJ-123` → Finds handoff from Linear
-
-**Example workflow**:
+Awl commands are **stateless**. Every workflow command takes the Linear ticket ID as a required positional argument. There is no `.claude/config.json`, no `.workflow-context.json`, no hidden "current ticket" state.
 
 ```bash
-# Step 1: Research (sets ticket, saves to Linear)
+# Step 1: Research
 /awl-dev:research-codebase PROJ-123
 > How does authentication work?
 
-# Step 2: Create plan (auto-finds research from Linear)
-/awl-dev:create-plan
+# Step 2: Create plan (queries Linear for research attached to PROJ-123)
+/awl-dev:create-plan PROJ-123
 
-# Step 3: Implement (auto-finds plan from Linear)
-/awl-dev:implement-plan
+# Step 3: Implement (queries Linear for plan attached to PROJ-123)
+/awl-dev:implement-plan PROJ-123
 
-# Step 4: Create handoff (saves to Linear)
-/awl-dev:create-handoff
+# Step 4: Create handoff
+/awl-dev:create-handoff PROJ-123
 
-# Later: Resume work (finds handoff from Linear)
+# Later: Resume work
 /awl-dev:resume-handoff PROJ-123
 ```
 
-### Manual Management
-
-**View context**:
-
-```bash
-cat .claude/.workflow-context.json | jq
-```
-
-**Set ticket** (normally automatic):
-
-```bash
-plugins/dev/scripts/workflow-context.sh set-ticket PROJ-123
-```
-
-**Get current ticket**:
-
-```bash
-plugins/dev/scripts/workflow-context.sh get-ticket
-```
+PR commands extract the ticket from the branch name (pattern `[A-Z]+-[0-9]+`) and from PR title/body. PM commands take the team key as their first argument (e.g., `/awl-pm:analyze-cycle ENG`).
 
 ### Benefits
 
-- **No manual paths**: Documents discovered via Linear ticket
-- **Seamless chaining**: Research -> Plan -> Implement flows naturally
-- **Automatic**: Updated by commands, no user intervention needed
+- **No setup**: Install plugin, pass ticket ID, go
+- **No hidden state**: Each command is fully self-contained
+- **Composable**: Commands work the same in any context (worktree, fresh session, CI)
 
 ---
 

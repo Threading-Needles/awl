@@ -10,40 +10,18 @@ version: 2.0.0
 
 Safely merges a PR after comprehensive verification, with Linear integration and automated cleanup.
 
-## Prerequisites
-
-Before executing, verify Linear integration is available:
-
-```bash
-# Validate plugin prerequisites
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
-  "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
-fi
-```
-
 ## Execution Mode Detection
 
 Detect whether running interactively or headless (e.g., `claude -p`):
 
 ```bash
-MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
-# MODE will be "interactive" or "headless"
+MODE=$([[ "${CLAUDE_NON_INTERACTIVE:-}" == "1" || "${CLAUDE_CODE_ENTRYPOINT:-}" == "sdk-cli" ]] && echo headless || echo interactive)
 ```
 
 **Mode behavior:**
 
 - **Interactive**: Prompt for confirmation at key decision points (CI failures, missing approvals, final merge). Allow user overrides to proceed despite warnings.
 - **Headless**: Proceed automatically when all checks pass. Exit with error on any issues (CI failures, missing approvals, conflicts) with no override option.
-
-## Configuration
-
-Read team configuration from `.claude/config.json`:
-
-```bash
-CONFIG_FILE=".claude/config.json"
-TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' "$CONFIG_FILE")
-TEST_CMD=$(jq -r '.awl.pr.testCommand // "make test"' "$CONFIG_FILE")
-```
 
 ## Process:
 
@@ -165,39 +143,7 @@ Resolve manually:
 
 Exit with error.
 
-### 5. Run local tests
-
-**Read test command from config:**
-
-```bash
-test_cmd=$(jq -r '.awl.pr.testCommand // "make test"' .claude/config.json)
-```
-
-**Execute tests:**
-
-```bash
-echo "Running tests: $test_cmd"
-if ! $test_cmd; then
-    echo "❌ Tests failed"
-    exit 1
-fi
-```
-
-**If tests fail:**
-
-```
-❌ Local tests failed
-
-Fix failing tests before merge:
-  $test_cmd
-
-Or skip tests (not recommended):
-  /merge_pr $pr_number --skip-tests
-```
-
-Exit with error (unless `--skip-tests` flag provided).
-
-### 6. Check CI/CD status
+### 5. Check CI/CD status
 
 ```bash
 gh pr checks $pr_number
@@ -244,9 +190,7 @@ Fix the failing checks and try again.
 
 Exit with error code.
 
-**Skip CI checks entirely if** `requireCI: false` in config (applies to both interactive and headless modes - no prompt shown, no error raised).
-
-### 7. Check approval status
+### 6. Check approval status
 
 ```bash
 review_decision=$(gh pr view $pr_number --json reviewDecision -q .reviewDecision)
@@ -287,26 +231,24 @@ Approve the PR first and try again.
 
 Exit with error code.
 
-**Skip approval checks entirely if** `requireApproval: false` in config (applies to both interactive and headless modes - no prompt shown, no error raised).
-
-### 8. Extract ticket reference
+### 7. Extract ticket reference
 
 ```bash
 branch=$(gh pr view $pr_number --json headRefName -q .headRefName)
 title=$(gh pr view $pr_number --json title -q .title)
 
-# From branch using configured team key
-if [[ "$branch" =~ ($TEAM_KEY-[0-9]+) ]]; then
+# From branch (pattern: PREFIX-NUMBER)
+if [[ "$branch" =~ ([A-Z]+-[0-9]+) ]]; then
     ticket="${BASH_REMATCH[1]}"
 fi
 
 # From title if not in branch
-if [[ -z "$ticket" ]] && [[ "$title" =~ ($TEAM_KEY-[0-9]+) ]]; then
+if [[ -z "$ticket" ]] && [[ "$title" =~ ([A-Z]+-[0-9]+) ]]; then
     ticket="${BASH_REMATCH[1]}"
 fi
 ```
 
-### 9. Show merge summary
+### 8. Show merge summary
 
 ```
 About to merge:
@@ -319,7 +261,6 @@ About to merge:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  Reviews: $review_status
  CI:      $ci_status
- Tests:   ✅ Passed locally
  Ticket:  $ticket (will move to Done)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -340,7 +281,7 @@ Proceeding with merge (all checks passed)...
 
 Proceed automatically to merge execution.
 
-### 10. Execute squash merge
+### 9. Execute squash merge
 
 ```bash
 gh pr merge $pr_number --squash --delete-branch
@@ -357,7 +298,7 @@ gh pr merge $pr_number --squash --delete-branch
 merge_sha=$(git rev-parse HEAD)
 ```
 
-### 11. Update Linear ticket
+### 10. Update Linear ticket
 
 If ticket found and not using `--no-update`:
 
@@ -366,7 +307,7 @@ Use `mcp__linear__save_issue` to move the ticket state to "Done".
 Use `mcp__linear__save_comment` to add a merge comment with details:
 "PR merged! PR: #{prNumber} - {prTitle}, Merge commit: {mergeSha}, Merged into: {baseBranch}"
 
-### 12. Delete local branch and update base
+### 11. Delete local branch and update base
 
 ```bash
 # Switch to base branch
@@ -384,7 +325,7 @@ echo "✅ Deleted local branch: $head_branch"
 
 **Always delete local branch** - no prompt (remote already deleted).
 
-### 13. Extract post-merge tasks from Linear
+### 12. Extract post-merge tasks from Linear
 
 **Read PR description from Linear:**
 
@@ -408,7 +349,7 @@ Use `mcp__linear__get_document` to read the document content and extract the
 These tasks are recorded in the Linear document for reference.
 ```
 
-### 14. Report success summary
+### 13. Report success summary
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -458,15 +399,9 @@ Next steps:
 **How it connects:**
 
 - **Previous**: PR created by `/awl-dev:create-pr` with description in Linear
-- **Workflow context**: Ticket is used for Linear integration
+- **Ticket**: Extracted from PR branch name or title (pattern `[A-Z]+-[0-9]+`)
 
 ## Flags
-
-**`--skip-tests`** - Skip local test execution
-
-```bash
-/merge_pr 123 --skip-tests
-```
 
 **`--no-update`** - Don't update Linear ticket
 
@@ -478,12 +413,6 @@ Next steps:
 
 ```bash
 /merge_pr 123 --keep-branch
-```
-
-**Combined:**
-
-```bash
-/merge_pr 123 --skip-tests --no-update
 ```
 
 ## Error Handling
@@ -506,19 +435,6 @@ Resolve manually:
   git rebase --continue
   git push --force-with-lease
   /merge_pr $pr_number
-```
-
-**Tests failing:**
-
-```
-❌ Tests failed (exit code 1)
-
-Failed tests:
-  - validation.test.ts:45 - Expected true but got false
-  - auth.test.ts:12 - Timeout exceeded
-
-Fix tests or skip (not recommended):
-  /merge_pr $pr_number --skip-tests
 ```
 
 **CI checks failing:**
@@ -567,33 +483,6 @@ This won't affect the merge (already complete).
 Delete manually: git branch -D $head_branch
 ```
 
-## Configuration
-
-Uses `.claude/config.json`:
-
-```json
-{
-  "awl": {
-    "project": {
-      "ticketPrefix": "RCW"
-    },
-    "linear": {
-      "teamKey": "RCW",
-      "doneStatusName": "Done"
-    },
-    "pr": {
-      "defaultMergeStrategy": "squash",
-      "deleteRemoteBranch": true,
-      "deleteLocalBranch": true,
-      "updateLinearOnMerge": true,
-      "requireApproval": false,
-      "requireCI": false,
-      "testCommand": "make test"
-    }
-  }
-}
-```
-
 ## Examples
 
 **Happy path (all checks pass):**
@@ -601,8 +490,6 @@ Uses `.claude/config.json`:
 ```bash
 /merge_pr 123
 
-Running tests: make test
-✅ All tests passed
 ✅ CI checks passed
 ✅ PR approved
 
@@ -626,21 +513,11 @@ Continue anyway? y
 ✅ Merged (with overrides)
 ```
 
-**Skip tests:**
-
-```bash
-/merge_pr 125 --skip-tests
-
-⚠️  Skipping tests (not recommended)
-✅ Merged!
-```
-
 ## Safety Features
 
 **Fail fast on:**
 
 - Merge conflicts (can't auto-resolve)
-- Test failures (unless --skip-tests)
 - Rebase conflicts
 - PR not in mergeable state
 
@@ -663,9 +540,9 @@ Continue anyway? y
 
 - **Always squash merge** - clean history
 - **Always delete branches** - no orphan branches
-- **Always run tests** - unless explicitly skipped
+- **Rely on CI** - no local test run; trust `gh pr checks`
 - **Auto-rebase** - keep up-to-date with base
-- **Fail fast** - stop on conflicts or test failures
+- **Fail fast** - stop on conflicts
 - **Update Linear** - move ticket to Done automatically
 - **Clear summary** - show what happened
 - **Only prompt for exceptions** - approvals missing, CI failing

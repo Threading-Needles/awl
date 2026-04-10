@@ -12,24 +12,12 @@ You are tasked with creating detailed implementation plans through an interactiv
 process. You should be skeptical, thorough, and work collaboratively with the user to produce
 high-quality technical specifications.
 
-## Prerequisites
-
-Before executing, verify Linear integration is available:
-
-```bash
-# Validate plugin prerequisites (includes LINEAR_API_TOKEN check)
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
-  "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
-fi
-```
-
 ## Execution Mode Detection
 
 Detect whether running interactively or headless (e.g., `claude -p`):
 
 ```bash
-MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
-# MODE will be "interactive" or "headless"
+MODE=$([[ "${CLAUDE_NON_INTERACTIVE:-}" == "1" || "${CLAUDE_CODE_ENTRYPOINT:-}" == "sdk-cli" ]] && echo headless || echo interactive)
 ```
 
 **Mode behavior:**
@@ -38,42 +26,29 @@ MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
 
 ## Initial Response
 
-### Step 1: Get Current Ticket
+### Step 1: Validate Ticket Argument
 
-Check workflow context for current ticket:
-
-```bash
-CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
-```
-
-### Step 2: Handle Ticket State
-
-**If no current ticket:**
+**A ticket ID is REQUIRED as the first argument.** If no ticket ID was provided, respond with:
 
 ```
 I need a Linear ticket to attach this plan to.
 
-Please either:
-1. Run `/awl-dev:research-codebase PROJ-123` first (recommended - includes research phase)
-2. Provide a ticket ID now: I'll set it and continue
+Usage: /awl-dev:create-plan TICKET-123
 
-Which would you prefer?
+Tip: Run `/awl-dev:research-codebase TICKET-123` first for a research-informed plan.
 ```
 
-If user provides ticket, set it:
-```bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
-```
+Then stop. Do not proceed without a ticket ID.
 
-**If current ticket exists:**
+Use the provided ticket ID as `TICKET_ID` throughout this command.
 
 ```
-I'll create an implementation plan for ticket {CURRENT_TICKET}.
+I'll create an implementation plan for ticket {TICKET_ID}.
 
 Let me check for existing research on this ticket...
 ```
 
-### Step 2a: Update Linear Ticket Status (FIRST)
+### Step 2: Update Linear Ticket Status (FIRST)
 
 **This MUST be the first action after confirming ticket**:
 
@@ -87,7 +62,7 @@ Use `mcp__linear__get_issue` with the ticket ID to retrieve the issue and its at
 **If research found:**
 
 ```
-I found existing research for {CURRENT_TICKET}:
+I found existing research for {TICKET_ID}:
 - Research: {title}
 
 I'll use this as context for the plan. Let me read it...
@@ -111,10 +86,10 @@ Note: Non-blocking questions can remain unanswered - proceed with noted defaults
 The following questions need answers before planning can begin:
 
 **Q1 (blocking)**: {question text}
-  → Location: Research document attached to {CURRENT_TICKET}
+  → Location: Research document attached to {TICKET_ID}
 
 **Q2 (blocking)**: {question text}
-  → Location: Research document attached to {CURRENT_TICKET}
+  → Location: Research document attached to {TICKET_ID}
 
 Please answer these questions in the Linear document, then run:
   /awl-dev:create-plan
@@ -129,7 +104,7 @@ Continue to Step 3b.
 **If no research found:**
 
 ```
-No research document found for {CURRENT_TICKET}.
+No research document found for {TICKET_ID}.
 
 Would you like me to:
 1. Create a plan without research (you'll provide context)
@@ -153,7 +128,7 @@ Continue to Step 3c for iteration decision.
 **If multiple plans found:**
 
 ```
-Found multiple plans for {CURRENT_TICKET}:
+Found multiple plans for {TICKET_ID}:
 1. Plan: {title1} (created {date1})
 2. Plan: {title2} (created {date2})
 
@@ -169,7 +144,7 @@ Continue to Step 4 (create new plan flow).
 **If MODE is "interactive":**
 
 ```
-I found an existing plan for {CURRENT_TICKET}:
+I found an existing plan for {TICKET_ID}:
 - {EXISTING_PLAN_TITLE}
 
 Options:
@@ -206,7 +181,7 @@ Use `mcp__linear__get_issue` with the ticket ID to retrieve the issue details, i
 **If MODE is "interactive":**
 
 ```
-I'll help you create a detailed implementation plan for {CURRENT_TICKET}.
+I'll help you create a detailed implementation plan for {TICKET_ID}.
 
 Please provide:
 1. What feature/change are we implementing?
@@ -288,9 +263,9 @@ Does this look correct? (yes/no/edit)
 
 **If MODE is "headless":**
 
-Proceed directly to Step 5 with the updated plan content.
+Proceed directly to the "Save Plan to Linear" step (see `## Process Steps` below) with the updated plan content.
 
-After Step 4b, continue to Step 5 (Save Plan to Linear) with the iteration path.
+After Step 4b, continue to "Save Plan to Linear" (in `## Process Steps`) with the iteration path.
 
 ## Process Steps
 
@@ -390,7 +365,7 @@ After structure approval, create the plan document content:
 ````markdown
 # [Feature/Task Name] Implementation Plan
 
-**Ticket**: {CURRENT_TICKET}
+**Ticket**: {TICKET_ID}
 **Date**: {date}
 **Branch**: {branch-name}
 **Repository**: {repo-name}
@@ -500,7 +475,7 @@ Please answer before proceeding to /awl-dev:implement-plan:
 
 ## References
 
-- Ticket: {CURRENT_TICKET}
+- Ticket: {TICKET_ID}
 - Research: (attached to ticket in Linear)
 ````
 
@@ -535,7 +510,7 @@ Then output a clear message:
 ```
 ✅ Implementation plan created with questions pending.
 
-**Ticket**: {CURRENT_TICKET}
+**Ticket**: {TICKET_ID}
 **Status**: Spec Needed
 
 The plan document has been attached to the ticket with {N} questions
@@ -552,7 +527,7 @@ Please answer the questions in the Linear document, then run:
 ```
 ✅ Implementation plan created!
 
-**Ticket**: {CURRENT_TICKET}
+**Ticket**: {TICKET_ID}
 **Linear Document**: Plan: {description}
 
 ## 📊 Context Status
@@ -586,7 +561,7 @@ Please review the plan and let me know:
 ```
 ✅ Implementation plan updated!
 
-**Ticket**: {CURRENT_TICKET}
+**Ticket**: {TICKET_ID}
 **Linear Document**: {EXISTING_PLAN_TITLE} (iteration #{N})
 
 **Changes made:**
@@ -713,17 +688,17 @@ Please review the updated plan and let me know:
 **How it connects:**
 
 - **Previous**: Gets research from Linear documents attached to ticket
-- **Next**: `/awl-dev:implement-plan` finds plan via `linear-document-locator`
-- **Workflow context**: Current ticket is already set from research phase
+- **Next**: `/awl-dev:implement-plan TICKET-123` finds plan via `linear-document-locator`
+- **Ticket**: Passed explicitly as the first positional argument
 
 ## Example Workflow
 
 ```bash
 # After running /awl-dev:research-codebase PROJ-123...
 
-/awl-dev:create-plan
+/awl-dev:create-plan PROJ-123
 # You:
-# 1. Get current ticket from workflow context (PROJ-123)
+# 1. Use ticket ID passed as argument (PROJ-123)
 # 2. Update ticket status to "Plan in Progress" (THE FIRST thing)
 # 3. Find research document in Linear
 # 4. Read research content

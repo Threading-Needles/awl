@@ -5,19 +5,15 @@ helps you find the documentation you need.
 
 ## Core Concepts
 
-**Two-Layer Memory System**: Awl separates context into two layers:
+**Stateless Commands**: Every workflow command takes the Linear ticket ID as a positional argument. No config files, no hidden state.
 
-1. **Short-term Memory** (`.claude/.workflow-context.json`) - Session state, command chaining
-2. **Long-term Memory** (Linear documents) - Persistent workflow documents attached to tickets
+**Linear-Persisted Context**: Workflow documents (research, plans, handoffs, PRs) are stored as Linear documents attached to tickets. Discoverable by querying the ticket.
 
 **Structured Development Workflow**:
 
 ```
-research → plan → branch → implement → validate → merge_pr
+research → plan → implement → validate → create-pr → merge-pr
 ```
-
-**Multiple Projects**: Work on separate projects (work/personal, different clients) with isolated
-contexts via different Linear workspace configs.
 
 See [CLAUDE.md](../CLAUDE.md) for complete architecture details.
 
@@ -42,15 +38,6 @@ See [CLAUDE.md](../CLAUDE.md) for complete architecture details.
 Complete guide covering installation, configuration, service integration (Linear), and project setup.
 
 **Read this when**: Setting up a new project or configuring integrations.
-
----
-
-#### [MULTI_CONFIG_GUIDE.md](MULTI_CONFIG_GUIDE.md)
-
-Managing multiple client configurations, switching configs, separate Linear workspaces per
-client.
-
-**Read this when**: Working across multiple clients/projects simultaneously.
 
 ---
 
@@ -99,14 +86,6 @@ Discovering and importing workflows from external repositories using `/awl-meta:
 
 ### Integrations
 
-#### [LINEAR_WORKFLOW_AUTOMATION.md](LINEAR_WORKFLOW_AUTOMATION.md)
-
-Linear integration setup, workflow status automation, ticket creation, status progression.
-
-**Read this when**: Integrating with Linear or automating ticket workflows.
-
----
-
 #### [DEEPWIKI_INTEGRATION.md](DEEPWIKI_INTEGRATION.md)
 
 External research using DeepWiki, researching external repositories, learning from open-source
@@ -143,11 +122,7 @@ YAML frontmatter validation, required fields, valid categories/tools, validation
 [FRONTMATTER_STANDARD.md](FRONTMATTER_STANDARD.md) →
 [WORKFLOW_DISCOVERY_SYSTEM.md](WORKFLOW_DISCOVERY_SYSTEM.md)
 
-**Multiple Clients**: [MULTI_CONFIG_GUIDE.md](MULTI_CONFIG_GUIDE.md) →
-[Installation & Configuration Guide](../QUICKSTART.md)
-
-**Integration Specialists**: [LINEAR_WORKFLOW_AUTOMATION.md](LINEAR_WORKFLOW_AUTOMATION.md) →
-[DEEPWIKI_INTEGRATION.md](DEEPWIKI_INTEGRATION.md)
+**Integration Specialists**: [DEEPWIKI_INTEGRATION.md](DEEPWIKI_INTEGRATION.md)
 
 ---
 
@@ -169,18 +144,14 @@ YAML frontmatter validation, required fields, valid categories/tools, validation
 **Parent Directory**:
 
 - [../README.md](../README.md) - Overview
-- [../QUICKSTART.md](../QUICKSTART.md) - 5-minute setup
+- [../QUICKSTART.md](../QUICKSTART.md) - Installation guide
 - [../CLAUDE.md](../CLAUDE.md) - Full architecture (read this!)
-- [../COMMANDS_ANALYSIS.md](../COMMANDS_ANALYSIS.md) - Command catalog
 
 **Plugin Documentation**:
 
 - [../plugins/dev/README.md](../plugins/dev/README.md) - Development plugin
+- [../plugins/pm/README.md](../plugins/pm/README.md) - Project management plugin
 - [../plugins/meta/README.md](../plugins/meta/README.md) - Meta plugin
-
-**Setup Scripts**:
-
-- [../scripts/README.md](../scripts/README.md) - One-time setup utilities
 
 **External**:
 

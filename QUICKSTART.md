@@ -1,13 +1,11 @@
-# Awl Installation & Configuration Guide
+# Awl Installation Guide
 
-Complete guide to installing and configuring Awl for Claude Code.
+Complete guide to installing and using Awl for Claude Code.
 
 ## Table of Contents
 
-- [Quick Start (5 Minutes)](#quick-start-5-minutes)
+- [Quick Start](#quick-start)
 - [Installation](#installation)
-- [Configuration](#configuration)
-- [CLAUDE.md Setup](#claudemd-setup)
 - [Service Integration](#service-integration)
 - [Core Workflow](#core-workflow)
 - [Commands & Agents Reference](#commands--agents-reference)
@@ -15,33 +13,22 @@ Complete guide to installing and configuring Awl for Claude Code.
 
 ---
 
-## Quick Start (5 Minutes)
+## Quick Start
 
-**Download and run setup script:**
-```bash
-# Download the setup script
-curl -O https://raw.githubusercontent.com/Threading-Needles/awl/main/setup-awl.sh
-chmod +x setup-awl.sh
-
-# Run it (requires interactive input)
-./setup-awl.sh
-```
-
-**What this does:**
-- Checks/installs prerequisites (jq)
-- Creates project configuration
-- Prompts for API tokens (Linear, PostHog, etc.)
-
-**Then:**
 ```bash
 # In Claude Code:
 /plugin marketplace add Threading-Needles/awl
 /plugin install awl-dev
-
-# Restart Claude Code
 ```
 
-You're ready! Try `/awl-dev:research-codebase` in your next session.
+That's it. No setup script, no config file, no API tokens.
+
+Try it:
+```bash
+/awl-dev:research-codebase TICKET-123
+```
+
+Linear will OAuth in your browser on first use.
 
 ---
 
@@ -50,6 +37,7 @@ You're ready! Try `/awl-dev:research-codebase` in your next session.
 ### Prerequisites
 
 - **Claude Code** installed and working
+- **GitHub CLI** (`gh`) installed and authenticated (required for PR commands)
 
 ### Install Awl Plugins
 
@@ -122,168 +110,6 @@ For the best experience, install these complementary plugins from the Claude Cod
 
 ---
 
-## Configuration
-
-Awl uses a **two-layer configuration system**:
-
-### Setup Configuration
-
-**Unified setup script (recommended):**
-
-```bash
-# Download and run
-curl -fsSL https://raw.githubusercontent.com/Threading-Needles/awl/main/setup-awl.sh | bash
-```
-
-**What you'll be asked:**
-1. Project location (existing repo or clone fresh)
-2. Project key (defaults to GitHub org name)
-3. Ticket prefix (e.g., "ENG", "PROJ")
-4. API tokens for integrations (can skip optional ones)
-
-**Result:**
-- `.claude/config.json` (committable, no secrets)
-- `~/.config/awl/config-{projectKey}.json` (API tokens)
-
-**Idempotent:** Safe to re-run to add/update integrations.
-
-### Layer 1: Project Config (`.claude/config.json`)
-
-This file contains **non-sensitive** project metadata and is **safe to commit** to git.
-
-**Location**: `.claude/config.json` (in your project root)
-
-**Example**:
-```json
-{
-  "awl": {
-    "projectKey": "acme",
-    "repository": {
-      "org": "acme-corp",
-      "name": "api"
-    },
-    "project": {
-      "ticketPrefix": "ACME",
-      "name": "Acme Corp Project"
-    }
-  }
-}
-```
-
-**What goes here**:
-- All Awl configuration under the `awl` key
-- `awl.projectKey` - Links to your secrets config
-- `awl.project.ticketPrefix` - Your Linear/project ticket prefix (e.g., "ENG", "PROJ")
-- Project name and metadata
-
-### Layer 2: Secrets Config (`~/.config/awl/`)
-
-This file contains **API tokens and secrets** and is **never committed** to git.
-
-**Location**: `~/.config/awl/config-{projectKey}.json`
-
-**Example** (`~/.config/awl/config-acme.json`):
-```json
-{
-  "awl": {
-    "linear": {
-      "apiToken": "lin_api_...",
-      "teamKey": "ACME",
-      "defaultTeam": "ACME"
-    },
-    "posthog": {
-      "apiKey": "phx_...",
-      "projectId": "..."
-    },
-    "exa": {
-      "apiKey": "..."
-    }
-  }
-}
-```
-
-**What goes here**:
-- API tokens
-- Auth tokens
-- Service credentials
-
-### Switching Between Projects
-
-Working on multiple projects? Just change the `projectKey`:
-
-```json
-// .claude/config.json
-{
-  "awl": {
-    "projectKey": "work"  // Change to "personal", "client-a", etc.
-  }
-}
-```
-
-Each project key points to a different secrets file in `~/.config/awl/`.
-
----
-
-## CLAUDE.md Setup
-
-Add Awl workflow instructions to your project's CLAUDE.md to help Claude Code understand how to work
-with your codebase using Linear-driven development.
-
-### Add the Snippet
-
-Copy this section into your project's CLAUDE.md:
-
-```markdown
-## Awl Workflow Integration
-
-This project uses [Awl](https://github.com/Threading-Needles/awl) for Linear-driven development
-workflows.
-
-### Ticket-Driven Development
-
-Always work with a Linear ticket. The standard workflow is:
-
-/awl-dev:research_codebase PROJ-123 → /awl-dev:create_plan → /awl-dev:implement_plan
-
-Where `PROJ-123` is your Linear ticket ID (replace `PROJ` with your project's ticket prefix).
-
-### Key Commands
-
-| Command | Purpose |
-|---------|---------|
-| `/awl-dev:research_codebase` | Research codebase and save findings to Linear |
-| `/awl-dev:create_plan` | Create implementation plan from research |
-| `/awl-dev:implement_plan` | Execute plan with auto-validation and PR creation |
-| `/awl-dev:create_handoff` | Save context for later sessions |
-| `/awl-dev:resume_handoff` | Resume from saved context |
-| `/awl-dev:doctor` | Check Awl setup and dependencies |
-
-### Context Persistence
-
-- All workflow documents (research, plans, handoffs) are stored as Linear documents attached to
-  tickets
-- Use `/awl-dev:create_handoff` before ending a session to save context
-- Use `/awl-dev:resume_handoff PROJ-123` to resume work on a ticket
-
-### Configuration
-
-Project configuration is in `.claude/config.json`. See
-[Awl Configuration Guide](https://github.com/Threading-Needles/awl/blob/main/docs/CONFIGURATION.md).
-```
-
-### Customize
-
-After adding the snippet:
-
-1. Replace `PROJ` with your actual ticket prefix (e.g., `ENG`, `ACME`)
-2. Add any project-specific workflow notes
-
-### Verify
-
-Run `/awl-dev:doctor` to verify your setup - it will show the CLAUDE.md status.
-
----
-
 ## Service Integration
 
 ### Linear (Project Management)
@@ -292,50 +118,15 @@ The Linear MCP server (`https://mcp.linear.app/mcp`) is **bundled with the `awl-
 No separate installation needed.
 
 **First-time setup**: OAuth authentication happens automatically when you first use a Linear
-command - Claude Code opens your browser for consent. No API tokens needed.
-
-**Configuration**:
-
-Project config (`.claude/config.json`):
-```json
-{
-  "awl": {
-    "project": {
-      "ticketPrefix": "ENG"
-    },
-    "linear": {
-      "teamKey": "ENG"
-    }
-  }
-}
-```
+command — Claude Code opens your browser for consent. No API tokens, no config file.
 
 ### PostHog (Analytics & Error Tracking)
 
-Secrets config:
-```json
-{
-  "awl": {
-    "posthog": {
-      "apiKey": "phc_...",
-      "projectId": "12345"
-    }
-  }
-}
-```
+Bundled with `awl-analytics` and `awl-debugging` plugins. The PostHog MCP server handles its own auth.
 
 ### Exa (Web Search)
 
-Secrets config:
-```json
-{
-  "awl": {
-    "exa": {
-      "apiKey": "exa_..."
-    }
-  }
-}
-```
+Used by the `external-research` agent. Configure via the Exa MCP server (separate plugin).
 
 ---
 
@@ -343,13 +134,15 @@ Secrets config:
 
 Awl provides a research → plan → implement → validate → ship workflow.
 
+Every workflow command takes the Linear ticket ID as a positional argument.
+
 ### 1. Research Phase
 
 ```
-/awl-dev:research-codebase
+/awl-dev:research-codebase TICKET-123
 ```
 
-Follow prompts to research your codebase. This:
+This:
 - Spawns parallel research agents
 - Documents what exists (no critique)
 - Saves findings to Linear as a document attached to the ticket
@@ -357,24 +150,22 @@ Follow prompts to research your codebase. This:
 ### 2. Planning Phase
 
 ```
-/awl-dev:create-plan
+/awl-dev:create-plan TICKET-123
 ```
 
 This:
-- Reads research documents
+- Queries Linear for research attached to the ticket
 - Interactively builds a plan with you
 - Saves plan to Linear as a document attached to the ticket
 
 ### 3. Implementation Phase
 
 ```
-/awl-dev:implement-plan
+/awl-dev:implement-plan TICKET-123
 ```
 
-**Note**: If you just created a plan, omit the path - it auto-finds your most recent plan!
-
 This:
-- Reads the plan
+- Queries Linear for the plan attached to the ticket
 - Implements each phase
 - Runs automated tests
 - Updates checkboxes
@@ -382,7 +173,7 @@ This:
 ### 4. Validation Phase
 
 ```
-/awl-dev:validate-plan
+/awl-dev:validate-plan TICKET-123
 ```
 
 This:
@@ -397,29 +188,19 @@ This:
 /awl-dev:create-pr
 ```
 
-Automatically creates a PR with comprehensive description from your research and plan.
+Automatically creates a PR with comprehensive description from research and plan. Ticket is extracted from the branch name (pattern `[A-Z]+-[0-9]+`).
 
 ### Context Persistence
 
 **Handoffs** save context between sessions:
 
 ```bash
-# Save context
-/awl-dev:create-handoff
+# Save context (always pass the ticket)
+/awl-dev:create-handoff TICKET-123
 
 # Resume later
-/awl-dev:resume-handoff
+/awl-dev:resume-handoff TICKET-123
 ```
-
-### Workflow Context Auto-Discovery
-
-Awl tracks your workflow via `.claude/.workflow-context.json`:
-
-- `/awl-dev:research-codebase` → `/awl-dev:create-plan` references it
-- `/awl-dev:create-plan` → `/awl-dev:implement-plan` auto-finds it
-- `/awl-dev:create-handoff` → `/awl-dev:resume-handoff` auto-finds it
-
-**You don't need to specify file paths** - commands remember your work!
 
 ---
 
@@ -476,17 +257,6 @@ Awl tracks your workflow via `.claude/.workflow-context.json`:
    /plugin install awl-dev
    ```
 3. Restart Claude Code
-
-### Config not being read
-
-**Check**:
-1. File exists: `ls .claude/config.json`
-2. Valid JSON: `cat .claude/config.json | jq`
-3. Correct location: Must be in `.claude/` directory
-
-### Commands still use generic placeholders
-
-Commands use `PROJ-XXX` as placeholders in examples. When you run them, they'll use your configured `ticketPrefix` from `.claude/config.json`.
 
 ### Plugin not loading service integration
 

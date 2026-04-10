@@ -11,37 +11,9 @@ version: 2.0.0
 Orchestrates the complete PR creation flow: commit → rebase → push → create → describe → link Linear
 ticket.
 
-## Prerequisites
-
-Before executing, verify Linear integration is available:
-
-```bash
-# Validate plugin prerequisites
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
-  "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
-fi
-```
-
-## Configuration
-
-Read team configuration from `.claude/config.json`:
-
-```bash
-CONFIG_FILE=".claude/config.json"
-TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' "$CONFIG_FILE")
-```
-
 ## Process:
 
-### 1. Get Current Ticket
-
-Check workflow context for current ticket:
-
-```bash
-CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
-```
-
-### 2. Check for uncommitted changes
+### 1. Check for uncommitted changes
 
 ```bash
 git status --porcelain
@@ -53,7 +25,7 @@ If there are uncommitted changes:
 - If yes: internally call `/awl-dev:commit` workflow
 - If no: proceed (user may want to commit manually later)
 
-### 3. Verify not on main/master branch
+### 2. Verify not on main/master branch
 
 ```bash
 branch=$(git branch --show-current)
@@ -64,7 +36,7 @@ If on `main` or `master`:
 - Error: "Cannot create PR from main branch. Create a feature branch first."
 - Exit
 
-### 4. Detect base branch
+### 3. Detect base branch
 
 ```bash
 # Check which exists
@@ -77,7 +49,7 @@ else
 fi
 ```
 
-### 5. Check if branch is up-to-date with base
+### 4. Check if branch is up-to-date with base
 
 ```bash
 # Fetch latest
@@ -97,7 +69,7 @@ If behind:
   - Error: "Rebase conflicts detected. Resolve conflicts and run /awl-dev:create_pr again."
   - Exit
 
-### 6. Check for existing PR
+### 5. Check for existing PR
 
 ```bash
 # Check for existing PR (capture output and exit status)
@@ -131,26 +103,18 @@ If PR exists:
 - If A: exit
 - **This is the ONLY interactive prompt in the happy path**
 
-### 7. Extract ticket from branch name or workflow context
+### 6. Extract ticket from branch name
 
 ```bash
 branch=$(git branch --show-current)
 
-# First check workflow context
-ticket=$CURRENT_TICKET
-
-# If not in context, extract from branch pattern: PREFIX-NUMBER
-if [[ -z "$ticket" && "$branch" =~ ($TEAM_KEY-[0-9]+) ]]; then
+# Extract from branch pattern: PREFIX-NUMBER
+if [[ "$branch" =~ ([A-Z]+-[0-9]+) ]]; then
     ticket="${BASH_REMATCH[1]}"  # e.g., RCW-13
-fi
-
-# Set ticket in workflow context for subsequent commands
-if [[ "$ticket" ]]; then
-    "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$ticket"
 fi
 ```
 
-### 8. Generate PR title from branch and ticket
+### 7. Generate PR title from branch and ticket
 
 ```bash
 # Branch format examples:
@@ -175,7 +139,7 @@ else
 fi
 ```
 
-### 9. Push branch
+### 8. Push branch
 
 ```bash
 # Check if branch has upstream
@@ -188,7 +152,7 @@ else
 fi
 ```
 
-### 10. Create PR
+### 9. Create PR
 
 ```bash
 # Minimal initial body
@@ -205,7 +169,7 @@ gh pr create --title "$title" --body "$body" --base "$base"
 
 Capture PR number and URL from output.
 
-### 11. Auto-call /awl-dev:describe_pr
+### 10. Auto-call /awl-dev:describe_pr
 
 Immediately call `/awl-dev:describe_pr` with the PR number to:
 
@@ -215,7 +179,7 @@ Immediately call `/awl-dev:describe_pr` with the PR number to:
 - Save PR description as Linear document
 - Update Linear ticket status
 
-### 12. Update Linear ticket (if ticket found)
+### 11. Update Linear ticket (if ticket found)
 
 If ticket was extracted:
 
@@ -224,7 +188,7 @@ Update the ticket state to "In Review" using `mcp__linear__save_issue` with the 
 Add a comment using `mcp__linear__save_comment` with the body:
 "PR created and ready for review!\n\n**PR**: $prUrl\n\nDescription has been auto-generated with verification checks."
 
-### 13. Auto-call /awl-dev:babysit_pr
+### 12. Auto-call /awl-dev:babysit_pr
 
 After PR creation and description generation, automatically invoke `/awl-dev:babysit_pr` with the
 PR number to:
@@ -240,7 +204,7 @@ Use the Skill tool to invoke `/awl-dev:babysit_pr ${PR_NUMBER}`.
 If babysit completes with all checks passing, the PR is ready for human review. If issues are
 found, they'll be reported in the babysit summary.
 
-### 14. Report success
+### 13. Report success
 
 ```
 ✅ Pull request created successfully!
@@ -280,7 +244,7 @@ Review the PR on GitHub!
 
 - **Previous**: Work is done via `/awl-dev:implement-plan`
 - **Next**: `/awl-dev:merge-pr` will merge the PR and update Linear
-- **Workflow context**: Ticket is used for Linear linking
+- **Ticket**: Extracted from branch name (pattern `[A-Z]+-[0-9]+`)
 
 ## Error Handling
 
@@ -324,24 +288,6 @@ Then: gh repo set-default
 
 PR created successfully, but ticket not updated.
 Update manually or check ticket ID.
-```
-
-## Configuration
-
-Uses `.claude/config.json`:
-
-```json
-{
-  "awl": {
-    "project": {
-      "ticketPrefix": "RCW"
-    },
-    "linear": {
-      "teamKey": "RCW",
-      "inReviewStatusName": "In Review"
-    }
-  }
-}
 ```
 
 ## Examples

@@ -1,9 +1,0 @@
-{
-  "awl": {
-    "projectKey": "awl-workspace",
-    "project": {
-      "ticketPrefix": "PROJ",
-      "defaultTicketPrefix": "PROJ"
-    }
-  }
-}
