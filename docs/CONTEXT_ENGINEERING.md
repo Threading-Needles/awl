@@ -1,7 +1,6 @@
 # Context Engineering Guide
 
-A deep dive into context engineering principles and how they're implemented in the Ryan Claude
-Workspace.
+A deep dive into context engineering principles and how they're implemented in Awl.
 
 ## Table of Contents
 
