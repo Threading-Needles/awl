@@ -264,20 +264,6 @@ When invoked:
 {Instructions for second step}
 
 [Continue with all steps...]
-
-## Configuration
-
-This command uses configuration from `.claude/config.json`:
-
-```json
-{
-  "awl": {
-    "project": {
-      "ticketPrefix": "PROJ"
-    }
-  }
-}
-```
 ````
 
 ## Advanced Usage
@@ -336,7 +322,7 @@ Before showing to user, validate:
 3. **Consistency**:
    - Matches patterns from similar workflows?
    - Uses workspace conventions?
-   - References config.json for project-specific values?
+   - Stateless — takes parameters as arguments rather than reading config files?
 
 If validation fails, fix issues before proceeding.
 
@@ -557,7 +543,7 @@ Standard categories found in workspace:
 - **Clear descriptions**: Make purpose immediately obvious
 - **Include examples**: Show expected inputs/outputs for agents
 - **Error handling**: Always include error scenarios
-- **Configuration**: Use .claude/config.json for project values
+- **Statelessness**: Take parameters as command arguments — do not read config files
 
 ## Integration with Other Commands
 

@@ -85,6 +85,5 @@ These commands automatically read workflow context to find the current ticket an
 
 ## See Also
 
-- [Workflow Context](./WORKFLOW_CONTEXT.md)
 - [Scripts](./scripts/)
 - [Claude Code Hooks Documentation](https://docs.claude.com/en/docs/claude-code/hooks)

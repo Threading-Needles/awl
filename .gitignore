@@ -13,27 +13,10 @@ Thumbs.db
 *.tmp
 *.bak
 
-# Workspace update metadata (tracks installation state, not source)
-.claude/.workspace-metadata.json
-
-# Backup directories created by update-project.sh
-.claude-backup-*/
-
 # Personal developer configuration (not shared with team)
-.claude/config.local.json
 .claude/.personal/*
 !.claude/.personal/README.md
 !.claude/.personal/.gitkeep
 
-# Workflow context (per-worktree, not shared)
-.claude/.workflow-context.json
-.claude/.workflow-context.json.tmp
-
-# Backup files from config migration
-.claude/config.json.backup
-
-# Catalyst workflow state (per-session, not committed)
-# NOTE: .claude/config.json is SAFE to commit (only has projectKey, no secrets)
-# Secrets are stored in ~/.config/catalyst/config-*.json (never in repo)
+# Local overrides
 .claude/*.local.json
-.claude/*.backup

@@ -1662,14 +1662,13 @@ Keep in project's `.claude/` directory as custom plugins:
 ```bash
 my-project/
 ├── .claude/
-│   ├── plugins/
-│   │   └── custom/
-│   │       ├── agents/
-│   │       │   ├── project-specific-agent.md
-│   │       │   └── internal-tool-analyzer.md
-│   │       └── commands/
-│   │           └── deploy_to_staging.md
-│   └── config.json
+│   └── plugins/
+│       └── custom/
+│           ├── agents/
+│           │   ├── project-specific-agent.md
+│           │   └── internal-tool-analyzer.md
+│           └── commands/
+│               └── deploy_to_staging.md
 ```
 
 Commit to version control for team sharing.

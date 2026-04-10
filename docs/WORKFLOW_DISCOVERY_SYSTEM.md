@@ -105,7 +105,7 @@ Imports workflows from external repositories and adapts them to your workspace s
 3. Presents comprehensive import analysis
 4. Asks for confirmation
 5. Adapts frontmatter to standards
-6. Replaces config values from `.claude/config.json`
+6. Replaces hardcoded ticket prefixes / repo paths / team IDs with placeholders or command arguments
 7. Validates and saves
 8. Records import details
 
@@ -253,7 +253,7 @@ Validates frontmatter across all workflows and auto-fixes issues.
               │
               ├─→ Adapt to workspace standards:
               │   • Normalize frontmatter
-              │   • Replace config values (.claude/config.json)
+              │   • Parameterize hardcoded ticket prefixes / repo paths
               │   • Add source attribution
               │   • Validate tools
               │
@@ -356,27 +356,13 @@ Task 3: Implementation Patterns
 
 ## Integration Points
 
-### Configuration System
+### Stateless Commands
 
-All commands use `.claude/config.json` for project-specific values:
+All Awl commands are stateless. There is no project config file. Workflow commands take the Linear ticket ID as a positional argument; PM commands take the team key. When importing workflows from external sources:
 
-```json
-{
-  "project": {
-    "ticketPrefix": "PROJ",
-    "defaultTicketPrefix": "PROJ"
-  },
-  "linear": {
-    "teamId": "your-team-id",
-    "projectId": "your-project-id"
-  }
-}
-```
-
-When importing or creating workflows:
-
-- Replace hardcoded ticket prefixes with config values
-- Use config for Linear integration
+- Replace hardcoded ticket prefixes with placeholders (`TICKET-123`) or command-line arguments
+- Replace hardcoded team/project IDs with command-line arguments
+- Do not introduce config file reads
 - Maintain portability across projects
 
 ### Workflow Context
@@ -570,7 +556,6 @@ If you create excellent workflows, consider:
 
 - [Frontmatter Standard](FRONTMATTER_STANDARD.md) - Complete standard reference
 - [README](../README.md) - Workspace overview
-- `.claude/config.json` - Project configuration
 
 ## Version History
 

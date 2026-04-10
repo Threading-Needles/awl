@@ -687,18 +687,16 @@ Headless: claude -p "/awl-dev:create-plan"
 
 ### Mode Detection
 
-Commands detect their execution mode automatically:
+Commands detect their execution mode automatically with an inline env check:
 
 ```bash
-MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
-# Returns "interactive" or "headless"
+MODE=$([[ "${CLAUDE_NON_INTERACTIVE:-}" == "1" || "${CLAUDE_CODE_ENTRYPOINT:-}" == "sdk-cli" ]] && echo headless || echo interactive)
 ```
 
-**Detection priority:**
-1. `CLAUDE_MODE` env var (explicit override, always wins)
-2. `CLAUDE_NON_INTERACTIVE=1` (set by piped input, CI/CD)
-3. `CLAUDE_CODE_ENTRYPOINT=sdk-cli` (set by `claude -p`)
-4. Default: `interactive`
+**Detection rules:**
+1. `CLAUDE_NON_INTERACTIVE=1` (set by piped input, CI/CD) → headless
+2. `CLAUDE_CODE_ENTRYPOINT=sdk-cli` (set by `claude -p`) → headless
+3. Default: `interactive`
 
 **Interactive mode:**
 - Uses `AskUserQuestion` tool for clarifications
@@ -800,10 +798,6 @@ See `plugins/dev/LINEAR_DOCUMENTS.md` for the complete embedded questions specif
 - [Workflow Discovery System](WORKFLOW_DISCOVERY_SYSTEM.md)
 - [Frontmatter Standard](FRONTMATTER_STANDARD.md)
 - [Main README](../README.md)
-
-### Configuration
-
-- `.claude/config.json` - Project-specific settings
 
 ---
 

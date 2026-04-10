@@ -45,37 +45,22 @@ Then run /awl-dev:implement-plan again.
 
 ## Initial Response
 
-### Step 1: Get Current Ticket
+### Step 1: Validate Ticket Argument
 
-Check workflow context for current ticket:
-
-```bash
-CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
-```
-
-### Step 2: Handle Ticket State
-
-**If no current ticket:**
+**A ticket ID is REQUIRED as the first argument.** If no ticket ID was provided, respond with:
 
 ```
 I need a Linear ticket to find the implementation plan.
 
-Please either:
-1. Provide a ticket ID: `/awl-dev:implement-plan PROJ-123`
-2. Run `/awl-dev:create-plan` first (which sets the current ticket)
-
-Which would you prefer?
+Usage: /awl-dev:implement-plan TICKET-123
 ```
 
-If user provides ticket, set it:
-```bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
-```
+Then stop. Do not proceed without a ticket ID.
 
-**If current ticket exists:**
+Use the provided ticket ID as `TICKET_ID` throughout this command.
 
 ```
-I'll implement the plan for ticket {CURRENT_TICKET}.
+I'll implement the plan for ticket {TICKET_ID}.
 
 Let me find the implementation plan...
 ```
@@ -98,7 +83,7 @@ documents. Look for documents with title starting with "Plan:".
 **If plan found:**
 
 ```
-Found implementation plan for {CURRENT_TICKET}:
+Found implementation plan for {TICKET_ID}:
 - Plan: {title}
 
 Let me read the full plan...
@@ -122,10 +107,10 @@ Note: Non-blocking questions can remain unanswered - proceed with noted defaults
 The following questions need answers before implementation can begin:
 
 **Q1 (blocking)**: {question text}
-  → Location: Plan document attached to {CURRENT_TICKET}
+  → Location: Plan document attached to {TICKET_ID}
 
 **Q2 (blocking)**: {question text}
-  → Location: Plan document attached to {CURRENT_TICKET}
+  → Location: Plan document attached to {TICKET_ID}
 
 Please answer these questions in the Linear document, then run:
   /awl-dev:implement-plan
@@ -140,7 +125,7 @@ Continue to Step 4.
 **If no plan found:**
 
 ```
-No implementation plan found for {CURRENT_TICKET}.
+No implementation plan found for {TICKET_ID}.
 
 Would you like me to:
 1. Create a plan first? Run `/awl-dev:create-plan`
@@ -150,7 +135,7 @@ Would you like me to:
 **If multiple plans found:**
 
 ```
-Found multiple plans for {CURRENT_TICKET}:
+Found multiple plans for {TICKET_ID}:
 1. Plan: {title1} (created {date1})
 2. Plan: {title2} (created {date2})
 
@@ -452,7 +437,7 @@ Present completion summary:
 ```markdown
 ✅ Implementation Complete!
 
-**Ticket**: {CURRENT_TICKET}
+**Ticket**: {TICKET_ID}
 **PR**: #{number} - {url}
 
 ## Workflow Summary

@@ -1,8 +1,0 @@
-{
-  "projectKey": "acme",
-  "project": {
-    "ticketPrefix": "ACME",
-    "name": "Acme Corp Project",
-    "defaultTicketPrefix": "ACME"
-  }
-}

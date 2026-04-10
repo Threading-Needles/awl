@@ -185,9 +185,8 @@ automated.
 
 **Update these docs**:
 
-1. **CONFIGURATION.md** - Add MCP management section
-2. **QUICKSTART.md** - Remove PostHog from default setup
-3. **New: MCP_SETUP.md** - Guide for project-specific MCP config
+1. **QUICKSTART.md** - Document any per-plugin MCP behavior
+2. **MCP_SESSION_WORKFLOW.md** - Document the enable/disable session pattern
 
 **Template `.mcp.json`**:
 

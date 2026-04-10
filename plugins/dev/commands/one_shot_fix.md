@@ -16,40 +16,25 @@ needs to change, propose the fix, get confirmation, and implement it.
 Use this for small bug fixes, config changes, typo corrections, and other tickets that don't need
 formal research documents or implementation plans.
 
-## Prerequisites
-
-```bash
-if [[ -f "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" ]]; then
-  "${CLAUDE_PLUGIN_ROOT}/scripts/check-prerequisites.sh" || exit 1
-fi
-```
-
 ## Execution Mode Detection
 
 ```bash
-MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
-# MODE will be "interactive" or "headless"
+MODE=$([[ "${CLAUDE_NON_INTERACTIVE:-}" == "1" || "${CLAUDE_CODE_ENTRYPOINT:-}" == "sdk-cli" ]] && echo headless || echo interactive)
 ```
 
-## Step 1: Ticket Handling
+## Step 1: Validate Ticket Argument
 
-Check workflow context first (the router may have already set it):
+**A ticket ID is REQUIRED as the first argument.** If no ticket ID was provided, respond with:
 
-```bash
-CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
+```
+I need a Linear ticket to work on.
+
+Usage: /awl-dev:one-shot-fix TICKET-123
 ```
 
-- If a ticket ID argument is provided, use it and update context:
-  ```bash
-  "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
-  ```
-- If no argument but context has a ticket, use that
-- If neither, prompt the user:
-  ```
-  I need a Linear ticket to work on.
+Then stop. Do not proceed without a ticket ID.
 
-  Usage: /one-shot-fix PROJ-123
-  ```
+Use the provided ticket ID as `TICKET_ID` throughout this command.
 
 ## Step 2: Update Linear Ticket Status (FIRST)
 
@@ -249,7 +234,7 @@ This command reuses existing commands for the post-fix lifecycle:
 - `/awl-dev:commit` for conventional commits
 - `/awl-dev:create_pr` for PR creation (which handles describe_pr, Linear status, etc.)
 
-The workflow context ticket is set, so downstream commands find it automatically.
+The ticket is encoded in the branch name, so downstream commands extract it automatically.
 
 ### When NOT to Use This Command
 

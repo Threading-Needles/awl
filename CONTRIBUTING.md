@@ -157,13 +157,6 @@ The frontmatter validator checks:
    - Use `[[` for conditionals
    - Prefer functions over inline code
 
-### Scripts Not Linted
-
-These scripts have ANSI color codes that confuse shellcheck:
-
-- `hack/install-user.sh`
-- `hack/update-project.sh`
-
 ## CI/CD
 
 ### GitHub Actions
@@ -249,19 +242,17 @@ Examples:
 
 ### Manual Testing
 
-1. Install workspace locally:
+This repository is a working installation of itself (dogfooding). Symlinks in `.claude/plugins/` point to `plugins/dev/`, `plugins/pm/`, and `plugins/meta/`, so any edits are immediately available.
 
-   ```bash
-   ./hack/install-user.sh
-   ```
-
-2. Test commands in Claude Code:
+1. Edit a command or agent under `plugins/`
+2. Restart Claude Code to reload the plugin
+3. Test the command in Claude Code:
 
    ```
-   /your-command-name
+   /awl-dev:your-command TICKET-123
    ```
 
-3. Verify behavior matches expectations
+4. Verify behavior matches expectations
 
 ### Automated Testing
 

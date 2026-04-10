@@ -13,41 +13,25 @@ session. The handoff will be saved as a Linear document attached to the current 
 
 ## Initial Setup
 
-### Step 1: Get Current Ticket
+### Step 1: Validate Ticket Argument
 
-Check workflow context for current ticket:
-
-```bash
-CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
-```
-
-### Step 2: Handle Ticket State
-
-**If no current ticket:**
+**A ticket ID is REQUIRED as the first argument.** If no ticket ID was provided, respond with:
 
 ```
 I need a Linear ticket to attach this handoff to.
 
-Please provide a ticket ID, or if this is general work not tied to a ticket,
-I can create a standalone handoff document.
-
-Options:
-1. Provide a ticket ID (e.g., PROJ-123)
-2. Create general handoff (no ticket attachment)
+Usage: /awl-dev:create-handoff TICKET-123
 ```
 
-If user provides ticket, set it:
-```bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
-```
+Then stop. Do not proceed without a ticket ID.
 
-**If current ticket exists:**
+Use the provided ticket ID as `TICKET_ID` throughout this command.
 
 ```
-I'll create a handoff document for ticket {CURRENT_TICKET}.
+I'll create a handoff document for ticket {TICKET_ID}.
 ```
 
-### Step 3: Gather Metadata
+### Step 2: Gather Metadata
 
 ```bash
 # Get current git information
@@ -78,7 +62,7 @@ Use this template structure:
 # Handoff: {TICKET} - {very concise description}
 
 **Date**: {current date/time with timezone}
-**Ticket**: {CURRENT_TICKET}
+**Ticket**: {TICKET_ID}
 **Git Commit**: {commit hash}
 **Branch**: {branch name}
 **Repository**: {repo name}
@@ -135,13 +119,13 @@ After saving:
 ```
 ✅ Handoff created and saved to Linear!
 
-**Ticket**: {CURRENT_TICKET}
+**Ticket**: {TICKET_ID}
 **Linear Document**: Handoff: {description}
 
 To resume from this handoff in a new session:
 
 1. Clear context (start fresh session)
-2. Run `/awl-dev:resume-handoff {CURRENT_TICKET}`
+2. Run `/awl-dev:resume-handoff {TICKET_ID}`
 
 The handoff document is attached to the ticket and will be automatically discovered.
 ```
@@ -186,22 +170,9 @@ The handoff document is attached to the ticket and will be automatically discove
 
 Please verify:
 1. You have access to this Linear workspace
-2. The ticket {CURRENT_TICKET} exists
+2. The ticket {TICKET_ID} exists
 
 The handoff content is shown above - you can manually save it if needed.
-```
-
-**If no ticket and user wants standalone handoff:**
-
-For general work not tied to a ticket, create the handoff as a comment or note, but encourage
-attaching to a ticket for better discoverability:
-
-```
-⚠️ Handoffs work best when attached to tickets for easy discovery.
-
-Would you like me to:
-1. Create a new ticket for this work and attach the handoff?
-2. Display the handoff content for manual saving?
 ```
 
 ## Status Update Convention

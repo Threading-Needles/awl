@@ -18,31 +18,6 @@ version: 3.0.0
 You are tasked with managing Linear tickets, updating ticket statuses, and following a structured
 workflow using the official Linear MCP tools.
 
-## Configuration
-
-Read team configuration from `.claude/config.json`:
-
-```bash
-CONFIG_FILE=".claude/config.json"
-
-# Read team key (e.g., "ENG", "PROJ")
-TEAM_KEY=$(jq -r '.awl.linear.teamKey // "PROJ"' "$CONFIG_FILE")
-
-# Read default team name (optional)
-DEFAULT_TEAM=$(jq -r '.awl.linear.defaultTeam // null' "$CONFIG_FILE")
-```
-
-**Configuration in `.claude/config.json`**:
-
-```json
-{
-  "linear": {
-    "teamKey": "ENG",
-    "defaultTeam": "Backend"
-  }
-}
-```
-
 ## Initial Response
 
 If tools are available, respond based on the user's request:
@@ -103,25 +78,28 @@ These commands automatically update ticket status:
 
 #### Steps to follow:
 
-1. **Gather information:**
+1. **Determine the team:**
+   - If the user passed a team key as argument (e.g., `/awl-dev:linear create ENG "My ticket"`), use it.
+   - Otherwise, use `mcp__linear__list_teams` to list available teams and ask which to create in.
+   - Do not assume or hardcode a default team.
+
+2. **Gather information:**
    - Title: Clear, action-oriented
    - Description: Problem/goal summary
    - Priority: 1=Urgent, 2=High, 3=Medium (default), 4=Low
 
-2. **Create the ticket:**
+3. **Create the ticket:**
 
    Use `mcp__linear__save_issue` with:
+   - team (from step 1)
    - title
    - description (markdown)
    - priority (1-4)
    - state: "Backlog"
 
-3. **Post-creation:**
-   - Show the created ticket URL
-   - Set the ticket in workflow context for subsequent commands:
-     ```bash
-     "${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
-     ```
+4. **Post-creation:**
+   - Show the created ticket URL and ID
+   - Tell the user they can now run workflow commands with that ticket ID, e.g., `/awl-dev:research-codebase NEW-123`
 
 ### 2. Adding Comments to Existing Tickets
 
@@ -286,9 +264,9 @@ Use the Linear MCP tools directly:
 
 ## Notes
 
-- **Configuration**: Use `.claude/config.json` for team settings
+- **Team selection**: Pass team as positional arg when creating tickets, or prompt interactively
 - **Status mapping**: Use status names that exist in your Linear workspace
-- **Automation**: Workflow commands auto-update tickets when ticket IDs are used
+- **Automation**: Workflow commands auto-update tickets when ticket IDs are passed as arguments
 - **Documents**: All workflow documents (research, plans, handoffs, PRs) are stored as Linear documents attached to tickets
 
 This command integrates seamlessly with the research → plan → implement → validate workflow while

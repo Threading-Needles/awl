@@ -1,18 +1,6 @@
 #!/usr/bin/env bash
 # Shared utility functions for PM commands
 
-# Get configuration value
-get_config() {
-    local key="$1"
-    local default="${2:-}"
-    jq -r ".awl.$key // \"$default\"" .claude/config.json
-}
-
-# Get Linear team key
-get_team_key() {
-    get_config "linear.teamKey" "PROJ"
-}
-
 # Parse ticket ID from branch name
 get_ticket_from_branch() {
     local branch
@@ -47,8 +35,6 @@ calc_progress() {
 }
 
 # Export functions
-export -f get_config
-export -f get_team_key
 export -f get_ticket_from_branch
 export -f format_timestamp
 export -f calc_progress

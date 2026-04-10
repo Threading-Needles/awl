@@ -13,37 +13,22 @@ success criteria and identifying any deviations or issues.
 
 ## Initial Setup
 
-### Step 1: Get Current Ticket
+### Step 1: Validate Ticket Argument
 
-Check workflow context for current ticket:
-
-```bash
-CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
-```
-
-### Step 2: Handle Ticket State
-
-**If no current ticket:**
+**A ticket ID is REQUIRED as the first argument.** If no ticket ID was provided, respond with:
 
 ```
 I need a Linear ticket to find the implementation plan.
 
-Please either:
-1. Provide a ticket ID: `/awl-dev:validate-plan PROJ-123`
-2. Or tell me which ticket to validate
-
-Which would you prefer?
+Usage: /awl-dev:validate-plan TICKET-123
 ```
 
-If user provides ticket, set it:
-```bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$TICKET_ID"
-```
+Then stop. Do not proceed without a ticket ID.
 
-**If current ticket exists:**
+Use the provided ticket ID as `TICKET_ID` throughout this command.
 
 ```
-I'll validate the implementation for ticket {CURRENT_TICKET}.
+I'll validate the implementation for ticket {TICKET_ID}.
 
 Let me find the plan and gather implementation evidence...
 ```
@@ -58,7 +43,7 @@ Use `mcp__linear__get_issue` with the ticket identifier to retrieve the issue an
 **If no plan found:**
 
 ```
-No implementation plan found for {CURRENT_TICKET}.
+No implementation plan found for {TICKET_ID}.
 
 Cannot validate without a plan. Would you like me to:
 1. Check a different ticket?
@@ -115,7 +100,7 @@ Create a Linear document with validation results using `mcp__linear__create_docu
 ```markdown
 # Validation: {Feature Name}
 
-**Ticket**: {CURRENT_TICKET}
+**Ticket**: {TICKET_ID}
 **Date**: {timestamp}
 **Status**: {PASS|FAIL|PARTIAL}
 
@@ -213,7 +198,7 @@ Create comprehensive validation summary:
 ```
 # Validation Report: {Feature Name}
 
-**Ticket**: {CURRENT_TICKET}
+**Ticket**: {TICKET_ID}
 **Plan**: (Linear document attached to ticket)
 **Validated**: {date}
 **Validation Status**: {PASS/FAIL/PARTIAL}
@@ -359,7 +344,7 @@ what was implemented.
 **If plan not found:**
 
 ```
-⚠️ No plan document found for {CURRENT_TICKET}.
+⚠️ No plan document found for {TICKET_ID}.
 
 Options:
 1. Provide a different ticket ID

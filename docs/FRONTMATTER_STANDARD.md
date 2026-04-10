@@ -416,18 +416,6 @@ When invoked:
 
 {Continue with all steps...}
 
-## Configuration
-
-This command uses configuration from \`.claude/config.json\`:
-
-\`\`\`json
-{
-  "project": {
-    "ticketPrefix": "PROJ"
-  }
-}
-\`\`\`
-
 ## Advanced Usage
 
 ### {Advanced Feature 1}
@@ -477,7 +465,7 @@ Commands that support both interactive and headless execution should include mod
 
 ### Mode Detection Pattern
 
-Add this after Prerequisites in your command:
+Add this near the top of your command:
 
 ```markdown
 ## Execution Mode Detection
@@ -485,8 +473,7 @@ Add this after Prerequisites in your command:
 Detect whether running interactively or headless (e.g., `claude -p`):
 
 \`\`\`bash
-MODE=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" detect-mode)
-# MODE will be "interactive" or "headless"
+MODE=$([[ "${CLAUDE_NON_INTERACTIVE:-}" == "1" || "${CLAUDE_CODE_ENTRYPOINT:-}" == "sdk-cli" ]] && echo headless || echo interactive)
 \`\`\`
 
 **Mode behavior:**

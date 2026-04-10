@@ -19,15 +19,7 @@ needed for Linear integration -- all Linear operations use MCP tools directly.
 
 ## Process:
 
-### 1. Get Current Ticket
-
-Check workflow context for current ticket:
-
-```bash
-CURRENT_TICKET=$("${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" get-ticket)
-```
-
-### 2. Identify target PR
+### 1. Identify target PR
 
 **If argument provided:**
 
@@ -49,44 +41,36 @@ gh pr list --limit 10 --json number,title,headRefName,state
 
 Ask user: "Which PR would you like to describe? (enter number)"
 
-### 3. Extract ticket reference
+### 2. Extract ticket reference
 
 **From multiple sources:**
 
 ```bash
-# 1. From workflow context (most reliable)
-ticket=$CURRENT_TICKET
-
-# 2. From branch name
+# 1. From branch name
 branch=$(gh pr view $pr_number --json headRefName -q .headRefName)
-if [[ -z "$ticket" && "$branch" =~ ([A-Z]+)-([0-9]+) ]]; then
-    ticket="${BASH_REMATCH[0]}"
+if [[ "$branch" =~ ([A-Z]+-[0-9]+) ]]; then
+    ticket="${BASH_REMATCH[1]}"
 fi
 
-# 3. From PR title
+# 2. From PR title
 title=$(gh pr view $pr_number --json title -q .title)
-if [[ -z "$ticket" && "$title" =~ ([A-Z]+)-([0-9]+) ]]; then
-    ticket="${BASH_REMATCH[0]}"
+if [[ -z "$ticket" && "$title" =~ ([A-Z]+-[0-9]+) ]]; then
+    ticket="${BASH_REMATCH[1]}"
 fi
 
-# 4. From existing PR body
+# 3. From existing PR body
 body=$(gh pr view $pr_number --json body -q .body)
 if [[ -z "$ticket" && "$body" =~ Refs:\ ([A-Z]+-[0-9]+) ]]; then
     ticket="${BASH_REMATCH[1]}"
 fi
 ```
 
-**If ticket found, set in workflow context:**
-```bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh" set-ticket "$ticket"
-```
-
-### 4. Check for existing PR description in Linear
+### 3. Check for existing PR description in Linear
 
 Use `mcp__linear__get_issue` with the ticket identifier to retrieve the issue and its
 attached documents. Inspect the returned documents for any with a title starting with "PR:".
 
-### 5. Gather comprehensive PR information
+### 4. Gather comprehensive PR information
 
 ```bash
 # Full diff
@@ -105,13 +89,13 @@ gh pr view $pr_number --json url,title,number,state,baseRefName,headRefName,auth
 gh pr checks $pr_number
 ```
 
-### 6. Get Linear ticket context
+### 5. Get Linear ticket context
 
 Use `mcp__linear__get_issue` with the ticket identifier to retrieve the ticket's title,
 description, status, and other metadata. Use the ticket title and description for context when
 generating the PR description.
 
-### 7. Analyze changes incrementally
+### 6. Analyze changes incrementally
 
 **If this is an UPDATE (existing PR document found):**
 
@@ -130,7 +114,7 @@ generating the PR description.
   - Migration requirements
   - Security implications
 
-### 8. Generate PR description
+### 7. Generate PR description
 
 Use the standard PR description format:
 
@@ -195,7 +179,7 @@ Use the standard PR description format:
 - **Manually checked boxes** - preserve [x] marks for manual steps
 - **Post-Merge Tasks** - append new, keep existing
 
-### 9. Run verification checks
+### 8. Run verification checks
 
 **For each checklist item in "How to Verify It":**
 
@@ -224,7 +208,7 @@ fi
 - `npm run typecheck` / `tsc --noEmit`
 - `make build` / `npm run build`
 
-### 10. Save PR description to Linear
+### 9. Save PR description to Linear
 
 **Create or update Linear document:**
 
@@ -234,15 +218,15 @@ fi
 - `issueId`: The ticket identifier to attach the document to
 
 **If updating an existing document:** Use `mcp__linear__update_document` with:
-- `id`: The existing document ID found in Step 4
+- `id`: The existing document ID found in Step 3
 - `content`: The updated PR description in markdown
 
-### 11. Update PR on GitHub
+### 10. Update PR on GitHub
 
 **Update title:**
 
 If a ticket exists, use `mcp__linear__get_issue` to retrieve the ticket title (if not
-already fetched in Step 6). Format the PR title as `TICKET: Descriptive title` (truncate the ticket
+already fetched in Step 5). Format the PR title as `TICKET: Descriptive title` (truncate the ticket
 title to 60 characters). If no ticket exists, generate a title from the primary change.
 
 ```bash
@@ -257,7 +241,7 @@ echo "$PR_DESCRIPTION" > /tmp/pr_body.md
 gh pr edit $pr_number --body-file /tmp/pr_body.md
 ```
 
-### 12. Update Linear ticket
+### 11. Update Linear ticket
 
 Use `mcp__linear__save_issue` to move the ticket to "In Review" state by setting the
 appropriate status.
@@ -271,7 +255,7 @@ Use `mcp__linear__save_comment` to add a comment to the ticket with the followin
 >
 > View PR: ${prUrl}
 
-### 13. Report results
+### 12. Report results
 
 **If first-time generation:**
 
@@ -328,7 +312,7 @@ Review updated PR: {url}
 
 - **Previous**: Gets context from research/plan documents in Linear
 - **Next**: `/awl-dev:create-pr` uses the description, also links to ticket
-- **Workflow context**: Ticket is used throughout
+- **Ticket**: Extracted from branch name, PR title, or PR body
 
 ## Error Handling
 
@@ -368,29 +352,6 @@ Passed:
 - make build ✅
 
 Fix failing tests before merge or document as known issues.
-```
-
-## Configuration
-
-Uses `.claude/config.json`:
-
-```json
-{
-  "awl": {
-    "project": {
-      "ticketPrefix": "RCW"
-    },
-    "linear": {
-      "teamId": "team-id",
-      "inReviewStatusName": "In Review"
-    },
-    "pr": {
-      "testCommand": "make test",
-      "lintCommand": "make lint",
-      "buildCommand": "make build"
-    }
-  }
-}
 ```
 
 ## Remember:

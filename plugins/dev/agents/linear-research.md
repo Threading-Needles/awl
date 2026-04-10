@@ -114,19 +114,6 @@ Present findings as structured data:
 ## What NOT to Do
 
 - Don't create or modify tickets (use /awl-dev:linear command for mutations)
-- Don't assume team keys (use config or ask)
+- Don't assume team keys — they come in via the prompt from the calling command
 - Don't parse Markdown descriptions deeply (token expensive)
 - Focus on metadata (status, assignee, cycle) over content
-
-## Configuration
-
-Team information comes from `.claude/config.json`:
-
-```json
-{
-  "linear": {
-    "teamKey": "ENG",
-    "defaultTeam": "Backend"
-  }
-}
-```

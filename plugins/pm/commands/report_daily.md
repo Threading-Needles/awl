@@ -42,20 +42,22 @@ mkdir -p "reports/daily"
 
 ## Process
 
-### Step 1: Gather Configuration
+### Step 1: Validate Team Argument
+
+**A Linear team key is REQUIRED as the first argument.** If no team was provided, respond with:
+
+```
+I need a Linear team key to generate the daily report.
+
+Usage: /awl-pm:report-daily TEAM-KEY
+
+Example: /awl-pm:report-daily ENG
+```
+
+Then stop. Do not proceed without a team key.
 
 ```bash
-# Determine script directory with fallback
-if [[ -n "${CLAUDE_PLUGIN_ROOT}" ]]; then
-  SCRIPT_DIR="${CLAUDE_PLUGIN_ROOT}/scripts"
-else
-  # Fallback: resolve relative to this command file
-  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/scripts"
-fi
-
-source "${SCRIPT_DIR}/pm-utils.sh"
-
-TEAM_KEY=$(get_team_key)
+TEAM_KEY="$1"
 TODAY=$(date +%Y-%m-%d)
 YESTERDAY=$(date -v-1d +%Y-%m-%d)
 ```

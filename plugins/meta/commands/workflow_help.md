@@ -73,13 +73,14 @@ Return: Evidence of active work with file paths"
 Tools: Bash (git status), Grep, Glob
 ```
 
-**Task 2 - Check Current Ticket**:
+**Task 2 - Infer Current Ticket From Branch**:
 
 ```
-"Get the current ticket from workflow context.
-Run: ${CLAUDE_PLUGIN_ROOT}/scripts/workflow-context.sh get-ticket
-If ticket exists, query Linear for documents attached to it.
-Return: Current ticket and any documents (research, plan, handoff) found"
+"Extract the ticket ID from the current git branch name.
+Run: git branch --show-current
+If the branch matches pattern ([A-Z]+-[0-9]+), that is the current ticket.
+If ticket found, query Linear for documents attached to it.
+Return: Current ticket (if any) and any documents (research, plan, handoff) found"
 
 Tools: Bash
 ```
