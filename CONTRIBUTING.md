@@ -7,103 +7,74 @@ Awl.
 
 ### Prerequisites
 
-- **Trunk** - Code quality tooling (linters, formatters)
-- **Make** - Build automation
-- **Git** - Version control
-- **jq** - JSON processor (for config handling)
+- **Git** — version control
+- **[Claude Code](https://claude.com/claude-code)** — to dogfood changes locally
+- **[GitHub CLI](https://cli.github.com)** (`gh`) — used by PR workflow commands
 
-### Installation
+### Clone
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-org/ryan-claude-workspace.git
-cd ryan-claude-workspace
-
-# Install dependencies (if using Trunk)
-trunk install
+git clone git@github.com:Threading-Needles/awl.git
+cd awl
 ```
+
+This repo is its own working installation via symlinks in `.claude/plugins/` → `plugins/`, so any
+edits to agents, commands, or scripts are immediately available the next time you restart Claude
+Code.
 
 ## Code Quality
 
-This project uses **Trunk** for automated code quality checks. All code must pass linting before
-being merged.
+Awl is markdown + a handful of shell scripts. There is no aggregated linter, no Makefile, no CI.
+Check your changes before committing:
 
-### Running Quality Checks
+**Shell scripts** (we have three — `plugins/dev/scripts/*.sh`, `plugins/pm/scripts/*.sh`):
 
 ```bash
-# Run all quality checks (recommended before committing)
-make check
-
-# Run only linters
-make lint
-
-# Run only frontmatter validation
-make check-frontmatter
-
-# Auto-fix formatting issues
-make format
+shellcheck plugins/*/scripts/*.sh
+bash -n plugins/*/scripts/*.sh   # syntax check
 ```
 
-### What Gets Checked
+**Markdown** (agents, commands, docs):
 
-**Enabled linters:**
+- Your editor's markdown formatter is fine (most people use `prettier` on save)
+- Run `/awl-meta:validate-frontmatter` from inside Claude Code to verify YAML frontmatter on all
+  agent/command files
 
-- **shellcheck** - Shell script linting
-- **shfmt** - Shell script formatting
-- **markdownlint** - Markdown linting
-- **prettier** - Code formatting
-- **yamllint** - YAML linting (frontmatter)
-- **frontmatter-validator** - Custom validator for command/agent frontmatter
-
-### Pre-commit Workflow
-
-Before committing changes:
-
-1. **Run quality checks:**
-
-   ```bash
-   make check
-   ```
-
-2. **Fix any issues:**
-
-   ```bash
-   make format  # Auto-fix what can be fixed
-   # Manually fix remaining issues
-   ```
-
-3. **Commit your changes:**
-   ```bash
-   git add .
-   git commit -m "feat: your change description"
-   ```
+That's it — no aggregator, no runtime pins, no `.trunk` cache.
 
 ## Command and Agent Development
 
 ### Adding a New Command
 
-1. Create markdown file in appropriate plugin directory:
+1. Create markdown file in the appropriate plugin directory:
    - `plugins/dev/commands/{command-name}.md` for workflow commands
+   - `plugins/pm/commands/{command-name}.md` for project-management commands
    - `plugins/meta/commands/{command-name}.md` for meta/creation commands
+
 2. **Add frontmatter** (required):
 
    ```yaml
    ---
    description: Brief description of what command does
-   category: workflow|utility|research
+   category: workflow|version-control-git|project-task-management|utility|pm
    tools: Read, Write, Bash, Task, etc.
    model: inherit
    version: 1.0.0
    ---
    ```
 
-3. Write command logic following existing patterns
-4. Test with `/your-command-name` in Claude Code (restart to reload)
+3. Write command logic following existing patterns. Workflow commands take the Linear ticket ID as
+   a required positional argument (`$1`); PM commands take the team key as `$1`. Commands are
+   **stateless** — no config file reads, no hidden state between runs.
+
+4. Restart Claude Code and test: `/your-command-name TICKET-123`
+
 5. Run `/awl-meta:validate-frontmatter` to check formatting
 
 ### Adding a New Agent
 
-1. Create markdown file in `plugins/dev/agents/{agent-name}.md`
+1. Create markdown file in `plugins/dev/agents/{agent-name}.md` (or `plugins/pm/agents/`)
+
 2. **Add frontmatter** (required):
 
    ```yaml
@@ -115,98 +86,26 @@ Before committing changes:
    ---
    ```
 
-3. Write agent logic as documentarian (not critic)
-4. Test by invoking agent in a command (restart Claude Code to reload)
+3. Write agent logic as a **documentarian, not a critic** — agents describe what exists, they do
+   not suggest improvements or critique the code they read. See `CLAUDE.md` for the agent philosophy.
+
+4. Restart Claude Code and test by invoking from a command or `@agent-name`
+
 5. Run `/awl-meta:validate-frontmatter` to check formatting
 
-### Frontmatter Validation
+## Shell Script Guidelines
 
-The frontmatter validator checks:
-
-**For commands:**
-
-- ✅ Has `description` field
-- ✅ Has `category` field
-- ✅ Has `version` field
-
-**For agents:**
-
-- ✅ Has `name` field
-- ✅ Has `description` field
-- ✅ Has `tools` field
-
-**Skipped files:**
-
-- README.md files (documentation, not commands/agents)
-- Plugin manifest files (plugin.json)
-
-## Shell Script Development
-
-### Best Practices
-
-1. **Use shellcheck** - All scripts are linted except those with ANSI colors
-2. **Add disable comments** for intentional violations:
-
-   ```bash
-   # shellcheck disable=SC2310 # Reason for disabling
-   ```
-
-3. **Follow conventions:**
-   - Use `set -euo pipefail` for strict mode
-   - Quote variables: `"${var}"`
-   - Use `[[` for conditionals
-   - Prefer functions over inline code
-
-## CI/CD
-
-### GitHub Actions
-
-Pull requests automatically run:
-
-- ✅ All Trunk linters
-- ✅ Frontmatter validation
-- ✅ Shellcheck on most scripts
-- ✅ Markdown linting
-
-**Checks must pass before merge.**
-
-### Local Testing
-
-Simulate CI checks locally:
-
-```bash
-make check
-```
-
-This runs the same checks as GitHub Actions.
-
-## Documentation
-
-### Updating Documentation
-
-When making changes:
-
-1. **Update relevant docs** in `docs/` directory
-2. **Update command README** if adding to namespace
-3. **Update CLAUDE.md** if changing workspace behavior
-4. **Run markdownlint:**
-   ```bash
-   trunk check docs/
-   ```
-
-### Documentation Files
-
-- `README.md` - Project overview and quick start
-- `CLAUDE.md` - Instructions for Claude Code
-- `docs/` - Comprehensive guides
-- `plugins/dev/README.md` - Development plugin documentation
-- `plugins/meta/README.md` - Meta plugin documentation
+1. **Use `set -euo pipefail`** for strict mode
+2. **Quote variables**: `"${var}"`
+3. **Use `[[` for conditionals**, not `[`
+4. **Prefer functions** over inline code
+5. **Run `shellcheck`** before committing
 
 ## Git Workflow
 
 ### Branch Naming
 
-Use ticket-based naming:
+Use the Linear ticket prefix:
 
 ```
 {PREFIX}-{NUMBER}-{description}
@@ -214,8 +113,11 @@ Use ticket-based naming:
 
 Examples:
 
-- `COA-19-add-code-quality-tooling`
-- `COA-20-improve-documentation`
+- `ENG-19-add-code-quality-tooling`
+- `PROJ-20-improve-documentation`
+
+PR commands (`/awl-dev:create-pr`, `/awl-dev:merge-pr`) extract the ticket from the branch name
+automatically, so the naming matters.
 
 ### Commit Messages
 
@@ -223,52 +125,54 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
 type(scope): description
+```
 
 Examples:
-- feat(commands): add new debug command
-- fix(ci): correct trunk configuration
-- docs: update contributing guide
-- chore: update dependencies
-```
+
+- `feat(commands): add new debug command`
+- `fix(agents): correct locator glob pattern`
+- `docs: update contributing guide`
+- `chore: update dependencies`
 
 ### Pull Requests
 
-1. Create PR from your branch to `main`
-2. Ensure CI checks pass
-3. Request review if needed
-4. Squash and merge when approved
+1. Create PR from your branch to `main` (`/awl-dev:create-pr` handles this)
+2. Request review if needed
+3. Squash-merge when approved (`/awl-dev:merge-pr` handles this)
+
+## Documentation
+
+When making changes:
+
+1. **Update relevant docs** in `docs/` directory
+2. **Update `plugins/*/README.md`** if adding to a plugin namespace
+3. **Update `CLAUDE.md`** if changing architecture or adding an ADR
+
+### Key documentation files
+
+- `README.md` — project overview and quick start
+- `QUICKSTART.md` — installation and first-use walkthrough
+- `CLAUDE.md` — instructions for Claude Code (architecture, ADRs)
+- `docs/` — comprehensive guides (USAGE, AGENTIC_WORKFLOW_GUIDE, PR_LIFECYCLE, etc.)
+- `plugins/dev/README.md`, `plugins/pm/README.md`, `plugins/meta/README.md` — per-plugin docs
 
 ## Testing
 
-### Manual Testing
-
-This repository is a working installation of itself (dogfooding). Symlinks in `.claude/plugins/` point to `plugins/dev/`, `plugins/pm/`, and `plugins/meta/`, so any edits are immediately available.
+Awl has no automated test suite — this repo is markdown and shell scripts, and testing is
+dogfooding.
 
 1. Edit a command or agent under `plugins/`
 2. Restart Claude Code to reload the plugin
-3. Test the command in Claude Code:
-
-   ```
-   /awl-dev:your-command TICKET-123
-   ```
-
-4. Verify behavior matches expectations
-
-### Automated Testing
-
-Currently no automated tests. Future additions:
-
-- Command frontmatter validation (✅ done)
-- Installation script behavior
-- Configuration file handling
+3. Test the command against a real Linear ticket: `/awl-dev:your-command TICKET-123`
+4. Verify the behavior matches expectations
 
 ## Getting Help
 
-- **Documentation**: See `docs/` directory
-- **Issues**: Create issue on GitHub
-- **Questions**: Open discussion on GitHub
+- **Documentation**: see `docs/` and `CLAUDE.md`
+- **Issues**: https://github.com/Threading-Needles/awl/issues
+- **Questions**: open a discussion on GitHub
 
 ## License
 
 By contributing, you agree that your contributions will be licensed under the same license as this
-project.
+project (MIT).
