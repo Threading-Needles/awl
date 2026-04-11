@@ -105,11 +105,20 @@ Context budgets, just-in-time loading, sub-agent architecture, handoff strategie
 
 ---
 
-#### [FRONTMATTER_STANDARD.md](FRONTMATTER_STANDARD.md)
+#### Skills (auto-loaded, progressive disclosure)
 
-YAML frontmatter validation, required fields, valid categories/tools, validation rules.
+Awl ships four skills that Claude Code loads on demand when their trigger context appears:
 
-**Read this when**: Creating new agents/commands or debugging frontmatter issues.
+- [`awl-linear-workflow`](../plugins/dev/skills/awl-linear-workflow/) — Linear ticket state
+  machine and workflow document conventions. Fires on any Linear ticket reference.
+- [`awl-pr-lifecycle`](../plugins/dev/skills/awl-pr-lifecycle/) — PR creation → describe →
+  babysit → merge flow. Fires on feature branches and PR work.
+- [`awl-conventional-commits`](../plugins/dev/skills/awl-conventional-commits/) — commit format
+  rules and type taxonomy. Fires before `git commit`.
+- [`awl-frontmatter`](../plugins/meta/skills/awl-frontmatter/) — YAML frontmatter spec for
+  agents and commands. Fires when editing agent/command markdown files.
+
+Skill bodies are short; full specs live in each skill's `references/` directory.
 
 ---
 
@@ -119,7 +128,7 @@ YAML frontmatter validation, required fields, valid categories/tools, validation
 [BEST_PRACTICES.md](BEST_PRACTICES.md)
 
 **Plugin Developers**: [AGENTIC_WORKFLOW_GUIDE.md](AGENTIC_WORKFLOW_GUIDE.md) →
-[FRONTMATTER_STANDARD.md](FRONTMATTER_STANDARD.md) →
+[`awl-frontmatter` skill](../plugins/meta/skills/awl-frontmatter/) →
 [WORKFLOW_DISCOVERY_SYSTEM.md](WORKFLOW_DISCOVERY_SYSTEM.md)
 
 **Integration Specialists**: [DEEPWIKI_INTEGRATION.md](DEEPWIKI_INTEGRATION.md)

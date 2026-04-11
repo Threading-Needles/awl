@@ -583,10 +583,13 @@ What would you like to do?
 
 ## See Also
 
-- [commands/README.md](../commands/README.md) - All available commands
-- [LINEAR_DOCUMENTS.md](../plugins/dev/LINEAR_DOCUMENTS.md) - Linear documents conventions
-- [docs/USAGE.md](USAGE.md) - General workspace usage
-- [commands/dev/commit.md](../commands/dev/commit.md) - Commit command details
-- [commands/linear/create_pr.md](../commands/linear/create_pr.md) - Create PR command details
-- [commands/dev/describe_pr.md](../commands/dev/describe_pr.md) - Describe PR command details
-- [commands/linear/merge_pr.md](../commands/linear/merge_pr.md) - Merge PR command details
+- [`../SKILL.md`](../SKILL.md) — the `awl-pr-lifecycle` skill entry point
+- [`awl-linear-workflow` skill](../../awl-linear-workflow/) — Linear state machine and document
+  conventions that the PR commands rely on
+- [`awl-conventional-commits` skill](../../awl-conventional-commits/) — commit message format
+  used by `/awl-dev:commit`
+- [`../../../commands/commit.md`](../../../commands/commit.md) — commit command workflow
+- [`../../../commands/create_pr.md`](../../../commands/create_pr.md) — create-pr command
+- [`../../../commands/describe_pr.md`](../../../commands/describe_pr.md) — describe-pr command
+- [`../../../commands/babysit_pr.md`](../../../commands/babysit_pr.md) — babysit-pr command
+- [`../../../commands/merge_pr.md`](../../../commands/merge_pr.md) — merge-pr command

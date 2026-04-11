@@ -178,7 +178,7 @@ Validates frontmatter across all workflows and auto-fixes issues.
   - **Extract Tool References** - Inventories all tools used
 - Comprehensive validation report
 - Auto-fix capability for common issues
-- Generates FRONTMATTER_STANDARD.md reference
+- Points at the `awl-frontmatter` skill as the canonical reference
 - Non-destructive (shows plan before fixing)
 
 **Usage**:
@@ -297,8 +297,8 @@ Validates frontmatter across all workflows and auto-fixes issues.
               │   • Apply fixes
               │   • Report changes
               │
-              └─→ Optionally generate reference doc
-                  • docs/FRONTMATTER_STANDARD.md
+              └─→ Points at canonical reference
+                  • plugins/meta/skills/awl-frontmatter/
 ```
 
 ## Parallel Sub-Agent Architecture
@@ -381,7 +381,8 @@ This enables researching external repositories without cloning them locally.
 
 ## Frontmatter Standards
 
-All workflows must follow the workspace frontmatter standard (see `docs/FRONTMATTER_STANDARD.md`).
+All workflows must follow the workspace frontmatter standard, bundled in the
+[`awl-frontmatter`](../plugins/meta/skills/awl-frontmatter/) skill.
 
 ### Agent Frontmatter
 
@@ -554,7 +555,7 @@ If you create excellent workflows, consider:
 
 ## See Also
 
-- [Frontmatter Standard](FRONTMATTER_STANDARD.md) - Complete standard reference
+- [`awl-frontmatter` skill](../plugins/meta/skills/awl-frontmatter/) - Complete frontmatter standard reference
 - [README](../README.md) - Workspace overview
 
 ## Version History

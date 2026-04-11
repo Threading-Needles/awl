@@ -196,7 +196,9 @@ Awl requires Linear because:
 Unlike workflow documents, PM reports (cycles, milestones, daily) are saved to git in `reports/`
 directory since they're not tied to single tickets.
 
-See `plugins/dev/LINEAR_DOCUMENTS.md` for comprehensive guide.
+See the `awl-linear-workflow` skill
+(`plugins/dev/skills/awl-linear-workflow/`) for the state machine, document conventions, and
+embedded questions format. Claude auto-loads this skill whenever a Linear ticket is in scope.
 
 ## Directory Structure
 
@@ -206,9 +208,9 @@ awl/
 │   ├── dev/                 # Core development workflow (awl-dev)
 │   │   ├── agents/          # 9 research agents (codebase, Linear, GitHub, external)
 │   │   ├── commands/        # 17 workflow commands (research/plan/implement/PR/etc.)
+│   │   ├── skills/          # awl-linear-workflow, awl-pr-lifecycle, awl-conventional-commits
 │   │   ├── scripts/         # check-prerequisites.sh, frontmatter-utils.sh
-│   │   ├── docs/            # WORKFLOW_STATES.md, CLAUDE_MD_SNIPPET.md
-│   │   ├── LINEAR_DOCUMENTS.md
+│   │   ├── CLAUDE_MD_SNIPPET.md  # snippet users paste into their own CLAUDE.md
 │   │   ├── README.md
 │   │   └── .claude-plugin/  # plugin.json, .mcp.json (Linear MCP)
 │   ├── pm/                  # Project management (awl-pm)
@@ -219,6 +221,7 @@ awl/
 │   │   └── .claude-plugin/
 │   ├── meta/                # Workflow discovery and creation (awl-meta)
 │   │   ├── commands/        # discover/import/create/validate-frontmatter
+│   │   ├── skills/          # awl-frontmatter
 │   │   ├── scripts/
 │   │   ├── README.md
 │   │   └── .claude-plugin/

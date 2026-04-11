@@ -3,175 +3,75 @@ description: Create conventional commits for session changes
 category: version-control-git
 tools: Bash, Read
 model: inherit
-version: 2.0.0
+version: 3.0.0
 ---
 
 # Commit Changes
 
-You are tasked with creating git commits using conventional commit format for the changes made
-during this session.
+Create a git commit for the changes made during this session, following Awl's conventional commit
+format.
 
-## Process:
+**Format and type rules live in the `awl-conventional-commits` skill** — read that skill (or its
+`references/conventional-commits.md`) for the full type taxonomy, scope detection rules, header
+limits, and the no-Claude-attribution policy. This command is the workflow orchestration; the
+skill is the spec.
 
-1. **Analyze what changed:**
-   - Review the conversation history and understand what was accomplished
-   - Run `git status` to see current changes
-   - Run `git diff --cached` to see staged changes (if any)
-   - Run `git diff` to see unstaged changes
-   - Get changed file list: `git diff --name-only` and `git diff --cached --name-only`
+## Process
 
-2. **Auto-detect conventional commit components:**
+### 1. Understand what changed
 
-   **Type detection (suggest to user):**
-   - If only `*.md` files in `docs/`: suggest `docs`
-   - If only test files (`*test*`, `*spec*`): suggest `test`
-   - If `package.json`, `*.lock` files: suggest `build`
-   - If `.github/workflows/`: suggest `ci`
-   - If mix of changes: suggest `feat` or `fix` based on context
-   - Otherwise: ask user to choose from: `feat`, `fix`, `refactor`, `chore`, `docs`, `style`,
-     `perf`, `test`, `build`, `ci`
+- Read the conversation history — what did this session accomplish?
+- Run `git status` to see current working-tree state
+- Run `git diff --cached` for staged changes (if any)
+- Run `git diff` for unstaged changes
+- Collect the changed-file list with `git diff --name-only` and `git diff --cached --name-only`
 
-   **Scope detection (suggest to user):**
-   - Parse changed file paths
-   - Map to scopes:
-     - `plugins/dev/agents/*.md` → `agents`
-     - `plugins/*/commands/*.md` → `commands`
-     - `plugins/*/scripts/*` → `scripts`
-     - `docs/*.md` → `docs`
-     - `.claude/` → `claude`
-     - Multiple dirs or root files → empty scope (cross-cutting)
+### 2. Propose type, scope, and message
 
-   **Extract ticket reference:**
-   - Get current branch: `git branch --show-current`
-   - Extract ticket pattern: `{PREFIX}-{NUMBER}` (e.g., PROJ-13, ENG-123)
-   - Will be added to commit footer
+Apply the rules from the `awl-conventional-commits` skill:
 
-3. **Generate conventional commit message:**
+- Infer `type` from the nature of the changes (docs-only → `docs`, test-only → `test`, new
+  feature → `feat`, bug fix → `fix`, etc.). When unclear, ask the user.
+- Infer `scope` from the changed-file paths using the scope map in the skill. If changes span
+  unrelated areas, omit the scope entirely.
+- Extract the ticket ID from the branch name (`git branch --show-current`) using the regex
+  `[A-Z]+-[0-9]+`. If found, it becomes the `Refs: TICKET-N` footer. If not, omit the footer —
+  do **not** fabricate a ticket ID.
+- Draft the summary in imperative mood, no trailing period, no capital leading letter, header
+  ≤ 100 characters total.
+- Draft a body that explains **why**, not what (the diff already shows what). Optional for
+  trivial changes.
 
-   **Format:**
+### 3. Present the plan
 
-   ```
-   <type>(<scope>): <short summary>
+Show the user:
 
-   <body - optional but recommended>
+- Detected type + scope + confidence ("I think this is `feat(agents)` — changes are all in
+  `plugins/dev/agents/`.")
+- The generated commit message (header + body + footer)
+- The files that will be staged (by name — never `-A` or `.`)
 
-   <footer - ticket reference>
-   ```
+Ask: "Proceed with this commit? [Y/n/e(dit)]"
 
-   **Rules:**
-   - Header max 100 characters
-   - Type: lowercase
-   - Subject: imperative mood, no period, no capital first letter
-   - Body: explain WHY, not what (optional for simple changes)
-   - Footer: `Refs: TICKET-123` if ticket in branch name
+- **Y** — stage the listed files and create the commit
+- **n** — abort, don't touch anything
+- **e** — let the user edit the message, then re-present
 
-   **Example:**
+### 4. Execute
 
-   ```
-   feat(commands): add conventional commit support to /awl-dev:commit
+- Stage files with `git add <specific-files>`. **Never** use `git add -A` or `git add .` — they
+  pick up unrelated changes (e.g. `.env`, scratch files).
+- Create the commit with the approved message (use a HEREDOC for multi-line messages).
+- Show the result: `git log --oneline -n 1` and `git show --stat HEAD`.
 
-   Updates the commit command to automatically detect commit type
-   and scope from changed files, following conventional commits spec.
-   Extracts ticket references from branch names for traceability.
+## Important
 
-   Refs: PROJ-13
-   ```
-
-4. **Present plan to user:**
-   - Show detected type and scope with confidence
-   - Show generated commit message
-   - Explain: "Detected changes suggest: `<type>(<scope>): <summary>`"
-   - List files to be committed
-   - Ask: "Proceed with this commit? [Y/n/e(dit)]"
-     - Y: execute as-is
-     - n: abort
-     - e: allow user to edit message
-
-5. **Execute commit:**
-   - Stage files: `git add <specific-files>` (NEVER use `-A` or `.`)
-   - Create commit with message
-   - Show result: `git log --oneline -n 1`
-   - Show summary: `git show --stat HEAD`
-
-## Type Reference
-
-**Types that appear in CHANGELOG:**
-
-- `feat` - New feature
-- `fix` - Bug fix
-- `perf` - Performance improvement
-- `revert` - Revert previous commit
-
-**Internal types:**
-
-- `docs` - Documentation only
-- `style` - Formatting, no code change
-- `refactor` - Code restructuring, no behavior change
-- `test` - Adding/updating tests
-- `build` - Build system or dependencies
-- `ci` - CI/CD configuration
-- `chore` - Maintenance tasks
-
-## Examples
-
-**Feature:**
-
-```
-feat(agents): add codebase-pattern-finder agent
-
-Implements new agent for finding similar code patterns across
-the codebase with concrete examples and file references.
-
-Refs: PROJ-45
-```
-
-**Fix:**
-
-```
-fix(commands): handle missing PR description gracefully
-
-Previously crashed when PR document was not found in Linear.
-Now provides clear error with instructions to create one.
-
-Refs: PROJ-78
-```
-
-**Documentation:**
-
-```
-docs(scripts): add README for plugin scripts
-
-Documents all bundled scripts with usage examples
-and explains when to use each installation method.
-
-Refs: PROJ-12
-```
-
-**Chore (no ticket):**
-
-```
-chore(config): update conventional commit scopes
-
-Adds new scopes for agents and commands directories.
-```
-
-## Important:
-
-- **NEVER add co-author information or Claude attribution**
-- Commits should be authored solely by the user
-- Do not include any "Generated with Claude" messages
-- Do not add "Co-Authored-By" lines
-- Write commit messages as if the user wrote them
-- Use conventional format for consistency and changelog generation
-- Keep header under 100 characters
-- Use imperative mood: "add feature" not "added feature"
-
-## Remember:
-
-- You have the full context of what was done in this session
-- Group related changes together logically
-- Keep commits focused and atomic when possible
-- The user trusts your judgment - they asked you to commit
-- Suggest type and scope based on file analysis
-- Extract ticket from branch name automatically
-- Allow user to override suggestions
+- The `awl-conventional-commits` skill is authoritative on format — if this command seems to
+  disagree with the skill, the skill wins.
+- **Do not** add `Co-authored-by: Claude` or any attribution footer unless the user explicitly
+  asks, or unless this is a commit to the Awl workspace itself (which has its own dogfooding
+  policy documented in the root `CLAUDE.md`).
+- Keep commits focused and atomic when possible. If the session produced logically separate
+  changes, consider proposing multiple commits rather than one mega-commit.
+- The user trusts your judgment — they asked you to commit. But always show the plan before
+  executing so they can veto or edit.
