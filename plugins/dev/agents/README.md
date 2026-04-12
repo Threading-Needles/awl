@@ -272,8 +272,8 @@ Instructions for the agent...
 
 - `version`, `category`, `color`
 
-See [`docs/FRONTMATTER_STANDARD.md`](../../../docs/FRONTMATTER_STANDARD.md) for the full rules
-and model-tier guidance.
+See the [`awl-frontmatter` skill](../../meta/skills/awl-frontmatter/) for the full rules and
+model-tier guidance (Claude auto-loads it when editing agent or command files).
 
 ### Naming Convention
 
@@ -503,8 +503,10 @@ Agents specify required tools in frontmatter:
 
 ## See Also
 
-- `../commands/README.md` - Documentation for commands in this plugin
-- `../../docs/AGENTIC_WORKFLOW_GUIDE.md` - Agent patterns and best practices
-- `../../docs/FRONTMATTER_STANDARD.md` - Frontmatter validation rules
-- `../../README.md` - Workspace overview
-- `../../scripts/README.md` - Setup scripts documentation
+- [`../commands/README.md`](../commands/README.md) — documentation for commands in this plugin
+- [`../../../docs/AGENTIC_WORKFLOW_GUIDE.md`](../../../docs/AGENTIC_WORKFLOW_GUIDE.md) — agent
+  patterns and best practices
+- [`awl-frontmatter` skill](../../meta/skills/awl-frontmatter/) — frontmatter validation rules
+- [`awl-linear-workflow` skill](../skills/awl-linear-workflow/) — Linear state machine and
+  document conventions the research agents apply
+- [`../../../README.md`](../../../README.md) — workspace overview

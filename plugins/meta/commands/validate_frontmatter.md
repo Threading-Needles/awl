@@ -10,13 +10,15 @@ workspace_only: true
 # Validate Frontmatter
 
 You validate YAML frontmatter across all agents and commands in this repository against the
-canonical standard in `docs/FRONTMATTER_STANDARD.md`.
+canonical standard bundled in the `awl-frontmatter` skill.
 
 ## The canonical standard
 
-Before validating, read `docs/FRONTMATTER_STANDARD.md` — it is the single source of truth for
-required fields, recommended fields, model tiers, and naming rules. This command enforces that
-standard; it does not define its own.
+Before validating, read the `awl-frontmatter` skill
+(`plugins/meta/skills/awl-frontmatter/SKILL.md` plus
+`plugins/meta/skills/awl-frontmatter/references/frontmatter-standard.md`) — it is the single
+source of truth for required fields, recommended fields, model tiers, and naming rules. This
+command enforces the skill's standard; it does not define its own.
 
 ## Initial response
 
@@ -37,8 +39,9 @@ Which mode?
 
 ### Step 1 — Load the standard
 
-Read `docs/FRONTMATTER_STANDARD.md` so your validation rules match the current standard exactly.
-Do not hardcode rules from memory — they drift over time.
+Read the `awl-frontmatter` skill's full spec at
+`plugins/meta/skills/awl-frontmatter/references/frontmatter-standard.md` so your validation rules
+match the current standard exactly. Do not hardcode rules from memory — they drift over time.
 
 ### Step 2 — Discover files
 
@@ -143,8 +146,9 @@ per-issue report without the distribution summary.
 
 ## Important notes
 
-- **The canonical standard lives in `docs/FRONTMATTER_STANDARD.md`** — update that file when the
-  rules change, not this command.
+- **The canonical standard lives in the `awl-frontmatter` skill**
+  (`plugins/meta/skills/awl-frontmatter/references/frontmatter-standard.md`) — update that file
+  when the rules change, not this command.
 - **Use relative paths** — never hardcode absolute paths like `/Users/someone/...`.
 - **Be lenient with optional fields** — `category`, `version`, `color`, `argument-hint` are all
   optional metadata. Missing them is not an error.
@@ -154,4 +158,4 @@ per-issue report without the distribution summary.
 
 - `/awl-meta:create-workflow` — creates new agents/commands that should pass this validation
 - `/awl-meta:import-workflow` — imports external workflows and should run this after adaptation
-- `docs/FRONTMATTER_STANDARD.md` — the rules this command enforces
+- The `awl-frontmatter` skill (`plugins/meta/skills/awl-frontmatter/`) — the rules this command enforces

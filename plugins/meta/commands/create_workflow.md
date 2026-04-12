@@ -78,7 +78,9 @@ Return: Workflow examples with their implementations
 **Task 3 - Frontmatter Standards**:
 
 ```
-Read docs/FRONTMATTER_STANDARD.md directly — it is the canonical source for required fields,
+Read the `awl-frontmatter` skill's full spec at
+`plugins/meta/skills/awl-frontmatter/references/frontmatter-standard.md` directly — it is the
+canonical source for required fields,
 optional fields, model tiers, and validation rules. Do not re-derive the standard from existing
 files; the standard document is authoritative.
 ```

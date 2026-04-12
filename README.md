@@ -207,7 +207,7 @@ before running out of context, creating structured handoff documents that add to
   planning, handoff, worktree, implementation, verify, and PR workflows
 - [Context Engineering](docs/CONTEXT_ENGINEERING.md) - Token efficiency strategies and context
   management patterns
-- [PR Lifecycle](docs/PR_LIFECYCLE.md) - PR creation, review, and merge workflow
+- [PR Lifecycle skill](plugins/dev/skills/awl-pr-lifecycle/) - PR creation, review, and merge workflow (auto-loaded on feature branches)
 
 ## Core Philosophy
 

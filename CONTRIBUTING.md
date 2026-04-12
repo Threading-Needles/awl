@@ -44,9 +44,11 @@ That's it — no aggregator, no runtime pins, no `.trunk` cache.
 
 ## Command and Agent Development
 
-See [`docs/FRONTMATTER_STANDARD.md`](docs/FRONTMATTER_STANDARD.md) for the full frontmatter rules,
-including model-tier guidance (`inherit`/`haiku`/`sonnet`/`opus`). The steps below are a quick
-starting point.
+The canonical frontmatter spec lives in the
+[`awl-frontmatter` skill](plugins/meta/skills/awl-frontmatter/) — Claude auto-loads it whenever
+you edit an agent or command file, and it covers required fields, recommended fields, and the
+four-tier model assignment rules (`inherit`/`haiku`/`sonnet`/`opus`). The steps below are a
+quick starting point.
 
 ### Adding a New Command
 
@@ -86,7 +88,7 @@ starting point.
    name: agent-name            # must match filename (kebab-case)
    description: What this agent does and when Claude should invoke it
    tools: Grep, Glob, Read     # restrict where it makes sense
-   model: inherit              # or haiku/sonnet — see FRONTMATTER_STANDARD.md
+   model: inherit              # or haiku/sonnet — see awl-frontmatter skill
    ---
    ```
 

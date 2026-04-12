@@ -100,7 +100,7 @@ You are a specialist at [specific task]. Your job is to [clear responsibility].
 - `haiku` - Force Haiku 4.5 (fast, cheap — for pure lookup/data agents)
 - `sonnet` - Force Sonnet 4.6 (balanced — for structured analysis agents)
 - `opus` - Force Opus 4.6 (deep reasoning — rarely hardcoded; prefer `inherit`)
-- See `docs/FRONTMATTER_STANDARD.md` for the full model-tier rationale
+- See the `awl-frontmatter` skill (`plugins/meta/skills/awl-frontmatter/`) for the full model-tier rationale
 
 ---
 
