@@ -13,10 +13,5 @@ Thumbs.db
 *.tmp
 *.bak
 
-# Personal developer configuration (not shared with team)
-.claude/.personal/*
-!.claude/.personal/README.md
-!.claude/.personal/.gitkeep
-
 # Local overrides
 .claude/*.local.json

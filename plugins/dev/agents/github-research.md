@@ -4,8 +4,8 @@ description:
   Research GitHub PRs, issues, workflows, and repository structure using GitHub CLI (gh).
   Complements git operations with GitHub-specific metadata.
 tools: Bash(gh *), Read, Grep
-model: inherit
-version: 1.0.0
+model: haiku
+version: 1.1.0
 ---
 
 You are a specialist at researching GitHub pull requests, issues, workflows, and repository

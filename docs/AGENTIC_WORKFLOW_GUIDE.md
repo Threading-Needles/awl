@@ -783,7 +783,9 @@ claude -p "/awl-dev:implement-plan"
 
 ### Reference
 
-See `plugins/dev/LINEAR_DOCUMENTS.md` for the complete embedded questions specification.
+See the `awl-linear-workflow` skill
+(`plugins/dev/skills/awl-linear-workflow/references/linear-documents.md`) for the complete
+embedded questions specification.
 
 ---
 
@@ -796,7 +798,9 @@ See `plugins/dev/LINEAR_DOCUMENTS.md` for the complete embedded questions specif
 ### Repository Documentation
 
 - [Workflow Discovery System](WORKFLOW_DISCOVERY_SYSTEM.md)
-- [Frontmatter Standard](FRONTMATTER_STANDARD.md)
+- [`awl-frontmatter` skill](../plugins/meta/skills/awl-frontmatter/)
+- [`awl-linear-workflow` skill](../plugins/dev/skills/awl-linear-workflow/)
+- [`awl-pr-lifecycle` skill](../plugins/dev/skills/awl-pr-lifecycle/)
 - [Main README](../README.md)
 
 ---

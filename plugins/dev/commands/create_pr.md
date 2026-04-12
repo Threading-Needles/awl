@@ -110,7 +110,7 @@ branch=$(git branch --show-current)
 
 # Extract from branch pattern: PREFIX-NUMBER
 if [[ "$branch" =~ ([A-Z]+-[0-9]+) ]]; then
-    ticket="${BASH_REMATCH[1]}"  # e.g., RCW-13
+    ticket="${BASH_REMATCH[1]}"  # e.g., PROJ-13
 fi
 ```
 
@@ -118,7 +118,7 @@ fi
 
 ```bash
 # Branch format examples:
-# - RCW-13-implement-pr-lifecycle → "RCW-13: implement pr lifecycle"
+# - PROJ-13-implement-pr-lifecycle → "PROJ-13: implement pr lifecycle"
 # - feature-add-validation → "add validation"
 
 # Extract description from branch name
@@ -218,103 +218,6 @@ found, they'll be reported in the babysit summary.
 Description has been generated and verification checks have been run.
 CI has been monitored and test plan items verified.
 Review the PR on GitHub!
-```
-
-## Integration with Other Commands
-
-```
-/awl-dev:research-codebase PROJ-123 → research document
-                  ↓
-           /awl-dev:create-plan → implementation plan
-                  ↓
-          /awl-dev:implement-plan → code changes
-                  ↓
-           /awl-dev:validate-plan → verification
-                  ↓
-              /awl-dev:describe-pr → PR description
-                  ↓
-              /awl-dev:create-pr → creates PR on GitHub (this command)
-                  ↓
-            /awl-dev:babysit-pr → monitors CI, runs test plan
-                  ↓
-              /awl-dev:merge-pr → merges PR
-```
-
-**How it connects:**
-
-- **Previous**: Work is done via `/awl-dev:implement-plan`
-- **Next**: `/awl-dev:merge-pr` will merge the PR and update Linear
-- **Ticket**: Extracted from branch name (pattern `[A-Z]+-[0-9]+`)
-
-## Error Handling
-
-**On main/master branch:**
-
-```
-❌ Cannot create PR from main branch.
-
-Create a feature branch first:
-  git checkout -b TICKET-123-feature-name
-```
-
-**Rebase conflicts:**
-
-```
-❌ Rebase conflicts detected
-
-Conflicting files:
-  - src/file1.ts
-  - src/file2.ts
-
-Resolve conflicts and run:
-  git add <resolved-files>
-  git rebase --continue
-  /awl-dev:create_pr
-```
-
-**GitHub CLI not configured:**
-
-```
-❌ GitHub CLI not configured
-
-Run: gh auth login
-Then: gh repo set-default
-```
-
-**Linear ticket not found:**
-
-```
-⚠️  Could not find Linear ticket for {ticket}
-
-PR created successfully, but ticket not updated.
-Update manually or check ticket ID.
-```
-
-## Examples
-
-**Branch: `RCW-13-implement-pr-lifecycle`**
-
-```
-Extracting ticket: RCW-13
-Generated title: "RCW-13: Implement pr lifecycle"
-Creating PR...
-✅ PR #2 created
-Calling /awl-dev:describe_pr to generate description...
-Saving PR description to Linear...
-Updating Linear ticket RCW-13 → In Review
-✅ Complete!
-```
-
-**Branch: `feature-add-validation` (no ticket)**
-
-```
-No ticket found in branch name
-Generated title: "Feature add validation"
-Creating PR...
-✅ PR #3 created
-Calling /awl-dev:describe_pr...
-⚠️  No Linear ticket to update
-✅ Complete!
 ```
 
 ## Remember:

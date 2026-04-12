@@ -1,666 +1,161 @@
 ---
-description: Validate and fix frontmatter consistency across all workflows
+description: Validate and fix frontmatter consistency across all Awl agents and commands
 category: workflow-discovery
 tools: Read, Edit, Glob, Grep
 model: inherit
-version: 1.0.0
+version: 2.0.0
 workspace_only: true
 ---
 
 # Validate Frontmatter
 
-You are tasked with validating frontmatter consistency across all agents and commands in the
-workspace, and fixing any issues found.
+You validate YAML frontmatter across all agents and commands in this repository against the
+canonical standard bundled in the `awl-frontmatter` skill.
 
-## Purpose
+## The canonical standard
 
-This command ensures all workflows follow the workspace frontmatter standard, making them easier to
-maintain, discover, and integrate.
+Before validating, read the `awl-frontmatter` skill
+(`plugins/meta/skills/awl-frontmatter/SKILL.md` plus
+`plugins/meta/skills/awl-frontmatter/references/frontmatter-standard.md`) — it is the single
+source of truth for required fields, recommended fields, model tiers, and naming rules. This
+command enforces the skill's standard; it does not define its own.
 
-## Initial Response
+## Initial response
 
 When invoked:
 
 ```
-I'll validate frontmatter across all workflows.
+I'll validate frontmatter across all Awl plugins (dev, pm, meta, debugging, analytics).
 
-Checking:
-- agents/ directory
-- commands/ directory
+Mode:
+1. Validate all (report only)
+2. Validate and auto-fix what's safe
+3. Validate a specific file (pass path as argument)
 
-What would you like to do?
-1. Validate all workflows (report issues only)
-2. Validate and auto-fix issues
-3. Validate specific workflow
-4. Generate frontmatter standard document
+Which mode?
 ```
 
 ## Process
 
-### Step 1: Determine Scope
+### Step 1 — Load the standard
 
-Get user selection:
+Read the `awl-frontmatter` skill's full spec at
+`plugins/meta/skills/awl-frontmatter/references/frontmatter-standard.md` so your validation rules
+match the current standard exactly. Do not hardcode rules from memory — they drift over time.
 
-- **All workflows**: Check everything
-- **Auto-fix**: Fix issues automatically
-- **Specific workflow**: Validate one file
-- **Generate standard**: Create reference document
+### Step 2 — Discover files
 
-### Step 2: Parallel Validation
-
-**IMPORTANT**: Spawn parallel validation tasks for efficiency.
-
-Use TodoWrite to track parallel validation tasks.
-
-**For "Validate All" mode**:
-
-**Task 1 - Validate Agents**:
+Glob for every agent and command file across all plugins:
 
 ```
-Use codebase-analyzer agent:
-"Validate frontmatter in all files matching agents/*.md. For each file, check:
-1. Required fields present (name, description, tools, model, version)
-2. Name field matches filename (kebab-case)
-3. Tools list contains valid Claude Code tools
-4. Category is one of: research, analysis, search, execution, validation, general
-5. Version follows semver (e.g., 1.0.0)
-6. Description is clear and informative
-Return: List of all validation issues found with file:line references"
-
-Tools: Glob, Grep, Read
-Path: /Users/ryan/code-repos/ryan-claude-workspace/agents/
-Return: Validation report for all agents
+plugins/*/agents/*.md
+plugins/*/commands/*.md
 ```
 
-**Task 2 - Validate Commands**:
+Exclude README files from validation (they are documentation, not agents/commands).
 
-```
-Use codebase-analyzer agent:
-"Validate frontmatter in all files matching commands/*.md. For each file, check:
-1. Required fields present (description, category, tools, model, version)
-2. No 'name' field (commands use filename)
-3. Tools list contains valid Claude Code tools
-4. Category is one of: workflow, planning, implementation, validation, linear, git, workflow-discovery, general
-5. Version follows semver (e.g., 1.0.0)
-6. Description is clear and concise
-7. argument-hint present if command takes arguments
-Return: List of all validation issues found with file:line references"
+### Step 3 — Parse and validate each file
 
-Tools: Glob, Grep, Read
-Path: /Users/ryan/code-repos/ryan-claude-workspace/commands/
-Return: Validation report for all commands
-```
+For each file, extract the frontmatter block (between the first two `---` lines) and check:
 
-**Task 3 - Extract Tool References**:
+**Agents (`plugins/*/agents/*.md`):**
 
-```
-Use codebase-pattern-finder agent:
-"Extract all unique tool names referenced in frontmatter across agents/*.md and commands/*.md. Return a sorted list of all tools used."
+- `name` field is present
+- `name` value matches the filename (minus `.md`) in kebab-case
+- `description` field is present and non-empty
+- If `model` is set, it is one of: `inherit`, `haiku`, `sonnet`, `opus`
+- If `version` is set, it follows semver `X.Y.Z`
+- Tools in the `tools:` list are plausible (no obviously invented names like `SearchFiles`,
+  `FindFile`, `GrepFiles`)
+- YAML is well-formed
 
-Tools: Glob, Grep
-Path: /Users/ryan/code-repos/ryan-claude-workspace/
-Return: Complete list of tools referenced
-```
+**Commands (`plugins/*/commands/*.md`):**
 
-**WAIT for all 3 tasks to complete.**
+- `description` field is present and non-empty
+- Commands must NOT have a `name` field (filename is the identifier)
+- If `model` is set, it is one of: `inherit`, `haiku`, `sonnet`, `opus`
+- If `version` is set, it follows semver `X.Y.Z`
+- Tools in the `tools:` list are plausible
+- YAML is well-formed
 
-### Step 3: Aggregate Validation Results
+**Category field**: Free-form per the current standard — don't flag unusual categories, just
+record them for the distribution report.
 
-Combine results from parallel tasks:
+### Step 4 — Present the report
 
-- Agent issues (Task 1)
-- Command issues (Task 2)
-- Tool inventory (Task 3)
-
-Mark all tasks complete in TodoWrite.
-
-Analyze:
-
-1. **Critical issues**: Missing required fields, invalid formats
-2. **Warnings**: Unusual patterns, potential improvements
-3. **Tool usage**: Are all tools valid?
-4. **Category distribution**: Are categories being used correctly?
-
-### Step 4: Present Validation Report
-
-Show comprehensive report:
+Group issues by severity:
 
 ```markdown
-# Frontmatter Validation Report
+# Frontmatter validation report
 
-**Validated**: {date} **Scope**: {agents-count} agents, {commands-count} commands **Status**:
-{PASS/FAIL}
+**Scanned**: {agents-count} agents, {commands-count} commands across {plugin-count} plugins
 
-## Summary
+## Critical issues (must fix)
 
-- ✅ **Passed**: {pass-count} workflows
-- ⚠️ **Warnings**: {warning-count} workflows
-- ❌ **Failed**: {fail-count} workflows
+### plugins/{plugin}/agents/{name}.md
+- ❌ `name` field ("foo") does not match filename ("bar")
+- ❌ Missing required `description`
 
-## Critical Issues
-
-### {workflow-name}.md
-
-- ❌ Missing required field: `version`
-- ❌ Invalid category: "misc" (should be one of: general, research, analysis...)
-
-### {workflow-name}.md
-
-- ❌ Name field "{name}" doesn't match filename "{filename}"
-- ❌ Invalid tool reference: "SearchFiles" (not a valid Claude Code tool)
+### plugins/{plugin}/commands/{name}.md
+- ❌ Has a `name:` field — commands identify by filename; remove it
+- ❌ YAML is malformed (line 3: unclosed list)
 
 ## Warnings
 
-### {workflow-name}.md
+### plugins/{plugin}/agents/{name}.md
+- ⚠️ Unknown tool `FooBar` — did you mean `Bash`?
+- ⚠️ `version: v1.0` is not semver; should be `1.0.0`
 
-- ⚠️ Description is very short (< 20 chars)
-- ⚠️ No category specified (defaulting to "general")
+## Model distribution
 
-### {workflow-name}.md
+- inherit: {count}
+- haiku: {count}
+- sonnet: {count}
+- opus: {count}
 
-- ⚠️ Using old version format: "v1.0" (should be "1.0.0")
-
-## Tool Inventory
-
-**Total unique tools**: {tool-count} **Valid tools**: {valid-count} **Invalid references**:
-{invalid-count}
-
-### Used Tools:
-
-- Read ({usage-count} workflows)
-- Write ({usage-count} workflows)
-- Edit ({usage-count} workflows)
-- Grep ({usage-count} workflows)
-- Glob ({usage-count} workflows) [... more tools ...]
-
-### Invalid References:
-
-- SearchFiles (used in {workflow-name}.md) → Should be: Grep or Glob
-- FindFile (used in {workflow-name}.md) → Should be: Glob
-
-## Category Distribution
-
-### Agents:
-
-- research: {count}
-- analysis: {count}
-- search: {count}
-- execution: {count}
-- validation: {count}
-- general: {count}
-
-### Commands:
+## Category distribution
 
 - workflow: {count}
-- planning: {count}
-- implementation: {count}
-- validation: {count}
-- linear: {count}
-- git: {count}
-- workflow-discovery: {count}
-- general: {count}
-
-## Recommendations
-
-1. **Fix critical issues first**: {count} workflows need immediate attention
-2. **Standardize versions**: {count} workflows use non-semver format
-3. **Update tool references**: {count} invalid tool names found
-4. **Add descriptions**: {count} workflows have minimal descriptions
-
----
-
-Next steps:
-
-- Run with `--fix` to auto-correct issues
-- Review and approve fixes before applying
-- Re-validate after fixes
+- pm: {count}
+- version-control-git: {count}
+- ...
 ```
 
-### Step 5: Auto-Fix Mode (if requested)
+### Step 5 — Auto-fix mode (if requested)
 
-If user chose auto-fix:
+If the user chose mode 2, offer to auto-fix these safe cases:
 
-1. **Create fix plan**:
-   - List all fixable issues
-   - Show what will be changed
-   - Ask for confirmation
+- `version: v1.0` → `version: 1.0.0`
+- `version: 1.0` → `version: 1.0.0`
+- Command has `name: ...` → remove the line
+- Missing `model: inherit` on a command → add it (only if absent)
 
-2. **Present fix plan**:
+Do NOT auto-fix things that need human judgment:
 
-   ```markdown
-   # Auto-Fix Plan
-
-   I can automatically fix {fixable-count} issues:
-
-   ## {workflow-name}.md
-
-   - Add missing `version: 1.0.0`
-   - Fix category: "misc" → "general"
-   - Standardize tool name: "SearchFiles" → "Grep"
-
-   ## {workflow-name}.md
-
-   - Fix version format: "v1.0" → "1.0.0"
-   - Add missing `model: inherit`
-
-   **Cannot auto-fix** ({manual-count} issues):
-
-   - {workflow-name}.md: Description too short (needs human review)
-   - {workflow-name}.md: Unclear category (analysis vs research?)
-
-   Proceed with auto-fix? (Y/n)
-   ```
-
-3. **Apply fixes** (after confirmation):
-   - Use Edit tool to fix each issue
-   - Track all changes made
-   - Preserve original formatting and comments
-
-4. **Report results**:
-
-   ```markdown
-   ✅ Auto-fix complete!
-
-   **Fixed**: {fixed-count} issues across {file-count} files
-
-   ### Changes Made:
-
-   #### agents/codebase-locator.md
-
-   - Added `version: 1.0.0`
-   - Standardized category: "search"
-
-   #### commands/create_plan.md
-
-   - Fixed version: "v1.0" → "1.0.0"
-   - Updated tool reference: "SearchFiles" → "Grep"
-
-   [... more changes ...]
-
-   **Still needs manual review**:
-
-   - {workflow-name}.md: {issue description}
-
-   Re-run validation to verify: `/awl-meta:validate-frontmatter`
-   ```
-
-### Step 6: Generate Standard Document (if requested)
-
-If user chose to generate standard:
-
-Create `docs/FRONTMATTER_STANDARD.md`:
-
-````markdown
-# Frontmatter Standard
-
-This document defines the frontmatter standard for all agents and commands in this workspace.
-
-## Agent Frontmatter
-
-### Required Fields
-
-```yaml
----
-name: { agent-name } # Agent identifier (kebab-case, must match filename)
-description: | # Multi-line description
-  {What this agent does}
-
-  Use this agent when:
-  - {Use case 1}
-  - {Use case 2}
-tools: { tool-list } # Array of Claude Code tools
-model: inherit # Always "inherit"
-category: { category } # One of: research, analysis, search, execution, validation, general
-version: 1.0.0 # Semantic version
----
-```
-````
-
-### Optional Fields
-
-```yaml
-source: { repo-url } # If imported/adapted
-adapted: { date } # Date of adaptation
-original-author: { name } # Original creator
-```
-
-### Valid Categories
-
-- **research**: Finding and gathering information
-- **analysis**: Deep code/data analysis
-- **search**: Locating files/patterns/content
-- **execution**: Running commands/operations
-- **validation**: Checking and verifying
-- **general**: Multi-purpose or uncategorized
-
-### Example
-
-```yaml
----
-name: codebase-analyzer
-description: |
-  Analyzes codebases to understand implementation details and patterns.
-
-  Use this agent when:
-  - You need to understand how a feature is implemented
-  - You want to trace data flow through the system
-  - You need to find patterns and conventions
-tools: Read, Grep, Glob
-model: inherit
-category: analysis
-version: 1.0.0
----
-```
-
-## Command Frontmatter
-
-### Required Fields
-
-```yaml
----
-description: { one-line-summary } # Brief description (no name field!)
-category: { category } # Command category
-tools: { tool-list } # Array of Claude Code tools
-model: inherit # Always "inherit"
-version: 1.0.0 # Semantic version
----
-```
-
-### Optional Fields
-
-```yaml
-argument-hint: { hint } # Hint for command arguments
-source: { repo-url } # If imported/adapted
-adapted: { date } # Date of adaptation
-original-author: { name } # Original creator
-```
-
-### Valid Categories
-
-- **workflow**: Development workflows
-- **planning**: Planning and design
-- **implementation**: Code changes
-- **validation**: Testing and verification
-- **linear**: Linear integration
-- **git**: Version control
-- **workflow-discovery**: Meta-workflows
-- **general**: Miscellaneous
-
-### Example
-
-```yaml
----
-description: Create detailed implementation plans through interactive process
-category: planning
-argument-hint: [ticket-file | ticket-reference]
-tools: Read, Write, Edit, Grep, Glob, Task, TodoWrite
-model: inherit
-version: 1.0.0
----
-```
-
-## Valid Tools
-
-Claude Code provides these tools:
-
-### File Operations
-
-- `Read` - Read file contents
-- `Write` - Write files
-- `Edit` - Edit existing files
-
-### Search
-
-- `Grep` - Search file contents (regex)
-- `Glob` - Find files by pattern
-
-### Execution
-
-- `Bash` - Run shell commands
-- `Task` - Spawn sub-agents
-
-### Management
-
-- `TodoWrite` - Manage todo lists
-
-### External
-
-- `WebFetch` - Fetch web content
-- `WebSearch` - Search the web
-- `mcp__deepwiki__ask_question` - Query external repos
-- `mcp__deepwiki__read_wiki_structure` - Get repo structure
-- `mcp__deepwiki__read_wiki_contents` - Read repo docs
-
-### Linear Integration
-
-- `linear_get_ticket` - Get Linear ticket details
-- `linear_create_ticket` - Create Linear tickets
-- `linear_update_ticket` - Update Linear tickets
-
-(Check official Claude Code docs for complete list)
-
-## Validation Rules
-
-### All Workflows
-
-1. **Required fields must be present**
-2. **Version must follow semver**: `X.Y.Z` (not `vX.Y`)
-3. **Model must be "inherit"** (unless specific reason)
-4. **Tools must be valid Claude Code tools**
-5. **Category must be from valid list**
-
-### Agents Specifically
-
-1. **Must have `name` field** matching filename
-2. **Name must be kebab-case**
-3. **Description should be multi-line with use cases**
-
-### Commands Specifically
-
-1. **Must NOT have `name` field** (use filename)
-2. **Description should be one-line summary**
-3. **Use `argument-hint` if command takes arguments**
-
-## Common Mistakes
-
-### ❌ Wrong: Command with name field
-
-```yaml
----
-name: create-plan # Commands don't have name field
-description: Create plans
----
-```
-
-### ✅ Correct: Command without name
-
-```yaml
----
-description: Create detailed implementation plans
-category: planning
----
-```
-
-### ❌ Wrong: Invalid tool reference
-
-```yaml
-tools: SearchFiles, FindFile # These aren't real tools
-```
-
-### ✅ Correct: Valid tools
-
-```yaml
-tools: Grep, Glob # Correct tool names
-```
-
-### ❌ Wrong: Version format
-
-```yaml
-version: v1.0 # Should be semver
-```
-
-### ✅ Correct: Semver version
-
-```yaml
-version: 1.0.0 # Proper semver
-```
-
-## Updating the Standard
-
-When adding new categories or patterns:
-
-1. Update this document
-2. Validate all existing workflows
-3. Fix any inconsistencies
-4. Document the change in git commit
-
-## See Also
-
-- `/awl-meta:validate-frontmatter` - Validate workflows against this standard
-- `/awl-meta:create-workflow` - Create new workflows with correct frontmatter
-- `/awl-meta:import-workflow` - Import external workflows and adapt frontmatter
-
-```
-
-Save and report:
-```
-
-✅ Frontmatter standard documented!
-
-**Saved to**: docs/FRONTMATTER_STANDARD.md
-
-This document now serves as the canonical reference for all frontmatter in this workspace.
-
-Next steps:
-
-1. Review the standard
-2. Share with team
-3. Use `/awl-meta:validate-frontmatter` to check compliance
-4. Reference when creating new workflows
-
-```
-
-## Advanced Usage
-
-### Validate Specific Workflow
-
-```
-
-/awl-meta:validate-frontmatter agents/codebase-analyzer.md
-
-```
-
-Validates just one file.
-
-### Auto-Fix Everything
-
-```
-
-/awl-meta:validate-frontmatter --fix
-
-```
-
-Automatically fixes all issues without prompting.
-
-### Generate Report Only
-
-```
-
-/awl-meta:validate-frontmatter --report-only > frontmatter-report.md
-
-```
-
-Saves report to file for review.
-
-### Validate by Category
-
-```
-
-/awl-meta:validate-frontmatter --category research
-
-```
-
-Only validates workflows in "research" category.
-
-## Validation Categories
-
-### Critical Issues (Must Fix)
-
-- Missing required fields
-- Invalid field values
-- Name/filename mismatch (agents)
-- Invalid tool references
+- Missing `description`
+- Mismatched agent `name`/filename (needs human decision which is right)
+- Unknown tool names (could be a new tool, could be a typo)
 - Malformed YAML
 
-### Warnings (Should Fix)
+Show the diff before applying and ask for confirmation.
 
-- Short descriptions (< 20 chars)
-- Missing optional but recommended fields
-- Unusual category choices
-- Non-standard patterns
+### Step 6 — Single-file mode
 
-### Info (Nice to Have)
+If the user passed a specific path as an argument, validate only that file and present a
+per-issue report without the distribution summary.
 
-- Could add more detail
-- Could specify argument-hint
-- Could add source attribution
-- Could improve formatting
+## Important notes
 
-## Auto-Fix Capabilities
+- **The canonical standard lives in the `awl-frontmatter` skill**
+  (`plugins/meta/skills/awl-frontmatter/references/frontmatter-standard.md`) — update that file
+  when the rules change, not this command.
+- **Use relative paths** — never hardcode absolute paths like `/Users/someone/...`.
+- **Be lenient with optional fields** — `category`, `version`, `color`, `argument-hint` are all
+  optional metadata. Missing them is not an error.
+- **Don't invent rules** — if the standard doesn't require something, don't flag it.
 
-### What Can Be Auto-Fixed
+## Integration
 
-✅ Missing version field → Add `version: 1.0.0`
-✅ Wrong version format → Convert to semver
-✅ Missing model field → Add `model: inherit`
-✅ Common tool typos → Fix to correct names
-✅ Category typos → Fix to valid category
-✅ YAML formatting → Standardize indentation
-
-### What Requires Manual Review
-
-❌ Ambiguous categories → Needs human judgment
-❌ Short descriptions → Needs content creation
-❌ Complex tool issues → May need workflow redesign
-❌ Missing description → Needs understanding of purpose
-
-## Important Notes
-
-- **Non-destructive**: Auto-fix preserves content, only fixes frontmatter
-- **Safe**: Always shows plan before applying fixes
-- **Trackable**: Reports all changes made
-- **Reversible**: Changes are standard edits, can be reverted via git
-- **Standard-based**: Uses workspace-specific conventions
-
-## Integration with Other Commands
-
-- **Discover**: `/awl-meta:discover-workflows` → uses this for validation
-- **Import**: `/awl-meta:import-workflow` → validates imported workflows
-- **Create**: `/awl-meta:create-workflow` → ensures new workflows are valid
-- **Validate**: `/awl-meta:validate-frontmatter` (this command) → checks everything
-
-## Error Handling
-
-### Malformed YAML
-- Report syntax errors
-- Show line number
-- Suggest fixes
-- Cannot auto-fix (manual correction needed)
-
-### Unknown Fields
-- Report unexpected fields
-- Ask: Keep / Remove?
-- Could be custom extensions
-
-### Missing Files
-- Skip files that don't exist
-- Report which files were skipped
-- Continue validation
-
-### Permission Errors
-- Report read/write issues
-- Skip files that can't be accessed
-- Provide error details
-
-This command ensures workspace consistency and quality!
-```
+- `/awl-meta:create-workflow` — creates new agents/commands that should pass this validation
+- `/awl-meta:import-workflow` — imports external workflows and should run this after adaptation
+- The `awl-frontmatter` skill (`plugins/meta/skills/awl-frontmatter/`) — the rules this command enforces

@@ -86,15 +86,15 @@ For the best experience, install these complementary plugins from the Claude Cod
 ### What You Get
 
 **awl-dev** (Always enabled):
-- 11 research agents
-- 18 workflow commands
+- 9 research agents (codebase, Linear, GitHub, external)
+- 17 workflow commands
 - Linear integration
 - Handoff system
 - ~3.5k context (lightweight)
 
 **awl-pm** (Enable for project management):
-- Cycle tracking, milestone planning
-- Backlog grooming, daily standups
+- Cycle tracking, milestone planning, initiative analysis
+- Backlog grooming, daily standups, status updates
 - GitHub-Linear sync
 
 **awl-analytics** (Enable when analyzing metrics):
@@ -224,10 +224,12 @@ Automatically creates a PR with comprehensive description from research and plan
 | Command | Purpose |
 |---------|---------|
 | `/awl-pm:analyze-cycle` | Cycle health report |
-| `/awl-pm:analyze-milestone` | Milestone progress |
+| `/awl-pm:analyze-milestone` | Milestone progress toward target date |
+| `/awl-pm:analyze-initiative` | Initiative portfolio health |
+| `/awl-pm:update-status` | Generate and post Linear status updates |
 | `/awl-pm:report-daily` | Daily standup summary |
-| `/awl-pm:groom-backlog` | Backlog analysis |
-| `/awl-pm:sync-prs` | GitHub-Linear sync |
+| `/awl-pm:groom-backlog` | Backlog analysis and cleanup |
+| `/awl-pm:sync-prs` | GitHub-Linear PR correlation |
 
 ### Research Agents
 
@@ -235,7 +237,13 @@ Automatically creates a PR with comprehensive description from research and plan
 |-------|---------|
 | `@awl-dev:codebase-locator` | Find files by topic |
 | `@awl-dev:codebase-analyzer` | Understand implementation |
-| `@awl-dev:codebase-pattern-finder` | Find code examples |
+| `@awl-dev:codebase-pattern-finder` | Find code examples and patterns |
+| `@awl-dev:linear-document-locator` | Find docs attached to a ticket |
+| `@awl-dev:linear-document-analyzer` | Extract insights from a Linear doc |
+| `@awl-dev:linear-research` | Research Linear tickets, cycles, projects |
+| `@awl-dev:github-research` | Research PRs, issues, workflows via `gh` |
+| `@awl-dev:history-reader` | Find context from completed work |
+| `@awl-dev:external-research` | Research external GitHub repos and libraries |
 
 **Example**:
 ```

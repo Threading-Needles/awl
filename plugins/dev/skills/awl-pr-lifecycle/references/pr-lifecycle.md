@@ -46,15 +46,15 @@ Creates git commits using conventional commit format with auto-detection.
 **Example:**
 
 ```bash
-# Working on branch: RCW-13-implement-pr-lifecycle
-# Changed files: commands/dev/commit.md, commands/linear/create_pr.md
+# Working on branch: PROJ-13-implement-pr-lifecycle
+# Changed files: plugins/dev/commands/commit.md, plugins/dev/commands/create_pr.md
 
 /awl-dev:commit
 
 # Detects:
 # - Type: feat (new functionality)
 # - Scope: commands (directory with changes)
-# - Ticket: RCW-13 (from branch name)
+# - Ticket: PROJ-13 (from branch name)
 
 # Suggests:
 # feat(commands): implement pr lifecycle commands
@@ -62,7 +62,7 @@ Creates git commits using conventional commit format with auto-detection.
 # Adds complete PR lifecycle automation with conventional commits,
 # auto-rebase, incremental descriptions, and Linear integration.
 #
-# Refs: RCW-13
+# Refs: PROJ-13
 ```
 
 **Conventional Commit Format:**
@@ -130,7 +130,7 @@ Orchestrates complete PR creation: commit → rebase → push → create → des
 **Example:**
 
 ```bash
-# Branch: RCW-13-implement-pr-lifecycle
+# Branch: PROJ-13-implement-pr-lifecycle
 
 /awl-dev:create_pr
 
@@ -141,19 +141,19 @@ Auto-rebasing onto origin/main... ✅
 Pushing branch...
 ✅
 Creating PR...
-Title: "RCW-13: Implement pr lifecycle"
+Title: "PROJ-13: Implement pr lifecycle"
 ✅ PR #2 created
 
 Generating comprehensive description...
 (calls /awl-dev:describe_pr internally)
 
-Updating Linear RCW-13:
+Updating Linear PROJ-13:
 - Status: In Progress → In Review
 - Assignee: ryan
 - Link added: PR #2
 
 ✅ Pull request created successfully!
-PR: #2 - RCW-13: Implement pr lifecycle
+PR: #2 - PROJ-13: Implement pr lifecycle
 URL: https://github.com/org/repo/pull/2
 ```
 
@@ -164,7 +164,7 @@ URL: https://github.com/org/repo/pull/2
 
 **Linear integration:**
 
-- Extracts ticket: `RCW-13` from branch `RCW-13-feature-name`
+- Extracts ticket: `PROJ-13` from branch `PROJ-13-feature-name`
 - Moves to "In Review" status
 - Assigns to current user
 - Adds PR as attachment
@@ -268,8 +268,7 @@ Safely merges PR after comprehensive checks, with Linear integration and cleanup
 2. Verifies PR is open and mergeable
 3. Checks if branch up-to-date with main
 4. Auto-rebases if behind (fails on conflicts)
-5. **Runs local tests** (configurable command)
-6. Checks CI/CD status
+5. Checks CI/CD status
 7. Checks approval status
 8. Shows merge summary
 9. **Squash merges** (always)
@@ -285,24 +284,20 @@ Safely merges PR after comprehensive checks, with Linear integration and cleanup
 ```bash
 /awl-dev:merge_pr
 
-Running tests: make test
-✅ All tests passed (15 passed, 0 failed)
-
 Checking CI status...
 ✅ All checks passed
 
 About to merge:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- PR:      #2 - RCW-13: Implement pr lifecycle
- From:    RCW-13-implement-pr-lifecycle
+ PR:      #2 - PROJ-13: Implement pr lifecycle
+ From:    PROJ-13-implement-pr-lifecycle
  To:      main
  Commits: 5
  Files:   8 changed
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  Reviews: APPROVED
  CI:      ✅ All checks passed
- Tests:   ✅ Passed locally
- Ticket:  RCW-13 (will move to Done)
+ Ticket:  PROJ-13 (will move to Done)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Merge strategy: Squash and merge
@@ -312,7 +307,7 @@ Proceed? [Y/n]: Y
 Merging...
 ✅ PR merged!
 ✅ Remote branch deleted
-✅ Linear ticket RCW-13 → Done
+✅ Linear ticket PROJ-13 → Done
 ✅ Local branch deleted
 ✅ Switched to main and pulled latest
 
@@ -325,7 +320,6 @@ Merging...
 
 - Always squash merge
 - Always delete branches
-- Always run tests (unless `--skip-tests`)
 - Always update Linear (unless `--no-update`)
 
 **Prompts only for:**
@@ -336,7 +330,6 @@ Merging...
 **Flags:**
 
 ```bash
-/awl-dev:merge_pr --skip-tests      # Skip local test execution
 /awl-dev:merge_pr --no-update       # Don't update Linear ticket
 /awl-dev:merge_pr --keep-branch     # Don't delete local branch
 ```
@@ -349,7 +342,7 @@ Merging...
 
 ```bash
 # 1. Create feature branch
-git checkout -b RCW-42-add-validation
+git checkout -b PROJ-42-add-validation
 
 # 2. Implement feature
 # ... make changes ...
@@ -364,7 +357,7 @@ git checkout -b RCW-42-add-validation
 # - Rebases onto main
 # - Creates PR
 # - Generates description
-# - Linear: RCW-42 → In Review (assigned to you)
+# - Linear: PROJ-42 → In Review (assigned to you)
 
 # 5. Code review feedback
 # Reviewer asks for changes
@@ -389,7 +382,7 @@ git checkout -b RCW-42-add-validation
 # - Checks CI ✅
 # - Squash merges
 # - Deletes branches
-# - Linear: RCW-42 → Done
+# - Linear: PROJ-42 → Done
 ```
 
 ---
@@ -458,7 +451,7 @@ None. PR commands are stateless:
 Always include ticket ID in branch name:
 
 ```bash
-git checkout -b RCW-123-feature-name
+git checkout -b PROJ-123-feature-name
 git checkout -b ENG-456-bug-fix
 ```
 
@@ -479,18 +472,6 @@ After pushing review changes, run `/awl-dev:describe_pr`:
 - Shows reviewers what changed
 - Updates verification status
 - Maintains description accuracy
-
-### Test Before Merge
-
-`/awl-dev:merge_pr` runs tests by default. Don't skip unless absolutely necessary:
-
-```bash
-# ✅ Good: tests run automatically
-/awl-dev:merge_pr
-
-# ⚠️ Use sparingly: skips safety checks
-/awl-dev:merge_pr --skip-tests
-```
 
 ### Monitor CI
 
@@ -520,23 +501,10 @@ Resolve manually:
   /awl-dev:create_pr  # or /awl-dev:merge_pr
 ```
 
-### Tests Failing
-
-```
-❌ Tests failed
-
-Fix tests or skip (not recommended):
-  # Fix tests
-  make test
-
-  # Or skip (use caution)
-  /awl-dev:merge_pr --skip-tests
-```
-
 ### Linear Ticket Not Found
 
 ```
-⚠️  Could not find Linear ticket RCW-999
+⚠️  Could not find Linear ticket PROJ-999
 
 - Check ticket exists in Linear
 - Verify ticket ID in branch name
@@ -583,10 +551,13 @@ What would you like to do?
 
 ## See Also
 
-- [commands/README.md](../commands/README.md) - All available commands
-- [LINEAR_DOCUMENTS.md](../plugins/dev/LINEAR_DOCUMENTS.md) - Linear documents conventions
-- [docs/USAGE.md](USAGE.md) - General workspace usage
-- [commands/dev/commit.md](../commands/dev/commit.md) - Commit command details
-- [commands/linear/create_pr.md](../commands/linear/create_pr.md) - Create PR command details
-- [commands/dev/describe_pr.md](../commands/dev/describe_pr.md) - Describe PR command details
-- [commands/linear/merge_pr.md](../commands/linear/merge_pr.md) - Merge PR command details
+- [`../SKILL.md`](../SKILL.md) — the `awl-pr-lifecycle` skill entry point
+- [`awl-linear-workflow` skill](../../awl-linear-workflow/) — Linear state machine and document
+  conventions that the PR commands rely on
+- [`awl-conventional-commits` skill](../../awl-conventional-commits/) — commit message format
+  used by `/awl-dev:commit`
+- [`../../../commands/commit.md`](../../../commands/commit.md) — commit command workflow
+- [`../../../commands/create_pr.md`](../../../commands/create_pr.md) — create-pr command
+- [`../../../commands/describe_pr.md`](../../../commands/describe_pr.md) — describe-pr command
+- [`../../../commands/babysit_pr.md`](../../../commands/babysit_pr.md) — babysit-pr command
+- [`../../../commands/merge_pr.md`](../../../commands/merge_pr.md) — merge-pr command

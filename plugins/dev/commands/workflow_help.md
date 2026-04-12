@@ -364,7 +364,9 @@ Type a command or ask another question!
 
 - Full workflow: `docs/AGENTIC_WORKFLOW_GUIDE.md`
 - Workflow discovery: `docs/WORKFLOW_DISCOVERY_SYSTEM.md`
-- Frontmatter: `docs/FRONTMATTER_STANDARD.md`
+- Frontmatter: `awl-frontmatter` skill (`plugins/meta/skills/awl-frontmatter/`)
+- Linear workflow: `awl-linear-workflow` skill (`plugins/dev/skills/awl-linear-workflow/`)
+- PR lifecycle: `awl-pr-lifecycle` skill (`plugins/dev/skills/awl-pr-lifecycle/`)
 - Main README: `README.md`
 
 ### Web Research (If Needed)

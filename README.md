@@ -52,8 +52,8 @@ and shared memory systems.
 
 **awl-dev** (Core - Always enabled)
 
-- 11 research agents (codebase + infrastructure)
-- 18 commands covering full dev lifecycle
+- 9 research agents (codebase, history, Linear, external)
+- 17 commands covering full dev lifecycle
 - Linear MCP bundled (OAuth, no API tokens needed)
 - Handoff system for context persistence
 - ~3.5k context (lightweight MCPs: DeepWiki, Context7)
@@ -61,10 +61,10 @@ and shared memory systems.
 **awl-pm** (Optional - Enable for project management)
 
 - Linear-focused project management workflows
-- 5 commands: analyze-cycle, analyze-milestone, report-daily, groom-backlog, sync-prs
+- 7 commands: analyze-cycle, analyze-milestone, analyze-initiative, update-status, report-daily, groom-backlog, sync-prs
 - Research-first architecture (Haiku for data, Sonnet for analysis)
-- 5 specialized agents: linear-research, cycle-analyzer, milestone-analyzer, backlog-analyzer, github-linear-analyzer
-- Cycle management and milestone tracking with target date feasibility
+- 6 specialized agents: linear-research, cycle-analyzer, milestone-analyzer, initiative-analyzer, backlog-analyzer, github-linear-analyzer
+- Cycle management, milestone tracking, initiative portfolio analysis
 - Actionable insights and recommendations (not just data dumps)
 
 **awl-analytics** (Optional - Enable when needed)
@@ -207,7 +207,7 @@ before running out of context, creating structured handoff documents that add to
   planning, handoff, worktree, implementation, verify, and PR workflows
 - [Context Engineering](docs/CONTEXT_ENGINEERING.md) - Token efficiency strategies and context
   management patterns
-- [PR Lifecycle](docs/PR_LIFECYCLE.md) - PR creation, review, and merge workflow
+- [PR Lifecycle skill](plugins/dev/skills/awl-pr-lifecycle/) - PR creation, review, and merge workflow (auto-loaded on feature branches)
 
 ## Core Philosophy
 

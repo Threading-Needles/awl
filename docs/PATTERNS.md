@@ -86,19 +86,21 @@ You are a specialist at [specific task]. Your job is to [clear responsibility].
 - Should convey when to use this agent
 - Example: "Locates files and directories relevant to a feature or task"
 
-**tools** (required)
+**tools** (recommended)
 
 - Comma-separated list of allowed tools
-- Common values: `Grep, Glob, Read, Bash(ls only)`
+- Common values: `Grep, Glob, Read, Bash(ls *)`
 - Restricts what agent can do (important for safety)
 - Read-only tools for research agents
+- Omit to grant all tools
 
 **model** (optional)
 
-- `inherit` - Use same model as main conversation (recommended)
-- `fast` - Use faster, cheaper model
-- `extended` - Use extended context model
-- Default: `inherit`
+- `inherit` - Use same model as main conversation (default)
+- `haiku` - Force Haiku 4.5 (fast, cheap — for pure lookup/data agents)
+- `sonnet` - Force Sonnet 4.6 (balanced — for structured analysis agents)
+- `opus` - Force Opus 4.6 (deep reasoning — rarely hardcoded; prefer `inherit`)
+- See the `awl-frontmatter` skill (`plugins/meta/skills/awl-frontmatter/`) for the full model-tier rationale
 
 ---
 
@@ -116,14 +118,16 @@ A command is a workflow that can be invoked with `/command_name`. Commands:
 
 ### Command File Structure
 
-Commands use the same frontmatter structure but focus on orchestration:
+Commands are identified by their filename — they do NOT have a `name` field. Frontmatter focuses
+on what the command does and which tools it needs:
 
 ```markdown
 ---
-name: command_name
 description: What this command does
-tools: all
+category: workflow
+tools: Read, Write, Grep, Glob, Bash, Task, TodoWrite
 model: inherit
+version: 1.0.0
 ---
 
 # Command Name

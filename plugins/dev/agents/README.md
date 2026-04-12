@@ -60,7 +60,7 @@ Task( subagent_type="awl-dev:codebase-locator", prompt="Find all authentication-
 - Identifying integration points
 - Tracing function calls
 
-**Tools**: Read, Grep, Glob, Bash(ls \*)
+**Tools**: Read, Grep, Glob, Bash(ls \*), mcp\_\_deepwiki\_\_ask\_question, mcp\_\_context7\_\_get\_library\_docs, mcp\_\_context7\_\_resolve\_library\_id
 
 **Example invocation:**
 
@@ -84,7 +84,7 @@ implementation and document how it works" )
 - Locating test examples
 - Understanding conventions
 
-**Tools**: Grep, Glob, Read, Bash(ls \*)
+**Tools**: Grep, Glob, Read, Bash(ls \*), mcp\_\_deepwiki\_\_ask\_question, mcp\_\_deepwiki\_\_read\_wiki\_structure, mcp\_\_context7\_\_get\_library\_docs, mcp\_\_context7\_\_resolve\_library\_id
 
 **Example invocation:**
 
@@ -107,7 +107,7 @@ error logging" )
 - Checking what context already exists
 - Listing document IDs for the analyzer agent
 
-**Tools**: mcp__linear__get_issue, mcp__linear__list_documents, mcp__linear__get_document
+**Tools**: mcp__linear__get_issue, mcp__linear__list_documents
 
 **Example invocation:**
 
@@ -129,7 +129,7 @@ Task( subagent_type="awl-dev:linear-document-locator", prompt="Find documents fo
 - Understanding plan details
 - Reading handoff context
 
-**Tools**: mcp__linear__get_document, mcp__linear__get_issue
+**Tools**: mcp__linear__get_document
 
 **Example invocation:**
 
@@ -151,7 +151,7 @@ Task( subagent_type="awl-dev:linear-document-analyzer", prompt="Analyze document
 - Finding architectural decisions from previous work
 - Surfacing lessons learned from past implementations
 
-**Tools**: mcp__linear__list_issues, mcp__linear__get_issue, mcp__linear__list_documents, mcp__linear__get_document
+**Tools**: mcp__linear__get_issue, mcp__linear__list_issues, mcp__linear__get_document, mcp__linear__list_documents, mcp__linear__research
 
 **Example invocation:**
 
@@ -160,6 +160,52 @@ Task( subagent_type="awl-dev:history-reader", prompt="How was authentication imp
 ```
 
 **Returns**: Structured historical context with related tickets, decisions, patterns, and lessons
+
+---
+
+### Linear and GitHub Research Agents
+
+#### linear-research
+
+**Purpose**: Research Linear tickets, cycles, projects, and milestones
+
+**Use when**: You need data from Linear
+
+- Finding tickets by status, label, cycle, or team
+- Looking up project and milestone details
+- Gathering ticket context for planning or analysis
+
+**Tools**: Linear MCP tools (`mcp__linear__list_issues`, `mcp__linear__get_issue`, etc.), Read, Grep
+
+**Example invocation:**
+
+```markdown
+Task( subagent_type="awl-dev:linear-research", prompt="List all In Progress tickets in team ENG with the backend label" )
+```
+
+**Returns**: Structured Linear data (tickets, cycles, projects) — pure data gathering, no synthesis
+
+---
+
+#### github-research
+
+**Purpose**: Research GitHub PRs, issues, and workflows via the `gh` CLI
+
+**Use when**: You need GitHub-specific metadata that git alone can't provide
+
+- Looking up PR status, CI checks, reviews, comments
+- Finding issues by label, author, or date
+- Gathering workflow run history
+
+**Tools**: `Bash(gh *)`, Read, Grep
+
+**Example invocation:**
+
+```markdown
+Task( subagent_type="awl-dev:github-research", prompt="List all open PRs assigned to me with failing CI checks" )
+```
+
+**Returns**: Structured GitHub data from `gh` CLI — pure data gathering, no synthesis
 
 ---
 
@@ -176,7 +222,7 @@ Task( subagent_type="awl-dev:history-reader", prompt="How was authentication imp
 - Researching best practices from open-source
 - Discovering external documentation
 
-**Tools**: mcp**deepwiki**ask_question, mcp**deepwiki**read_wiki_structure
+**Tools**: `mcp__deepwiki__ask_question`, `mcp__deepwiki__read_wiki_structure`, `mcp__context7__get_library_docs`, `mcp__context7__resolve_library_id`, `mcp__exa__search`, `mcp__exa__search_code`
 
 **Example invocation:**
 
@@ -210,12 +256,24 @@ Instructions for the agent...
 - ONLY describe what exists...
 ```
 
-### Required Frontmatter Fields
+### Frontmatter Fields
 
-- `name` - Agent identifier (matches filename without .md)
-- `description` - One-line description for invoking commands
-- `tools` - Tools available to the agent
-- `model` - AI model to use (usually "inherit")
+**Required** (Claude Code needs these to load the agent):
+
+- `name` - Agent identifier (must match filename without `.md`)
+- `description` - Tells Claude Code when to invoke this agent
+
+**Recommended** (improves safety and cost):
+
+- `tools` - Comma-separated tool list; omit to grant all tools
+- `model` - `inherit` (default), `haiku`, `sonnet`, or `opus`
+
+**Optional metadata**:
+
+- `version`, `category`, `color`
+
+See the [`awl-frontmatter` skill](../../meta/skills/awl-frontmatter/) for the full rules and
+model-tier guidance (Claude auto-loads it when editing agent or command files).
 
 ### Naming Convention
 
@@ -445,8 +503,10 @@ Agents specify required tools in frontmatter:
 
 ## See Also
 
-- `../commands/README.md` - Documentation for commands in this plugin
-- `../../docs/AGENTIC_WORKFLOW_GUIDE.md` - Agent patterns and best practices
-- `../../docs/FRONTMATTER_STANDARD.md` - Frontmatter validation rules
-- `../../README.md` - Workspace overview
-- `../../scripts/README.md` - Setup scripts documentation
+- [`../commands/README.md`](../commands/README.md) — documentation for commands in this plugin
+- [`../../../docs/AGENTIC_WORKFLOW_GUIDE.md`](../../../docs/AGENTIC_WORKFLOW_GUIDE.md) — agent
+  patterns and best practices
+- [`awl-frontmatter` skill](../../meta/skills/awl-frontmatter/) — frontmatter validation rules
+- [`awl-linear-workflow` skill](../skills/awl-linear-workflow/) — Linear state machine and
+  document conventions the research agents apply
+- [`../README.md`](../README.md) — plugin overview

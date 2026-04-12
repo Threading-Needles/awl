@@ -73,17 +73,23 @@ See [commands/README.md](commands/README.md) for full command documentation.
 
 ## Agents
 
-Research agents for parallel codebase exploration:
+Research agents for parallel codebase and infrastructure exploration:
 
-| Agent | Purpose |
-|-------|---------|
-| `@awl-dev:codebase-locator` | Find files by topic |
-| `@awl-dev:codebase-analyzer` | Understand implementation |
-| `@awl-dev:codebase-pattern-finder` | Find code patterns |
-| `@awl-dev:linear-document-locator` | Find workflow documents |
-| `@awl-dev:linear-document-analyzer` | Analyze Linear documents |
-| `@awl-dev:history-reader` | Find context from completed work |
-| `@awl-dev:external-research` | Research external sources |
+| Agent | Purpose | Model |
+|-------|---------|-------|
+| `@awl-dev:codebase-locator` | Find files by topic | haiku |
+| `@awl-dev:codebase-analyzer` | Understand implementation | inherit |
+| `@awl-dev:codebase-pattern-finder` | Find code patterns | inherit |
+| `@awl-dev:linear-document-locator` | Find workflow documents attached to tickets | haiku |
+| `@awl-dev:linear-document-analyzer` | Extract insights from Linear documents | inherit |
+| `@awl-dev:linear-research` | Research Linear tickets, cycles, projects | haiku |
+| `@awl-dev:github-research` | Research PRs, issues, workflows via `gh` | haiku |
+| `@awl-dev:history-reader` | Find context from completed work | inherit |
+| `@awl-dev:external-research` | Research external GitHub repos and libraries | inherit |
+
+Agents marked `inherit` follow the session's model (start Claude Code with
+`claude --model claude-opus-4-6[1m]` for deep reasoning). Agents pinned to `haiku` do pure lookup
+and data gathering — fast and cheap regardless of session model.
 
 ## Related Plugins
 

@@ -142,6 +142,8 @@ Recommended Linear workflow configuration:
 
 ## Related Documentation
 
-- [LINEAR_DOCUMENTS.md](./LINEAR_DOCUMENTS.md) - Document storage conventions
-- [CLAUDE.md](../../../CLAUDE.md) - Main project configuration
-- [USAGE.md](../../../docs/USAGE.md) - Workflow usage guide
+- [`linear-documents.md`](linear-documents.md) — sibling reference: document storage conventions,
+  embedded questions, icons and colors
+- [`../SKILL.md`](../SKILL.md) — the `awl-linear-workflow` skill entry point
+- [`CLAUDE.md`](../../../../../CLAUDE.md) — main project configuration
+- [`docs/USAGE.md`](../../../../../docs/USAGE.md) — workflow usage guide
