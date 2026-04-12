@@ -60,7 +60,7 @@ Task( subagent_type="awl-dev:codebase-locator", prompt="Find all authentication-
 - Identifying integration points
 - Tracing function calls
 
-**Tools**: Read, Grep, Glob, Bash(ls \*)
+**Tools**: Read, Grep, Glob, Bash(ls \*), mcp\_\_deepwiki\_\_ask\_question, mcp\_\_context7\_\_get\_library\_docs, mcp\_\_context7\_\_resolve\_library\_id
 
 **Example invocation:**
 
@@ -84,7 +84,7 @@ implementation and document how it works" )
 - Locating test examples
 - Understanding conventions
 
-**Tools**: Grep, Glob, Read, Bash(ls \*)
+**Tools**: Grep, Glob, Read, Bash(ls \*), mcp\_\_deepwiki\_\_ask\_question, mcp\_\_deepwiki\_\_read\_wiki\_structure, mcp\_\_context7\_\_get\_library\_docs, mcp\_\_context7\_\_resolve\_library\_id
 
 **Example invocation:**
 
@@ -107,7 +107,7 @@ error logging" )
 - Checking what context already exists
 - Listing document IDs for the analyzer agent
 
-**Tools**: mcp__linear__get_issue, mcp__linear__list_documents, mcp__linear__get_document
+**Tools**: mcp__linear__get_issue, mcp__linear__list_documents
 
 **Example invocation:**
 
@@ -129,7 +129,7 @@ Task( subagent_type="awl-dev:linear-document-locator", prompt="Find documents fo
 - Understanding plan details
 - Reading handoff context
 
-**Tools**: mcp__linear__get_document, mcp__linear__get_issue
+**Tools**: mcp__linear__get_document
 
 **Example invocation:**
 
@@ -151,7 +151,7 @@ Task( subagent_type="awl-dev:linear-document-analyzer", prompt="Analyze document
 - Finding architectural decisions from previous work
 - Surfacing lessons learned from past implementations
 
-**Tools**: mcp__linear__list_issues, mcp__linear__get_issue, mcp__linear__list_documents, mcp__linear__get_document
+**Tools**: mcp__linear__get_issue, mcp__linear__list_issues, mcp__linear__get_document, mcp__linear__list_documents, mcp__linear__research
 
 **Example invocation:**
 
@@ -222,7 +222,7 @@ Task( subagent_type="awl-dev:github-research", prompt="List all open PRs assigne
 - Researching best practices from open-source
 - Discovering external documentation
 
-**Tools**: `mcp__deepwiki__ask_question`, `mcp__deepwiki__read_wiki_structure`, `mcp__context7__get_library_docs`, `mcp__exa__search`
+**Tools**: `mcp__deepwiki__ask_question`, `mcp__deepwiki__read_wiki_structure`, `mcp__context7__get_library_docs`, `mcp__context7__resolve_library_id`, `mcp__exa__search`, `mcp__exa__search_code`
 
 **Example invocation:**
 
@@ -509,4 +509,4 @@ Agents specify required tools in frontmatter:
 - [`awl-frontmatter` skill](../../meta/skills/awl-frontmatter/) — frontmatter validation rules
 - [`awl-linear-workflow` skill](../skills/awl-linear-workflow/) — Linear state machine and
   document conventions the research agents apply
-- [`../../../README.md`](../../../README.md) — workspace overview
+- [`../README.md`](../README.md) — plugin overview

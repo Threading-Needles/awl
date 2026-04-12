@@ -390,5 +390,3 @@ MIT License - see LICENSE file in main repository
 ## Support
 
 - GitHub Issues: https://github.com/Threading-Needles/awl/issues
-- Documentation: https://awl.dev/docs
-- Community: https://awl.dev/community

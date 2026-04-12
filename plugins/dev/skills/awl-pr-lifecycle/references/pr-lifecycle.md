@@ -47,7 +47,7 @@ Creates git commits using conventional commit format with auto-detection.
 
 ```bash
 # Working on branch: PROJ-13-implement-pr-lifecycle
-# Changed files: commands/dev/commit.md, commands/linear/create_pr.md
+# Changed files: plugins/dev/commands/commit.md, plugins/dev/commands/create_pr.md
 
 /awl-dev:commit
 
@@ -268,8 +268,7 @@ Safely merges PR after comprehensive checks, with Linear integration and cleanup
 2. Verifies PR is open and mergeable
 3. Checks if branch up-to-date with main
 4. Auto-rebases if behind (fails on conflicts)
-5. **Runs local tests** (configurable command)
-6. Checks CI/CD status
+5. Checks CI/CD status
 7. Checks approval status
 8. Shows merge summary
 9. **Squash merges** (always)
@@ -285,9 +284,6 @@ Safely merges PR after comprehensive checks, with Linear integration and cleanup
 ```bash
 /awl-dev:merge_pr
 
-Running tests: make test
-✅ All tests passed (15 passed, 0 failed)
-
 Checking CI status...
 ✅ All checks passed
 
@@ -301,7 +297,6 @@ About to merge:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  Reviews: APPROVED
  CI:      ✅ All checks passed
- Tests:   ✅ Passed locally
  Ticket:  PROJ-13 (will move to Done)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -325,7 +320,6 @@ Merging...
 
 - Always squash merge
 - Always delete branches
-- Always run tests (unless `--skip-tests`)
 - Always update Linear (unless `--no-update`)
 
 **Prompts only for:**
@@ -336,7 +330,6 @@ Merging...
 **Flags:**
 
 ```bash
-/awl-dev:merge_pr --skip-tests      # Skip local test execution
 /awl-dev:merge_pr --no-update       # Don't update Linear ticket
 /awl-dev:merge_pr --keep-branch     # Don't delete local branch
 ```
@@ -480,18 +473,6 @@ After pushing review changes, run `/awl-dev:describe_pr`:
 - Updates verification status
 - Maintains description accuracy
 
-### Test Before Merge
-
-`/awl-dev:merge_pr` runs tests by default. Don't skip unless absolutely necessary:
-
-```bash
-# ✅ Good: tests run automatically
-/awl-dev:merge_pr
-
-# ⚠️ Use sparingly: skips safety checks
-/awl-dev:merge_pr --skip-tests
-```
-
 ### Monitor CI
 
 Check CI status before merging:
@@ -518,19 +499,6 @@ Resolve manually:
   git rebase --continue
   git push --force-with-lease
   /awl-dev:create_pr  # or /awl-dev:merge_pr
-```
-
-### Tests Failing
-
-```
-❌ Tests failed
-
-Fix tests or skip (not recommended):
-  # Fix tests
-  make test
-
-  # Or skip (use caution)
-  /awl-dev:merge_pr --skip-tests
 ```
 
 ### Linear Ticket Not Found

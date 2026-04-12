@@ -27,65 +27,29 @@ The workspace uses a plugin-based architecture where agents and commands are org
    - Symlinks to local plugin directories
    - Claude Code reads plugins from here
 
-### Linear Documents System
+### Stateless Commands with Linear Documents
 
-Workflow documents (research, plans, handoffs, PR descriptions) are stored as **Linear documents**
-attached to tickets:
-
-- **Research**: Created by `/awl-dev:research-codebase`, titled "Research: ..."
-- **Plans**: Created by `/awl-dev:create-plan`, titled "Plan: ..."
-- **Handoffs**: Created by `/awl-dev:create-handoff`, titled "Handoff: ..."
-- **PR Descriptions**: Created by `/awl-dev:describe-pr`, titled "PR: ..."
-
-Documents are discovered by querying Linear via `mcp__linear__get_issue` with the ticket ID.
-
-### Stateless Commands
-
-Awl commands are **stateless**. Every workflow command takes the Linear ticket ID as a required positional argument:
+Awl commands are **stateless**. Every workflow command takes the Linear ticket ID as a required positional argument. There is **no hidden state** — no config files, no "current ticket" tracking.
 
 ```bash
 /awl-dev:research-codebase PROJ-123
 /awl-dev:create-plan PROJ-123
 /awl-dev:implement-plan PROJ-123
-/awl-dev:create-handoff PROJ-123
-/awl-dev:resume-handoff PROJ-123
 ```
 
-There is **no hidden state** between command runs — no `workflow-context.json`, no `.claude/config.json`, no "current ticket" file. Each command is fully self-contained.
+PR commands extract the ticket from the branch name (pattern `[A-Z]+-[0-9]+`). PM commands take the team key as `$1` (e.g., `/awl-pm:analyze-cycle ENG`).
 
-PR commands extract the ticket from the branch name (pattern `[A-Z]+-[0-9]+`) and from PR title/body. PM commands take the team key as their first argument (e.g., `/awl-pm:analyze-cycle ENG`).
-
-### Linear Documents Architecture
-
-Awl uses Linear documents attached to tickets for persistent workflow context:
+Workflow documents (research, plans, handoffs, PR descriptions) are stored as **Linear documents** attached to tickets and queried via `mcp__linear__get_issue`:
 
 ```
-┌─────────────────────────────────────┐
-│  Linear Ticket: PROJ-123            │
-│  ├─ Research: OAuth Implementation  │ ← From /awl-dev:research-codebase
-│  ├─ Plan: OAuth Implementation      │ ← From /awl-dev:create-plan
-│  ├─ Handoff: Session 2025-01-08     │ ← From /awl-dev:create-handoff
-│  └─ PR: #456 - Add OAuth Support    │ ← From /awl-dev:describe-pr
-└─────────────────────────────────────┘
-          │
-          └──→ Queried via: mcp__linear__get_issue(id: PROJ-123)
+Linear Ticket: PROJ-123
+  ├─ Research: OAuth Implementation   ← /awl-dev:research-codebase
+  ├─ Plan: OAuth Implementation       ← /awl-dev:create-plan
+  ├─ Handoff: Session 2025-01-08      ← /awl-dev:create-handoff
+  └─ PR: #456 - Add OAuth Support     ← /awl-dev:describe-pr
 ```
 
-**Benefits:**
-
-- All workflow documents attached to the relevant ticket
-- Easy to find: query by ticket ID
-- Team collaboration: everyone sees same documents
-- No file path management
-- Documents survive across sessions and worktrees
-
-**Example Flow:**
-
-1. `/awl-dev:research-codebase PROJ-123` creates "Research: ..." document
-2. `/awl-dev:create-plan PROJ-123` queries PROJ-123 for research, creates "Plan: ..."
-3. `/awl-dev:implement-plan PROJ-123` queries PROJ-123 for plan, implements phases
-4. `/awl-dev:describe-pr` creates "PR: ..." document (ticket extracted from branch)
-5. `/awl-dev:create-handoff PROJ-123` creates "Handoff: ..." document if pausing work
+PM reports (cycles, milestones, daily) are saved to git in `reports/` since they're not tied to single tickets. See `plugins/dev/LINEAR_DOCUMENTS.md` for the full guide.
 
 ### Agent Philosophy
 
@@ -125,7 +89,7 @@ This workspace has no build process - it's markdown files and bash scripts.
 
 **Testing changes:**
 
-1. Edit source files in `agents/` or `commands/`
+1. Edit source files in `plugins/dev/agents/`, `plugins/dev/commands/`, etc.
 2. Changes are immediately available (same repo)
 3. Restart Claude Code to reload
 4. Test by invoking the agent/command
@@ -167,38 +131,12 @@ This means:
 
 ### Linear Integration (REQUIRED)
 
-Awl **requires** Linear for workflow document storage. This provides:
-
-- 📁 **Persistent context**: Research, plans, handoffs stored as Linear documents
-- 🔄 **Team collaboration**: Documents attached to tickets are visible to all
-- 🎫 **Ticket-centric**: All workflow artifacts tied to the work they support
-
-**Prerequisites:**
-
-1. Install `awl-dev` plugin (bundles the Linear MCP server automatically)
-
-**Validation:**
-
 The Linear MCP server (`https://mcp.linear.app/mcp`) is bundled in the `awl-dev` plugin's
 `.mcp.json` and connects automatically when the plugin is enabled. On first use, Claude Code
-opens a browser for OAuth consent. No API tokens needed - authentication is automatic.
+opens a browser for OAuth consent. No API tokens needed.
 
-**Why Required?**
-
-Awl requires Linear because:
-1. Workflow commands chain together via ticket documents (research → plan → implement)
-2. Each command queries Linear by the ticket ID passed as argument
-3. Team members see the same documents
-4. Documents survive across sessions and worktrees
-
-**PM Reports:**
-
-Unlike workflow documents, PM reports (cycles, milestones, daily) are saved to git in `reports/`
-directory since they're not tied to single tickets.
-
-See the `awl-linear-workflow` skill
-(`plugins/dev/skills/awl-linear-workflow/`) for the state machine, document conventions, and
-embedded questions format. Claude auto-loads this skill whenever a Linear ticket is in scope.
+See the `awl-linear-workflow` skill (`plugins/dev/skills/awl-linear-workflow/`) for the state
+machine, document conventions, and embedded questions format.
 
 ## Directory Structure
 
@@ -610,25 +548,6 @@ TICKET_ID="$1"
 # Test a command
 /awl-dev:research-codebase
 ```
-
-## Deployment and Distribution
-
-**Users install Awl via Claude Code marketplace:**
-
-```bash
-/plugin marketplace add Threading-Needles/awl
-/plugin install awl-dev
-```
-
-**Setting up Linear in a new project:**
-
-1. Install `awl-dev` plugin (bundles Linear MCP server)
-2. Run any workflow command with a ticket ID — Linear OAuth happens in your browser on first use
-
-There is no config file. The ticket ID encodes everything Awl needs (team is derivable from the prefix).
-
-**Sharing with team:** Team members see documents in Linear. Each team member installs the Awl
-plugin independently. OAuth authentication happens automatically on first use.
 
 ## Key Principles When Editing
 
